@@ -1,6 +1,6 @@
 //LimelightHelpers v1.9 (REQUIRES 2024.9.1)
 
-package frc.BotchedCode.Utils;
+package frc.BotchoCheese.Utils;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
