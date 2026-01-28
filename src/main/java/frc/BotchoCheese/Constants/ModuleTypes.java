@@ -1,4 +1,4 @@
-package frc.BotchedCode.Constants;
+package frc.BotchoCheese.Constants;
 
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
