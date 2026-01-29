@@ -40,6 +40,11 @@ public class RobotMap {
     public static final int LEFT_CLIMBER_TWO_MOTOR_ID = 12;
     public static final int RIGHT_CLIMBER_TWO_MOTOR_ID = 13;
 
+    // Climber PID Values
+    public static final double CLIMBER_P_VALUE = 0.3;
+    public static final double CLIMBER_I_VALUE = 0.25;
+    public static final double CLIMBER_D_VALUE = 0.4;
+
     // Climber speeds
     // TODO: Check whether new motors (l2Climber and r2Climber) speeds are required in some way
     public static final double TEST_MOTOR_LEFT_UP_SPEED = 0.2;
@@ -59,6 +64,11 @@ public class RobotMap {
     public static final int TOP_INTAKE_MOTOR_ID = 20;
     public static final int BOTTOM_INTAKE_MOTOR_ID = 21;
     public static final int INSIDE_INTAKE_MOTOR_ID = 22;
+
+    // Intake PID Values
+    public static final double INTAKE_P_VALUE = 0.4;
+    public static final double INTAKE_I_VALUE = 0.3;
+    public static final double INTAKE_D_VALUE = 0.1;
 
     // Intake speeds
     // Verify if values are correct and go in the right directions
@@ -81,7 +91,12 @@ public class RobotMap {
     public static final double TEST_MOTOR_SHOOTER_TOP_IN_SPEED = -0.2;
     public static final double TEST_MOTOR_SHOOTER_BOTTOM_OUT_SPEED = 0.2;
     public static final double TEST_MOTOR_SHOOTER_BOTTOM_IN_SPEED = -0.2;
-    
+
+    // Shooter PID Valuess
+    public static final double SHOOTER_P_VALUE = 0.5;
+    public static final double SHOOTER_I_VALUE = 0.15;
+    public static final double SHOOTER_D_VALUE = 0.2;
+
     // Indexer ID
     public static final int INDEXER_MOTOR_ID = 40;
 

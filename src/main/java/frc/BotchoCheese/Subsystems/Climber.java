@@ -1,5 +1,6 @@
 package frc.BotchoCheese.Subsystems;
 
+import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -31,6 +32,12 @@ public class Climber extends SubsystemBase {
 
         // Apply basic configuration
         TalonFXConfiguration config = new TalonFXConfiguration();
+
+        Slot0Configs slot0Configs = new Slot0Configs();
+        slot0Configs.kP = RobotMap.CLIMBER_P_VALUE;
+        slot0Configs.kI = RobotMap.CLIMBER_I_VALUE;
+        slot0Configs.kD = RobotMap.CLIMBER_D_VALUE;
+        config.Slot0 = slot0Configs;
         
         /* Set motors to Brake mode so the climber doesn't slide down */
         config.MotorOutput.NeutralMode = NeutralModeValue.Brake;

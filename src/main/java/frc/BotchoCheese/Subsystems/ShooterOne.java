@@ -2,14 +2,16 @@ package frc.BotchoCheese.Subsystems;
 
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
+import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.BotchoCheese.Robot;
-import frc.BotchoCheese.Utils.LimelightHelpers;
+//import frc.BotchoCheese.Robot;
+//import frc.BotchoCheese.Utils.LimelightHelpers;
 import frc.BotchoCheese.Constants.RobotMap; // Assuming your IDs are here
 
 public class ShooterOne extends SubsystemBase {
@@ -29,13 +31,31 @@ public class ShooterOne extends SubsystemBase {
 
         // Apply basic configuration
         TalonFXConfiguration config = new TalonFXConfiguration();
+
+        // PID Values
+        // in init function, set slot 0 gains
+        Slot0Configs slot0Configs = new Slot0Configs();
+        slot0Configs.kP = RobotMap.SHOOTER_P_VALUE;
+        slot0Configs.kI = RobotMap.SHOOTER_I_VALUE;
+        slot0Configs.kD = RobotMap.SHOOTER_D_VALUE;
+        config.Slot0 = slot0Configs;
+        //https://v6.docs.ctr-electronics.com/en/stable/docs/api-reference/device-specific/talonfx/basic-pid-control.html
+        
+        // Verify
+        CurrentLimitsConfigs currentLimits = new CurrentLimitsConfigs();
+        currentLimits.StatorCurrentLimit = 40.0; // Minions generally stay in the 30-50A range
+        currentLimits.StatorCurrentLimitEnable = true;
+        currentLimits.SupplyCurrentLimit = 30.0; 
+        currentLimits.SupplyCurrentLimitEnable = true;
+
+        config.CurrentLimits = currentLimits;
         
         /* Set motors to Brake mode so the climber doesn't slide down */
         config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
         topShooter.getConfigurator().apply(config);
         bottomShooter.getConfigurator().apply(config);
-        // TODO: Implement PID Map/Values
+
     }
 
     /**
