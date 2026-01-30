@@ -12,9 +12,9 @@ Once you have VS Code set up, you need to clone your repository to make sure it 
 
 ## Updating the Repository  
 
-Once you have the local repo folder, you will open it in VSCode. Once you open it, the VSCode will prompt you with this image: ![image](./docs/dependencies_imgs/choice.png)
+Once you have the local repo folder, you will open it in VSCode. Once you open it, the VSCode will prompt you with this image: ![image](./dependencies_imgs/choice.png)
 
-Click yes, and it will lead you to this page: ![image](./docs/dependencies_imgs/import_image.png)
+Click yes, and it will lead you to this page: ![image](./dependencies_imgs/import_image.png)
 
 Here, just follow along with this checklist as shown. It will create a duplicate of the repository. 
 
@@ -38,11 +38,11 @@ Once you have done this, you can finally work with updating dependencies.
 
 With the repo finally set up, your build command will likely not work. This is because the outdated dependency files are still here. Fortunately, WPILib has some functionality to support doing this automatically (which is much better than going through these one by one).
 
-You can click on this button to open up the command palette for WPILib commands: ![image](./docs/dependencies_imgs/wpilib_command.png)
+You can click on this button to open up the command palette for WPILib commands: ![image](./dependencies_imgs/wpilib_command.png)
 
-Once you click on this, type in for this command: ![image](./docs/dependencies_imgs/wpilib_command.png)
+Once you click on this, type in for this command: ![image](./dependencies_imgs/wpilib_command.png)
 
-Then, you will get an option for your dependencies on the left hand side. You want to click on the current year dependencies (for this project, 2026), and then select "update all" in this sidebar: ![image](./docs/dependencies_imgs/update_dependencies.png)
+Then, you will get an option for your dependencies on the left hand side. You want to click on the current year dependencies (for this project, 2026), and then select "update all" in this sidebar: ![image](./dependencies_imgs/update_dependencies.png)
 
 Once you do this, your code should be ready to build! 
 
