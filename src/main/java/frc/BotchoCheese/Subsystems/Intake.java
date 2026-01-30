@@ -43,10 +43,10 @@ public class Intake extends SubsystemBase {
         CurrentLimitsConfigs currentLimits = new CurrentLimitsConfigs();
         currentLimits.StatorCurrentLimit = 40.0; // Minions generally stay in the 30-50A range
         currentLimits.StatorCurrentLimitEnable = true;
-        currentLimits.SupplyCurrentLimit = 30.0; 
+        currentLimits.SupplyCurrentLimit = 30.0;
         currentLimits.SupplyCurrentLimitEnable = true;
         
-        /* Set motors to Brake mode so the climber doesn't slide down */
+        // Set motors to Brake mode so the climber doesn't slide down 
         config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
         topIntake.getConfigurator().apply(config);
@@ -56,9 +56,7 @@ public class Intake extends SubsystemBase {
 
     // Verify if values are correct and go in the right directions
 
-    /**
-     * Pulls the game objects in the Intake.
-     */
+    // Pulls the game objects in the Intake.
     public Command intakeIn() {
         return this.run(() -> {
             topIntake.setControl(m_output.withOutput(RobotMap.TEST_TOP_MOTOR_IN_SPEED));
@@ -69,9 +67,7 @@ public class Intake extends SubsystemBase {
         }).finallyDo(() -> stopMotors());
     }
 
-    /**
-     * Ejects the game objects from Intake.
-     */
+    // Ejects the game objects from Intake.
     public Command intakeOut() {
         return this.run(() -> {
             topIntake.setControl(m_output.withOutput(RobotMap.TEST_TOP_MOTOR_OUT_SPEED));
@@ -81,7 +77,7 @@ public class Intake extends SubsystemBase {
             goingOut = true;
         }).finallyDo(() -> stopMotors());
     }
-    // In: intakeMotor speed = +, Out: intakeMotor speed = -
+    
     public void stopMotors() {
         topIntake.stopMotor();
         bottomIntake.stopMotor();

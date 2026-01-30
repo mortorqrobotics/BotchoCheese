@@ -14,10 +14,10 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 //import frc.BotchoCheese.Utils.LimelightHelpers;
 import frc.BotchoCheese.Constants.RobotMap; // Assuming your IDs are here
 
-public class ShooterOne extends SubsystemBase {
+public class ShooterTwo extends SubsystemBase {
     // Motor controllers
-    private final TalonFX topShooter;
-    private final TalonFX bottomShooter;
+    private final TalonFX topTwoShooter;
+    private final TalonFX bottomTwoShooter;
 
     // Control requests (Phoenix 6 uses request objects instead of passing doubles directly)
     private final DutyCycleOut m_output = new DutyCycleOut(0);
@@ -25,9 +25,9 @@ public class ShooterOne extends SubsystemBase {
     private boolean goingLeft = false;
     private boolean goingRight = false;
     
-    public ShooterOne() {
-        topShooter = new TalonFX(RobotMap.TOP_SHOOTER_TWO_MOTOR_ID);
-        bottomShooter = new TalonFX(RobotMap.BOTTOM_SHOOTER_TWO_MOTOR_ID);
+    public ShooterTwo() {
+        topTwoShooter = new TalonFX(RobotMap.TOP_SHOOTER_TWO_MOTOR_ID);
+        bottomTwoShooter = new TalonFX(RobotMap.BOTTOM_SHOOTER_TWO_MOTOR_ID);
 
         // Apply basic configuration
         TalonFXConfiguration config = new TalonFXConfiguration();
@@ -53,26 +53,25 @@ public class ShooterOne extends SubsystemBase {
         /* Set motors to Brake mode so the climber doesn't slide down */
         config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
-        topShooter.getConfigurator().apply(config);
-        bottomShooter.getConfigurator().apply(config);
-
+        topTwoShooter.getConfigurator().apply(config);
+        bottomTwoShooter.getConfigurator().apply(config);
     }
 
     /**
      * Moves the top Shooter counter Clockwise.
      */
-    public Command topShooterTurnLeft() {
+    public Command topTwoShooterTurnLeft() {
         return this.run(() -> {
-            topShooter.setControl(m_output.withOutput(RobotMap.TEST_MOTOR_SHOOTER_TOP_OUT_SPEED));
+            topTwoShooter.setControl(m_output.withOutput(RobotMap.TEST_MOTOR_SHOOTER_TOP_OUT_SPEED));
             goingLeft = true;
             goingRight = false;
         }).finallyDo(() -> stopMotors());
     }
     // Shooter in if needed
 
-    // public Command topShooterTurnRight() {
+    // public Command topTwoShooterTurnRight() {
     //     return this.run(() -> {
-    //         topShooter.setControl(m_output.withOutput(RobotMap.TEST_MOTOR_SHOOTER_TOP_IN_SPEED));
+    //         topTwoShooter.setControl(m_output.withOutput(RobotMap.TEST_MOTOR_SHOOTER_TOP_IN_SPEED));
     //         goingRight = true;
     //         goingLeft = false;
     //     }).finallyDo(() -> stopMotors());
@@ -80,9 +79,9 @@ public class ShooterOne extends SubsystemBase {
     /**
      * Moves the bottom Shooter Counter Clockwise.
      */
-    public Command bottomShooterTurnLeft() {
+    public Command bottomTwoShooterTurnLeft() {
         return this.run(() -> {
-            bottomShooter.setControl(m_output.withOutput(RobotMap.TEST_MOTOR_SHOOTER_BOTTOM_OUT_SPEED));
+            bottomTwoShooter.setControl(m_output.withOutput(RobotMap.TEST_MOTOR_SHOOTER_BOTTOM_OUT_SPEED));
             goingLeft = true;
             goingRight = false;
         }).finallyDo(() -> stopMotors());
@@ -90,17 +89,24 @@ public class ShooterOne extends SubsystemBase {
 
     // Shooter in if needed
 
-    // public Command bottomShooterTurnRight() {
+    // public Command bottomTwoShooterTurnRight() {
     //     return this.run(() -> {
-    //         bottomShooter.setControl(m_output.withOutput(RobotMap.TEST_MOTOR_SHOOTER_BOTTOM_IN_SPEED));
+    //         bottomTwoShooter.setControl(m_output.withOutput(RobotMap.TEST_MOTOR_SHOOTER_BOTTOM_IN_SPEED));
     //         goingRight = true;
     //         goingLeft = false;
     //     }).finallyDo(() -> stopMotors());
     // }
 
+    public Command shoot() {
+        return this.run(() -> {
+            topTwoShooter.set(-RobotMap.SHOOTER_SPEED);
+            bottomTwoShooter.set(-RobotMap.SHOOTER_SPEED);
+        }).finallyDo(() -> stopMotors());
+    }
+
     public void stopMotors() {
-        topShooter.stopMotor();
-        bottomShooter.stopMotor();
+        topTwoShooter.stopMotor();
+        bottomTwoShooter.stopMotor();
         goingLeft = false;
         goingRight = false;
     }
@@ -116,6 +122,9 @@ public class ShooterOne extends SubsystemBase {
 
     @Override
     public void periodic() {
+        SmartDashboard.putNumber("kP", RobotMap.SHOOTER_P_VALUE);
+        SmartDashboard.putNumber("kI", RobotMap.SHOOTER_I_VALUE);
+        SmartDashboard.putNumber("kD", RobotMap.SHOOTER_D_VALUE);
         SmartDashboard.putBoolean("Shooter Turning Left?", goingLeft);
         SmartDashboard.putBoolean("Shooter Turning Right?", goingRight);
     } 

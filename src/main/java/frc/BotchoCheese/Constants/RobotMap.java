@@ -73,10 +73,11 @@ public class RobotMap {
     // Intake speeds
     // Verify if values are correct and go in the right directions
     public static final double TEST_TOP_MOTOR_IN_SPEED = 0.05;
-    public static final double TEST_TOP_MOTOR_OUT_SPEED = -0.05;
     public static final double TEST_BOTTOM_MOTOR_IN_SPEED = 0.05;
-    public static final double TEST_BOTTOM_MOTOR_OUT_SPEED = -0.05;
     public static final double TEST_INSIDE_MOTOR_IN_SPEED = 0.05;
+
+    public static final double TEST_TOP_MOTOR_OUT_SPEED = -0.05;
+    public static final double TEST_BOTTOM_MOTOR_OUT_SPEED = -0.05;
     public static final double TEST_INSIDE_MOTOR_OUT_SPEED = -0.05;
     
     // Shooter Motor IDs
@@ -88,9 +89,12 @@ public class RobotMap {
 
     // Shooter speeds
     public static final double TEST_MOTOR_SHOOTER_TOP_OUT_SPEED = 0.2;
-    public static final double TEST_MOTOR_SHOOTER_TOP_IN_SPEED = -0.2;
     public static final double TEST_MOTOR_SHOOTER_BOTTOM_OUT_SPEED = 0.2;
+
+    public static final double TEST_MOTOR_SHOOTER_TOP_IN_SPEED = -0.2;
     public static final double TEST_MOTOR_SHOOTER_BOTTOM_IN_SPEED = -0.2;
+
+    public static final double SHOOTER_SPEED = 0;
 
     // Shooter PID Valuess
     public static final double SHOOTER_P_VALUE = 0.5;

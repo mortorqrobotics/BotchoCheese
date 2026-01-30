@@ -55,7 +55,6 @@ public class ShooterOne extends SubsystemBase {
 
         topShooter.getConfigurator().apply(config);
         bottomShooter.getConfigurator().apply(config);
-
     }
 
     /**
@@ -98,6 +97,13 @@ public class ShooterOne extends SubsystemBase {
     //     }).finallyDo(() -> stopMotors());
     // }
 
+    public Command shoot() {
+        return this.run(() -> {
+            topShooter.set(-RobotMap.SHOOTER_SPEED);
+            bottomShooter.set(-RobotMap.SHOOTER_SPEED);
+        }).finallyDo(() -> stopMotors());
+    }
+
     public void stopMotors() {
         topShooter.stopMotor();
         bottomShooter.stopMotor();
@@ -116,6 +122,9 @@ public class ShooterOne extends SubsystemBase {
 
     @Override
     public void periodic() {
+        SmartDashboard.putNumber("kP", RobotMap.SHOOTER_P_VALUE);
+        SmartDashboard.putNumber("kI", RobotMap.SHOOTER_I_VALUE);
+        SmartDashboard.putNumber("kD", RobotMap.SHOOTER_D_VALUE);
         SmartDashboard.putBoolean("Shooter Turning Left?", goingLeft);
         SmartDashboard.putBoolean("Shooter Turning Right?", goingRight);
     } 

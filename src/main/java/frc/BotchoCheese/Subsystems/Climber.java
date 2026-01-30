@@ -48,9 +48,7 @@ public class Climber extends SubsystemBase {
         r2Climber.getConfigurator().apply(config);
     }
 
-    /**
-     * Commands to move the left climber. 
-     */
+    //Commands to move the left climber.
     public Command leftClimberUp() {
         return this.run(() -> {
             lClimber.setControl(m_output.withOutput(RobotMap.TEST_MOTOR_LEFT_UP_SPEED));
@@ -81,9 +79,7 @@ public class Climber extends SubsystemBase {
         }).finallyDo(() -> stopMotors());
     }
     
-    /**
-     * Commands to move the right climber.
-     */
+    // Commands to move the right climber.
     public Command rightClimberUp() {
         return this.run(() -> {
             rClimber.setControl(m_output.withOutput(RobotMap.TEST_MOTOR_RIGHT_UP_SPEED));
@@ -118,7 +114,7 @@ public class Climber extends SubsystemBase {
         lClimber.stopMotor();
         l2Climber.stopMotor();
         rClimber.stopMotor();
-        rClimber.stopMotor();
+        r2Climber.stopMotor();
         goingUp = false;
         goingDown = false;
     }
