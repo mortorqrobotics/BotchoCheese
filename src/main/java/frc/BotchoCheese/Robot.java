@@ -18,6 +18,9 @@ import frc.BotchoCheese.Constants.RobotMap;
 import frc.BotchoCheese.Utils.LimelightHelpers;
 
 public class Robot extends TimedRobot {
+
+  public static LimelightHelpers limelight;
+
   private Command m_autonomousCommand;
 
   private final RobotContainer m_robotContainer;
@@ -69,6 +72,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousInit() {
+
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
     if (m_autonomousCommand != null) {
