@@ -90,5 +90,12 @@ public class Intake extends SubsystemBase {
     public void periodic() {
         SmartDashboard.putBoolean("Intake Going In?", goingIn);
         SmartDashboard.putBoolean("Intake Going Out?", goingOut);
+
+        SmartDashboard.putNumber("Top Intake Battery Draw", topIntake.getSupplyCurrent().getValueAsDouble());
+        SmartDashboard.putNumber("Top Intake Motor Draw", topIntake.getStatorCurrent().getValueAsDouble());
+        SmartDashboard.putNumber("Bottom Intake Battery Draw", bottomIntake.getSupplyCurrent().getValueAsDouble());
+        SmartDashboard.putNumber("Bottom Intake Motor Draw", bottomIntake.getStatorCurrent().getValueAsDouble());
+        SmartDashboard.putNumber("Inside Intake Battery Draw", insideIntake.getSupplyCurrent().getValueAsDouble());
+        SmartDashboard.putNumber("Inside Intake Motor Draw", insideIntake.getStatorCurrent().getValueAsDouble());
     } 
 }

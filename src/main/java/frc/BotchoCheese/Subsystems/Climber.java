@@ -123,5 +123,10 @@ public class Climber extends SubsystemBase {
     public void periodic() {
         SmartDashboard.putBoolean("Climber Going Up?", goingUp);
         SmartDashboard.putBoolean("Climber Going Down?", goingDown);
+        
+        SmartDashboard.putNumber("Left Climber 1 Battery Draw", lClimber.getSupplyCurrent().getValueAsDouble());
+        SmartDashboard.putNumber("Left Climber 2 Battery Draw", l2Climber.getSupplyCurrent().getValueAsDouble());
+        SmartDashboard.putNumber("Right Climber 1 Motor Draw", rClimber.getStatorCurrent().getValueAsDouble());
+        SmartDashboard.putNumber("Right Climber 2 Motor Draw", r2Climber.getStatorCurrent().getValueAsDouble());
     } 
 }

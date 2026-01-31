@@ -127,5 +127,10 @@ public class ShooterTwo extends SubsystemBase {
         SmartDashboard.putNumber("kD", RobotMap.SHOOTER_D_VALUE);
         SmartDashboard.putBoolean("Shooter Turning Left?", goingLeft);
         SmartDashboard.putBoolean("Shooter Turning Right?", goingRight);
+
+        SmartDashboard.putNumber("Top Two Shooter Battery Draw", topTwoShooter.getSupplyCurrent().getValueAsDouble());
+        SmartDashboard.putNumber("Top Two Shooter Motor Draw", topTwoShooter.getStatorCurrent().getValueAsDouble());
+        SmartDashboard.putNumber("Bottom Two Shooter Battery Draw", bottomTwoShooter.getSupplyCurrent().getValueAsDouble());
+        SmartDashboard.putNumber("Bottom Two Shooter Motor Draw", bottomTwoShooter.getStatorCurrent().getValueAsDouble());
     } 
 }

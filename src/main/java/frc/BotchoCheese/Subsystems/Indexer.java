@@ -57,5 +57,8 @@ public class Indexer extends SubsystemBase {
     @Override
     public void periodic() {
         SmartDashboard.putBoolean("Indexer On?", isOn);
+
+        SmartDashboard.putNumber("Indexer Battery Draw", indexer.getSupplyCurrent().getValueAsDouble());
+        SmartDashboard.putNumber("Indexer Motor Draw", indexer.getStatorCurrent().getValueAsDouble());
     } 
 }
