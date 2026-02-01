@@ -4,9 +4,6 @@
 
 package frc.BotchoCheese;
 
-import com.ctre.phoenix.led.CANdle;
-import com.ctre.phoenix.led.CANdle.LEDStripType;
-import com.ctre.phoenix.led.CANdleConfiguration;
 import com.ctre.phoenix6.hardware.Pigeon2;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
@@ -33,7 +30,6 @@ import frc.BotchoCheese.Subsystems.CommandSwerveDrivetrain;
 
 
 public class RobotContainer {
-    public CANdle candle;
     public static double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
     public static double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
 
@@ -61,16 +57,6 @@ public class RobotContainer {
         autoChooser = AutoBuilder.buildAutoChooser("New Auto");
         SmartDashboard.putData("Auto Mode", autoChooser);
 
-        candle = new CANdle(0);
-       
-        CANdleConfiguration config = new CANdleConfiguration();
-        config.statusLedOffWhenActive = true;
-        config.stripType = LEDStripType.GRB;
-        config.v5Enabled = true;
-        config.vBatOutputMode = CANdle.VBatOutputMode.Modulated;
-        config.brightnessScalar = 1;
-        candle.configAllSettings(config, 100);
-        candle.configLEDType(LEDStripType.GRB); //just added this after cd post
 
         configureBindings();
     }
