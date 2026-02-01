@@ -20,7 +20,7 @@ Here, just follow along with this checklist as shown. It will create a duplicate
 
 However, you must then do this command to move the `.git` file from our original repository to this imported one. This is because WPILib just creates a copy of the directory, but excludes anything that actually makes the directory a repository. 
 
-Run this command to fix this problem: `cp -R ./BotchedCode/.git ./BotchedCode-Imported`. Note this assumes that you are in the directory that contains both the old and imported repos. 
+Run this command to fix this problem: `cp -R ./BotchoCheese/.git ./BotchoCheese-Imported`. Note this assumes that you are in the directory that contains both the old and imported repos. 
 
 Once you perform this command, your `-Imported` repo is now all set to be pushed remotely. It is important to note that if you run `git status` for the imported repository, you will see a ton of modified or deleted files. It is important that you allow this to happen, and run this sequence of commands: 
 
