@@ -98,6 +98,7 @@ public class ShooterOne extends SubsystemBase {
     // }
 
     public Command shoot() {
+        System.out.println("Bam!");
         return this.run(() -> {
             topShooter.set(-RobotMap.SHOOTER_SPEED);
             bottomShooter.set(-RobotMap.SHOOTER_SPEED);
