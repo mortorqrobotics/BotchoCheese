@@ -81,7 +81,7 @@ public class RobotMap {
     public static final double TEST_INSIDE_MOTOR_OUT_SPEED = -0.05;
     
     // Shooter Motor IDs
-    public static final int TOP_SHOOTER_ONE_MOTOR_ID = 30;
+    public static final int TOP_SHOOTER_ONE_MOTOR_ID = 20;
     public static final int BOTTOM_SHOOTER_ONE_MOTOR_ID = 31;
 
     public static final int TOP_SHOOTER_TWO_MOTOR_ID = 32;
@@ -94,7 +94,7 @@ public class RobotMap {
     public static final double TEST_MOTOR_SHOOTER_TOP_IN_SPEED = -0.2;
     public static final double TEST_MOTOR_SHOOTER_BOTTOM_IN_SPEED = -0.2;
 
-    public static final double SHOOTER_SPEED = 0;
+    public static final double SHOOTER_SPEED = 3;
 
     // Shooter PID Valuess
     public static final double SHOOTER_P_VALUE = 0.5;
@@ -106,4 +106,6 @@ public class RobotMap {
 
     // Indexer speeds
     public static final double INDEXER_MOTOR_SPEED = 0.5;
+
+    // 
 }

@@ -4,6 +4,10 @@
 
 package frc.BotchoCheese;
 
+import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.RadiansPerSecond;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
+
 import com.ctre.phoenix6.hardware.Pigeon2;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
@@ -12,21 +16,19 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
-import static edu.wpi.first.units.Units.MetersPerSecond;
-import static edu.wpi.first.units.Units.RadiansPerSecond;
-import static edu.wpi.first.units.Units.RotationsPerSecond;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.BotchoCheese.Commands.RotateToTag;
+import frc.BotchoCheese.Subsystems.ShooterOne;
+// import frc.BotchoCheese.Commands.ShootOne; // DELETE THIS IMPORT
+import frc.BotchoCheese.Commands.ControlPrint;
 import frc.BotchoCheese.Commands.StrafeToTag;
-import frc.BotchoCheese.Constants.RobotMap;
-import frc.BotchoCheese.Constants.TunerConstants;
-import frc.BotchoCheese.Constants.TunerConstantsOld;
 import frc.BotchoCheese.Subsystems.CommandSwerveDrivetrain;
-
+import frc.BotchoCheese.Constants.TunerConstants;
+import frc.BotchoCheese.Constants.RobotMap;
 
 
 public class RobotContainer {
@@ -44,10 +46,15 @@ public class RobotContainer {
 
     private final Telemetry logger = new Telemetry(MaxSpeed);
 
-    private final static CommandXboxController joystick = new CommandXboxController(0);
+    private final static CommandXboxController JOYSTICK1_CONTROLLER = new CommandXboxController(0);
+     private final static CommandXboxController JOYSTICK2_CONTROLLER = new CommandXboxController(1);
     
     public final static CommandSwerveDrivetrain drivetrain = createDrivetrain();
     public static Pigeon2 gyro = new Pigeon2(RobotMap.PIGEON_ID);
+
+    // Initializing the Shooter subsystem here so it persists
+    public final ShooterOne shooter1 = new ShooterOne();
+
 
     /* Path follower */
     private final SendableChooser<Command> autoChooser;
@@ -62,26 +69,28 @@ public class RobotContainer {
     }
 
     private void configureBindings() {
+        
         // Note that X is defined as forward according to WPILib convention,
         // and Y is defined as to the left according to WPILib convention.
         drivetrain.setDefaultCommand(
             // Drivetrain will execute this command periodically
+            //TODO: May be cause of sensitivity
             drivetrain.applyRequest(() ->
-                drive.withVelocityX(-joystick.getLeftY() * MaxSpeed * getRobotSpeed()) // Drive forward with negative Y (forward)
-                    .withVelocityY(-joystick.getLeftX() * MaxSpeed * getRobotSpeed()) // Drive left with negative X (left)
-                    .withRotationalRate(-joystick.getRightX() * MaxAngularRate * getRobotYawSpeed()) // Drive counterclockwise with negative X (left)
+                drive.withVelocityX(-JOYSTICK1_CONTROLLER.getLeftY() * MaxSpeed * getRobotSpeed()) // Drive forward with negative Y (forward)
+                    .withVelocityY(-JOYSTICK1_CONTROLLER.getLeftX() * MaxSpeed * getRobotSpeed()) // Drive left with negative X (left)
+                    .withRotationalRate(-JOYSTICK1_CONTROLLER.getRightX() * MaxAngularRate * getRobotYawSpeed()) // Drive counterclockwise with negative X (left)
             )
         );
 
-        joystick.a().whileTrue(drivetrain.applyRequest(() -> brake));
-        joystick.b().whileTrue(drivetrain.applyRequest(() ->
-            point.withModuleDirection(new Rotation2d(-joystick.getLeftY(), -joystick.getLeftX()))
+        JOYSTICK1_CONTROLLER.a().whileTrue(drivetrain.applyRequest(() -> brake));
+        JOYSTICK1_CONTROLLER.b().whileTrue(drivetrain.applyRequest(() ->
+            point.withModuleDirection(new Rotation2d(-JOYSTICK1_CONTROLLER.getLeftY(), -JOYSTICK1_CONTROLLER.getLeftX()))
         ));
 
-        joystick.pov(0).whileTrue(drivetrain.applyRequest(() ->
+        JOYSTICK1_CONTROLLER.pov(0).whileTrue(drivetrain.applyRequest(() ->
             forwardStraight.withVelocityX(0.5).withVelocityY(0))
         );
-        joystick.pov(180).whileTrue(drivetrain.applyRequest(() ->
+        JOYSTICK1_CONTROLLER.pov(180).whileTrue(drivetrain.applyRequest(() ->
             forwardStraight.withVelocityX(-0.5).withVelocityY(0))
         );
         
@@ -94,8 +103,11 @@ public class RobotContainer {
         // joystick.start().and(joystick.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
 
         // reset the field-centric heading on left bumper press
-        joystick.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
-        joystick.x().onTrue(Commands.sequence(new RotateToTag(drivetrain, 0), new StrafeToTag(drivetrain, 0.5)));
+        JOYSTICK1_CONTROLLER.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
+        JOYSTICK1_CONTROLLER.x().onTrue(Commands.sequence(new RotateToTag(drivetrain, 0), new StrafeToTag(drivetrain, 0.5)));
+        
+        // Correctly binding the shoot command
+        JOYSTICK1_CONTROLLER.y().whileTrue(shooter1.shoot());
 
         drivetrain.registerTelemetry(logger::telemeterize);
     }
@@ -103,13 +115,13 @@ public class RobotContainer {
     
     public static double getRobotSpeed() {
         
-        return joystick.getLeftTriggerAxis() >= 0.25 ? 0.1 : 1.0;
+        return JOYSTICK1_CONTROLLER.getLeftTriggerAxis() >= 0.25 ? 0.1 : 1.0;
     // return 0.7;
     }
 
     public static double getRobotYawSpeed() {
         
-        return joystick.getLeftTriggerAxis() >= 0.25 ? 0.1 : 0.7*(1.0/0.9);
+        return JOYSTICK1_CONTROLLER.getLeftTriggerAxis() >= 0.25 ? 0.1 : 0.7*(1.0/0.9);
     // return 0.7;
     }
 
@@ -121,10 +133,10 @@ public class RobotContainer {
 
     public static CommandSwerveDrivetrain createDrivetrain() {
         return new CommandSwerveDrivetrain(
-            TunerConstantsOld.DrivetrainConstants, 0,
+            TunerConstants.DrivetrainConstants, 0,
             VecBuilder.fill(RobotMap.kPositionStdDevX, RobotMap.kPositionStdDevY, Units.degreesToRadians(RobotMap.kPositionStdDevTheta)),
             VecBuilder.fill(RobotMap.kVisionStdDevX, RobotMap.kVisionStdDevY, Units.degreesToRadians(RobotMap.kVisionStdDevTheta)),
-            TunerConstantsOld.FrontLeft, TunerConstantsOld.FrontRight, TunerConstantsOld.BackLeft, TunerConstantsOld.BackRight
+            TunerConstants.FrontLeft, TunerConstants.FrontRight, TunerConstants.BackLeft, TunerConstants.BackRight
         );
     }
 }
