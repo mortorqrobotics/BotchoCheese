@@ -16,8 +16,8 @@ import frc.BotchoCheese.Constants.RobotMap; // Assuming your IDs are here
 
 public class ShooterTwo extends SubsystemBase {
     // Motor controllers
-    private final TalonFX topTwoShooter;
-    private final TalonFX bottomTwoShooter;
+    private final TalonFX topShooter;
+    private final TalonFX bottomShooter;
 
     // Control requests (Phoenix 6 uses request objects instead of passing doubles directly)
     private final DutyCycleOut m_output = new DutyCycleOut(0);
@@ -26,8 +26,8 @@ public class ShooterTwo extends SubsystemBase {
     private boolean goingRight = false;
     
     public ShooterTwo() {
-        topTwoShooter = new TalonFX(RobotMap.TOP_SHOOTER_TWO_MOTOR_ID);
-        bottomTwoShooter = new TalonFX(RobotMap.BOTTOM_SHOOTER_TWO_MOTOR_ID);
+        topShooter = new TalonFX(RobotMap.TOP_SHOOTER_ONE_MOTOR_ID);
+        bottomShooter = new TalonFX(RobotMap.BOTTOM_SHOOTER_ONE_MOTOR_ID);
 
         // Apply basic configuration
         TalonFXConfiguration config = new TalonFXConfiguration();
@@ -53,60 +53,52 @@ public class ShooterTwo extends SubsystemBase {
         /* Set motors to Brake mode so the climber doesn't slide down */
         config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
-        topTwoShooter.getConfigurator().apply(config);
-        bottomTwoShooter.getConfigurator().apply(config);
+        topShooter.getConfigurator().apply(config);
+        bottomShooter.getConfigurator().apply(config);
     }
 
     /**
      * Moves the top Shooter counter Clockwise.
      */
-    public Command topTwoShooterTurnLeft() {
+    public Command topShooterTurnLeft() {
         return this.run(() -> {
-            topTwoShooter.setControl(m_output.withOutput(RobotMap.TEST_MOTOR_SHOOTER_TOP_OUT_SPEED));
+            topShooter.setControl(m_output.withOutput(RobotMap.TEST_MOTOR_SHOOTER_TOP_OUT_SPEED));
             goingLeft = true;
             goingRight = false;
         }).finallyDo(() -> stopMotors());
     }
-    // Shooter in if needed
 
-    // public Command topTwoShooterTurnRight() {
-    //     return this.run(() -> {
-    //         topTwoShooter.setControl(m_output.withOutput(RobotMap.TEST_MOTOR_SHOOTER_TOP_IN_SPEED));
-    //         goingRight = true;
-    //         goingLeft = false;
-    //     }).finallyDo(() -> stopMotors());
-    // }
     /**
      * Moves the bottom Shooter Counter Clockwise.
      */
-    public Command bottomTwoShooterTurnLeft() {
+    public Command bottomShooterTurnLeft() {
         return this.run(() -> {
-            bottomTwoShooter.setControl(m_output.withOutput(RobotMap.TEST_MOTOR_SHOOTER_BOTTOM_OUT_SPEED));
+            bottomShooter.setControl(m_output.withOutput(RobotMap.TEST_MOTOR_SHOOTER_BOTTOM_OUT_SPEED));
             goingLeft = true;
             goingRight = false;
         }).finallyDo(() -> stopMotors());
     }
 
-    // Shooter in if needed
-
-    // public Command bottomTwoShooterTurnRight() {
-    //     return this.run(() -> {
-    //         bottomTwoShooter.setControl(m_output.withOutput(RobotMap.TEST_MOTOR_SHOOTER_BOTTOM_IN_SPEED));
-    //         goingRight = true;
-    //         goingLeft = false;
-    //     }).finallyDo(() -> stopMotors());
-    // }
-
     public Command shoot() {
-        return this.run(() -> {
-            topTwoShooter.set(RobotMap.SHOOTER_SPEED);
-            bottomTwoShooter.set(RobotMap.SHOOTER_SPEED);
-        }).finallyDo(() -> stopMotors());
+        // We use startEnd so it automatically stops motors when the command finishes (button release)
+        return this.startEnd(
+            // When command starts/runs:
+            () -> {
+                System.out.println("Bam!");
+                System.out.println("Kapoooooooooooooow!");
+                topShooter.set(RobotMap.SHOOTER_SPEED);
+                bottomShooter.set(RobotMap.SHOOTER_SPEED);
+            },
+            // When command ends:
+            () -> {
+                stopMotors();
+            }
+        );
     }
 
     public void stopMotors() {
-        topTwoShooter.stopMotor();
-        bottomTwoShooter.stopMotor();
+        topShooter.stopMotor();
+        bottomShooter.stopMotor();
         goingLeft = false;
         goingRight = false;
     }
@@ -127,10 +119,10 @@ public class ShooterTwo extends SubsystemBase {
         SmartDashboard.putNumber("kD", RobotMap.SHOOTER_D_VALUE);
         SmartDashboard.putBoolean("Shooter Turning Left?", goingLeft);
         SmartDashboard.putBoolean("Shooter Turning Right?", goingRight);
-
-        SmartDashboard.putNumber("Top Two Shooter Battery Draw", topTwoShooter.getSupplyCurrent().getValueAsDouble());
-        SmartDashboard.putNumber("Top Two Shooter Motor Draw", topTwoShooter.getStatorCurrent().getValueAsDouble());
-        SmartDashboard.putNumber("Bottom Two Shooter Battery Draw", bottomTwoShooter.getSupplyCurrent().getValueAsDouble());
-        SmartDashboard.putNumber("Bottom Two Shooter Motor Draw", bottomTwoShooter.getStatorCurrent().getValueAsDouble());
+        
+        SmartDashboard.putNumber("Top Shooter Battery Draw", topShooter.getSupplyCurrent().getValueAsDouble());
+        SmartDashboard.putNumber("Top Shooter Motor Draw", topShooter.getStatorCurrent().getValueAsDouble());
+        SmartDashboard.putNumber("Bottom Shooter Battery Draw", bottomShooter.getSupplyCurrent().getValueAsDouble());
+        SmartDashboard.putNumber("Bottom Shooter Motor Draw", bottomShooter.getStatorCurrent().getValueAsDouble());
     } 
 }
