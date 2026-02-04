@@ -23,8 +23,6 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.BotchoCheese.Commands.RotateToTag;
 import frc.BotchoCheese.Subsystems.ShooterOne;
-// import frc.BotchoCheese.Commands.ShootOne; // DELETE THIS IMPORT
-import frc.BotchoCheese.Commands.ControlPrint;
 import frc.BotchoCheese.Commands.StrafeToTag;
 import frc.BotchoCheese.Subsystems.CommandSwerveDrivetrain;
 import frc.BotchoCheese.Constants.TunerConstants;
