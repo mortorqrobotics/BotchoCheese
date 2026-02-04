@@ -23,7 +23,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.BotchoCheese.Commands.RotateToTag;
 import frc.BotchoCheese.Subsystems.ShooterOne;
-import frc.BotchoCheese.Commands.ShootOne;
+// import frc.BotchoCheese.Commands.ShootOne; // DELETE THIS IMPORT
 import frc.BotchoCheese.Commands.ControlPrint;
 import frc.BotchoCheese.Commands.StrafeToTag;
 import frc.BotchoCheese.Subsystems.CommandSwerveDrivetrain;
@@ -52,7 +52,8 @@ public class RobotContainer {
     public final static CommandSwerveDrivetrain drivetrain = createDrivetrain();
     public static Pigeon2 gyro = new Pigeon2(RobotMap.PIGEON_ID);
 
-    
+    // Initializing the Shooter subsystem here so it persists
+    public final ShooterOne shooter1 = new ShooterOne();
 
 
     /* Path follower */
@@ -68,8 +69,7 @@ public class RobotContainer {
     }
 
     private void configureBindings() {
-        ShooterOne shooter1 = new ShooterOne();
-
+        
         // Note that X is defined as forward according to WPILib convention,
         // and Y is defined as to the left according to WPILib convention.
         drivetrain.setDefaultCommand(
@@ -105,8 +105,9 @@ public class RobotContainer {
         // reset the field-centric heading on left bumper press
         JOYSTICK1_CONTROLLER.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
         JOYSTICK1_CONTROLLER.x().onTrue(Commands.sequence(new RotateToTag(drivetrain, 0), new StrafeToTag(drivetrain, 0.5)));
-        JOYSTICK1_CONTROLLER.y().whileTrue(new ShootOne(shooter1));
-        //JOYSTICK1_CONTROLLER.y().whileTrue(new ControlPrint(shooter1));
+        
+        // Correctly binding the shoot command
+        JOYSTICK1_CONTROLLER.y().whileTrue(shooter1.shoot());
 
         drivetrain.registerTelemetry(logger::telemeterize);
     }

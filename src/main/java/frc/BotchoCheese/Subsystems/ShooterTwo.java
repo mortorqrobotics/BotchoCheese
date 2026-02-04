@@ -99,8 +99,8 @@ public class ShooterTwo extends SubsystemBase {
 
     public Command shoot() {
         return this.run(() -> {
-            topTwoShooter.set(-RobotMap.SHOOTER_SPEED);
-            bottomTwoShooter.set(-RobotMap.SHOOTER_SPEED);
+            topTwoShooter.set(RobotMap.SHOOTER_SPEED);
+            bottomTwoShooter.set(RobotMap.SHOOTER_SPEED);
         }).finallyDo(() -> stopMotors());
     }
 

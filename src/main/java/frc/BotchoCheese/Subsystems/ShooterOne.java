@@ -67,15 +67,7 @@ public class ShooterOne extends SubsystemBase {
             goingRight = false;
         }).finallyDo(() -> stopMotors());
     }
-    // Shooter in if needed
 
-    // public Command topShooterTurnRight() {
-    //     return this.run(() -> {
-    //         topShooter.setControl(m_output.withOutput(RobotMap.TEST_MOTOR_SHOOTER_TOP_IN_SPEED));
-    //         goingRight = true;
-    //         goingLeft = false;
-    //     }).finallyDo(() -> stopMotors());
-    // }
     /**
      * Moves the bottom Shooter Counter Clockwise.
      */
@@ -87,22 +79,21 @@ public class ShooterOne extends SubsystemBase {
         }).finallyDo(() -> stopMotors());
     }
 
-    // Shooter in if needed
-
-    // public Command bottomShooterTurnRight() {
-    //     return this.run(() -> {
-    //         bottomShooter.setControl(m_output.withOutput(RobotMap.TEST_MOTOR_SHOOTER_BOTTOM_IN_SPEED));
-    //         goingRight = true;
-    //         goingLeft = false;
-    //     }).finallyDo(() -> stopMotors());
-    // }
-
     public Command shoot() {
-        System.out.println("Bam!");
-        return this.run(() -> {
-            topShooter.set(-RobotMap.SHOOTER_SPEED);
-            bottomShooter.set(-RobotMap.SHOOTER_SPEED);
-        }).finallyDo(() -> stopMotors());
+        // We use startEnd so it automatically stops motors when the command finishes (button release)
+        return this.startEnd(
+            // When command starts/runs:
+            () -> {
+                System.out.println("Bam!");
+                System.out.println("Kapoooooooooooooow!");
+                topShooter.set(RobotMap.SHOOTER_SPEED);
+                bottomShooter.set(RobotMap.SHOOTER_SPEED);
+            },
+            // When command ends:
+            () -> {
+                stopMotors();
+            }
+        );
     }
 
     public void stopMotors() {
