@@ -80,6 +80,13 @@ public class RobotMap {
     public static final double TEST_BOTTOM_MOTOR_OUT_SPEED = -0.05;
     public static final double TEST_INSIDE_MOTOR_OUT_SPEED = -0.05;
     
+    // Feeder Encoder ID and Speed
+    public static final int FEEDER_MOTOR_ID = 22;
+    public static final double FEEDER_P_VALUE = 0.12;
+    public static final double FEEDER_I_VALUE = 0.0;
+    public static final double FEEDER_D_VALUE = 0.001;
+    public static final double FEEDER_SPEED = 1.5;
+
     // Shooter Motor IDs
     public static final int TOP_SHOOTER_ONE_MOTOR_ID = 20;
     public static final int BOTTOM_SHOOTER_ONE_MOTOR_ID = 31;
