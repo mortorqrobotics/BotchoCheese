@@ -1,10 +1,11 @@
 package frc.BotchoCheese.Subsystems;
 
-import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.hardware.TalonFXS;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.ctre.phoenix6.signals.MotorArrangementValue;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
-import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.configs.TalonFXSConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -13,8 +14,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.BotchoCheese.Constants.RobotMap;
 
 public class Feeder extends SubsystemBase {
-    // Single Minion motor for the feeder
-    private final TalonFX feederMotor;
+    // Single Minion motor controlled by a Talon FXS
+    private final TalonFXS feederMotor;
 
     // Control request object
     private final DutyCycleOut m_output = new DutyCycleOut(0);
@@ -22,11 +23,17 @@ public class Feeder extends SubsystemBase {
     private boolean isFeeding = false;
     
     public Feeder() {
-        feederMotor = new TalonFX(RobotMap.FEEDER_MOTOR_ID);
+        // Updated to TalonFXS class
+        feederMotor = new TalonFXS(RobotMap.FEEDER_MOTOR_ID);
 
-        TalonFXConfiguration config = new TalonFXConfiguration();
+        TalonFXSConfiguration config = new TalonFXSConfiguration();
 
-        // PID Values for velocity control (if needed later)
+        /** * CRITICAL: Set the Motor Arrangement. 
+         * This tells the FXS it is connected to a Minion via the JST sensor port.
+         */
+        config.Commutation.MotorArrangement = MotorArrangementValue.Minion_JST;
+
+        // PID Values for velocity control
         Slot0Configs slot0Configs = new Slot0Configs();
         slot0Configs.kP = RobotMap.FEEDER_P_VALUE;
         slot0Configs.kI = RobotMap.FEEDER_I_VALUE;
@@ -44,6 +51,7 @@ public class Feeder extends SubsystemBase {
         // Use Brake mode to ensure the note stops exactly when we want
         config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
+        // Apply the configuration to the FXS
         feederMotor.getConfigurator().apply(config);
     }
 
@@ -68,7 +76,7 @@ public class Feeder extends SubsystemBase {
     public Command reverseFeeder() {
         return this.run(() -> {
             feederMotor.setControl(m_output.withOutput(-RobotMap.FEEDER_SPEED));
-        }).finallyDo(() -> stopMotor());
+        }).finallyDo((interrupted) -> stopMotor());
     }
 
     public void stopMotor() {
@@ -79,6 +87,7 @@ public class Feeder extends SubsystemBase {
     @Override
     public void periodic() {
         SmartDashboard.putBoolean("Feeder Running?", isFeeding);
+        // Using getValueAsDouble() to keep it simple for your dashboard
         SmartDashboard.putNumber("Feeder Current", feederMotor.getStatorCurrent().getValueAsDouble());
     } 
 }
