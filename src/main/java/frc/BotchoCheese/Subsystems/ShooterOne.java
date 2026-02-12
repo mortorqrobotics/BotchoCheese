@@ -62,7 +62,7 @@ public class ShooterOne extends SubsystemBase {
      */
     public Command topShooterTurnLeft() {
         return this.run(() -> {
-            topShooter.setControl(m_output.withOutput(RobotMap.TEST_MOTOR_SHOOTER_TOP_OUT_SPEED));
+            topShooter.setControl(m_output.withOutput(RobotMap.MOTOR_SHOOTER_TOP_OUT_SPEED));
             goingLeft = true;
             goingRight = false;
         }).finallyDo(() -> stopMotors());
@@ -73,7 +73,7 @@ public class ShooterOne extends SubsystemBase {
      */
     public Command bottomShooterTurnLeft() {
         return this.run(() -> {
-            bottomShooter.setControl(m_output.withOutput(RobotMap.TEST_MOTOR_SHOOTER_BOTTOM_OUT_SPEED));
+            bottomShooter.setControl(m_output.withOutput(RobotMap.MOTOR_SHOOTER_BOTTOM_OUT_SPEED));
             goingLeft = true;
             goingRight = false;
         }).finallyDo(() -> stopMotors());
@@ -86,8 +86,8 @@ public class ShooterOne extends SubsystemBase {
             () -> {
                 System.out.println("Bam!");
                 System.out.println("Kapoooooooooooooow!");
-                topShooter.set(RobotMap.SHOOTER_SPEED);
-                bottomShooter.set(RobotMap.SHOOTER_SPEED);
+                topShooter.set(RobotMap.MOTOR_SHOOTER_TOP_OUT_SPEED);
+                bottomShooter.set(RobotMap.MOTOR_SHOOTER_BOTTOM_OUT_SPEED);
             },
             // When command ends:
             () -> {
