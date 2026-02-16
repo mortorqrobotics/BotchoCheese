@@ -6,13 +6,23 @@ package frc.BotchoCheese;
 
 import com.ctre.phoenix6.Utils;
 
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StructArrayPublisher;
+import edu.wpi.first.networktables.StructPublisher;
+import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.BotchoCheese.Constants.RobotMap;
 import frc.BotchoCheese.Utils.LimelightHelpers;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StructPublisher;
+
 
 public class Robot extends TimedRobot {
 
@@ -24,8 +34,20 @@ public class Robot extends TimedRobot {
 
   private final boolean kUseLimelight = true;
 
+  private StructPublisher<Pose2d> publisher;
+
+  private final Field2d m_field = new Field2d();
+
   public Robot() {
     m_robotContainer = new RobotContainer();
+
+    publisher = NetworkTableInstance.getDefault()
+    .getStructTopic("MyPose", Pose2d.struct)
+    .publish();
+
+    SmartDashboard.putData("Field", m_field);
+    m_field.setRobotPose(RobotContainer.drivetrain.getState().Pose);
+    DataLogManager.start(); 
   }
 
   @Override
@@ -54,13 +76,21 @@ public class Robot extends TimedRobot {
         RobotContainer.drivetrain.addVisionMeasurement(llMeasurement.pose, Utils.fpgaToCurrentTime(llMeasurement.timestampSeconds));
       }
     }
-  }
+  
+  //AdvantageScope simulation
+  Pose2d poseA = RobotContainer.drivetrain.getState().Pose;
+  System.out.println("Current pose: " + poseA);
+  publisher.set(poseA);
+  
+}
 
   @Override
   public void disabledInit() {}
 
   @Override
-  public void disabledPeriodic() {}
+  public void disabledPeriodic() {
+     NetworkTableInstance.getDefault().getTable("limelight").getEntry("throttle_set").setNumber(100);
+  }
 
   @Override
   public void disabledExit() {}
@@ -83,6 +113,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
+    NetworkTableInstance.getDefault().getTable("limelight").getEntry("throttle_set").setNumber(0);
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
