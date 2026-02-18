@@ -105,10 +105,12 @@ public class RobotContainer {
         // joystick.start().and(joystick.y()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
         // joystick.start().and(joystick.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
         // reset the field-centric heading on left bumper press
-        // JOYSTICK1_CONTROLLER.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
+        // JOYSTICK1_CONTROLLER.leftBumper().onTrue(new InstantCommand(()->drivetrain.seedFieldCentric()));
         // JOYSTICK1_CONTROLLER.leftBumper().onTrue(new InstantCommand(() -> gyro.setYaw(0)));
         // JOYSTICK1_CONTROLLER.x().onTrue(Commands.sequence(new RotateToTag(drivetrain, 0), new StrafeToTag(drivetrain, 0.5)));
-        // TODO
+        // TODO Do Left Bumper for StrafeToTag command
+        // Pass in your drivetrain and the offset you want (e.g., 0.5 meters)
+        JOYSTICK1_CONTROLLER.rightBumper().onTrue(new StrafeToTag(drivetrain, 0.5));
         
         // Correctly binding the shoot command
         JOYSTICK1_CONTROLLER.y().whileTrue(shooter1.shoot());
