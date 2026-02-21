@@ -23,7 +23,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.BotchoCheese.Commands.RotateToTag;
-import frc.BotchoCheese.Subsystems.ShooterOne;
+import frc.BotchoCheese.Subsystems.Shooter;
 import frc.BotchoCheese.Commands.StrafeToTag;
 import frc.BotchoCheese.Subsystems.CommandSwerveDrivetrain;
 import frc.BotchoCheese.Constants.TunerConstants;
@@ -53,7 +53,7 @@ public class RobotContainer {
     public static Pigeon2 gyro = new Pigeon2(RobotMap.PIGEON_ID);
 
     // Initializing the Shooter subsystem here so it persists
-    public final ShooterOne shooter1 = new ShooterOne();
+    public final Shooter shooter = new Shooter();
 
     // Initializing the Feeder subsystem
     public final Feeder feeder = new Feeder();
@@ -113,7 +113,7 @@ public class RobotContainer {
         JOYSTICK1_CONTROLLER.rightBumper().onTrue(new StrafeToTag(drivetrain, 0.5));
         
         // Correctly binding the shoot command
-        JOYSTICK1_CONTROLLER.y().whileTrue(shooter1.shoot());
+        JOYSTICK1_CONTROLLER.y().whileTrue(shooter.shoot());
 
         // Binding the feeder to the X button
         JOYSTICK1_CONTROLLER.x().whileTrue(feeder.runFeeder());

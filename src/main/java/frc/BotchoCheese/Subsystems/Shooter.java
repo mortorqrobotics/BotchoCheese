@@ -29,7 +29,7 @@ public class Shooter extends SubsystemBase {
     
     public Shooter() {
         shooter = new TalonFX(RobotMap.SHOOTER_MOTOR_ID);
-        hood = new TalonFX(RobotMap.HOOD_MOTOR_ONE_ID);
+        hood = new TalonFX(RobotMap.HOOD_MOTOR_ID);
 
         // Apply basic configuration
         TalonFXConfiguration config = new TalonFXConfiguration();
