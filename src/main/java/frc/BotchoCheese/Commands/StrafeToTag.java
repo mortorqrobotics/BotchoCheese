@@ -50,43 +50,55 @@ public class StrafeToTag extends Command {
         var results = LimelightHelpers.getRawFiducials(RobotMap.LIMELIGHT_NAME);
         var blah = Arrays.stream(results).map(c -> Integer.toString(c.id)).collect(Collectors.joining(","));
         System.out.println("all results " + blah + " blah");
+        System.out.println("Var Results: " + results);
         // Use Limelight "tv" to confirm a valid fiducial target exists right now.
         if (!LimelightHelpers.getTV(RobotMap.LIMELIGHT_NAME)) {
             System.out.println("StrafeToTag initialize: no valid target (tv=false)");
             xSetpoint = drivetrainSubsystem.getState().Pose.getX();
             ySetpoint = drivetrainSubsystem.getState().Pose.getY();
+            System.out.println("Setpoint: (" + xSetpoint + ", " + ySetpoint + ")");
         } else {
             int fid = (int) LimelightHelpers.getFiducialID(RobotMap.LIMELIGHT_NAME);
             var optionalTagPose = RobotMap.WELDED_FIELD2026.getTagPose(fid);
-
+            System.out.println("Fiducial ID: " + fid);
+            System.out.println("Optional Tag Pose: " + optionalTagPose);
+            
+            // optionalTagPose = Position of the AprilTag?
             if (optionalTagPose.isEmpty()) {
                 // Target exists, but we can't map the ID to a pose in the field layout.
                 System.out.println("StrafeToTag initialize: tag pose missing for fid=" + fid);
                 xSetpoint = drivetrainSubsystem.getState().Pose.getX();
                 ySetpoint = drivetrainSubsystem.getState().Pose.getY();
+                System.out.println("Setpoint: (" + xSetpoint + ", " + ySetpoint + ")");
             } else {
                 var tagPose = optionalTagPose.get();
                 double angle = drivetrainSubsystem.getState().Pose.getRotation().getRadians();
 
                 xSetpoint = tagPose.getX() - offset * Math.cos(angle);
                 ySetpoint = tagPose.getY() - offset * Math.sin(angle);
+                System.out.println("Tag Pose: " + tagPose);
+                System.out.println("Angle: " + angle);
+                System.out.println("Setpoint: (" + xSetpoint + ", " + ySetpoint + ")");
             }
         }
-
+    // Sets the new speeds from the previous one
     xController.reset();
     yController.reset();
     xController.setSetpoint(xSetpoint);
     yController.setSetpoint(ySetpoint);
 
-    System.out.println("StrafeToTag initialized");
+    System.out.println("StrafeToTag initialized\nControllers reset");
 }
 
     @Override
     public void execute() {
         var robotPos = drivetrainSubsystem.getState().Pose;
+        System.out.println("Robot Pose: " + robotPos);
 
         double xSpeed = xController.calculate(robotPos.getX());
         double ySpeed = yController.calculate(robotPos.getY());
+        System.out.println("xSpeed: " + xSpeed);
+        System.out.println("ySpeed: " + ySpeed);
 
         drivetrainSubsystem.setControl(
             driveRequest
@@ -96,6 +108,7 @@ public class StrafeToTag extends Command {
         );
     }
 
+    //Checks whether it's at the target position
     @Override
     public boolean isFinished() {
         return xController.atSetpoint() && yController.atSetpoint();
