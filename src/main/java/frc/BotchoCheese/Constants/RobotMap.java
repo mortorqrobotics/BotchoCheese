@@ -95,6 +95,13 @@ public class RobotMap {
 
     public static final int TOP_SHOOTER_TWO_MOTOR_ID = 32;
     public static final int BOTTOM_SHOOTER_TWO_MOTOR_ID = 33;
+    
+    // Hood Motor IDs
+    // TODO Change Hood ID
+    public static final int HOOD_MOTOR_ID = 999;
+    public static final double HOOD_P_VALUE = 0.4;
+    public static final double HOOD_I_VALUE = 0.0;
+    public static final double HOOD_D_VALUE = 0.2;
 
     // Shooter speeds
     public static final double MOTOR_SHOOTER_TOP_OUT_SPEED = 0.6;

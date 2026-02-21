@@ -18,6 +18,7 @@ public class ShooterOne extends SubsystemBase {
     // Motor controllers
     private final TalonFX topShooter;
     private final TalonFX bottomShooter;
+    private final TalonFX hood;
 
     // Control requests (Phoenix 6 uses request objects instead of passing doubles directly)
     private final DutyCycleOut m_output = new DutyCycleOut(0);
@@ -28,6 +29,7 @@ public class ShooterOne extends SubsystemBase {
     public ShooterOne() {
         topShooter = new TalonFX(RobotMap.TOP_SHOOTER_ONE_MOTOR_ID);
         bottomShooter = new TalonFX(RobotMap.BOTTOM_SHOOTER_ONE_MOTOR_ID);
+        hood = new TalonFX(RobotMap.HOOD_MOTOR_ID);
 
         // Apply basic configuration
         TalonFXConfiguration config = new TalonFXConfiguration();
