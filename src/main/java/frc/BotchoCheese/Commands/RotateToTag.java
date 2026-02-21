@@ -45,7 +45,7 @@ public class RotateToTag extends Command {
     @Override
     public void execute() {
         double rotation = angleController.calculate(drivetrainSubsystem.getState().Pose.getRotation().getRadians(), angleSetpoint);
-                
+        System.out.println("Rotation: " + rotation);
         drivetrainSubsystem.setControl( //Does it need to move to rotate (drive with x/y 0)?
             RobotContainer.drive.withVelocityX(0) // Drive forward with negative Y (forward)
             .withVelocityY(0) // Drive left with negative X (left)
