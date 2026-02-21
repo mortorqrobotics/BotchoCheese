@@ -14,27 +14,27 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 //import frc.BotchoCheese.Utils.LimelightHelpers;
 import frc.BotchoCheese.Constants.RobotMap; // Assuming your IDs are here
 
-public class ShooterOne extends SubsystemBase {
+public class Shooter extends SubsystemBase {
     // Motor controllers
-    private final TalonFX topShooter;
-    private final TalonFX bottomShooter;
+    private final TalonFX shooter;
+    //private final TalonFX bottomShooter;
     private final TalonFX hood;
 
     // Control requests (Phoenix 6 uses request objects instead of passing doubles directly)
     private final DutyCycleOut m_output = new DutyCycleOut(0);
 
-    private boolean goingLeft = false;
-    private boolean goingRight = false;
+    private boolean shooterTurning = false;
+    private boolean hoodUp = false;
+    private boolean hoodDown = false;
     
-    public ShooterOne() {
-        topShooter = new TalonFX(RobotMap.TOP_SHOOTER_ONE_MOTOR_ID);
-        bottomShooter = new TalonFX(RobotMap.BOTTOM_SHOOTER_ONE_MOTOR_ID);
-        hood = new TalonFX(RobotMap.HOOD_MOTOR_ID);
+    public Shooter() {
+        shooter = new TalonFX(RobotMap.SHOOTER_MOTOR_ID);
+        hood = new TalonFX(RobotMap.HOOD_MOTOR_ONE_ID);
 
         // Apply basic configuration
         TalonFXConfiguration config = new TalonFXConfiguration();
 
-        // PID Values
+        // PID Shooter Values
         // in init function, set slot 0 gains
         Slot0Configs slot0Configs = new Slot0Configs();
         slot0Configs.kP = RobotMap.SHOOTER_P_VALUE;
@@ -42,6 +42,14 @@ public class ShooterOne extends SubsystemBase {
         slot0Configs.kD = RobotMap.SHOOTER_D_VALUE;
         config.Slot0 = slot0Configs;
         //https://v6.docs.ctr-electronics.com/en/stable/docs/api-reference/device-specific/talonfx/basic-pid-control.html
+
+        // PID Hood Values
+        // in init function, set slot 0 gains
+        Slot0Configs slot1Configs = new Slot0Configs();
+        slot1Configs.kP = RobotMap.HOOD_P_VALUE;
+        slot1Configs.kI = RobotMap.HOOD_I_VALUE;
+        slot1Configs.kD = RobotMap.HOOD_D_VALUE;
+        config.Slot0 = slot1Configs;
         
         // Verify
         CurrentLimitsConfigs currentLimits = new CurrentLimitsConfigs();
@@ -55,29 +63,32 @@ public class ShooterOne extends SubsystemBase {
         /* Set motors to Brake mode so the climber doesn't slide down */
         config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
-        topShooter.getConfigurator().apply(config);
-        bottomShooter.getConfigurator().apply(config);
+        shooter.getConfigurator().apply(config);
     }
 
     /**
      * Moves the top Shooter counter Clockwise.
      */
-    public Command topShooterTurnLeft() {
+    public Command turnShooter() {
         return this.run(() -> {
-            topShooter.setControl(m_output.withOutput(RobotMap.MOTOR_SHOOTER_TOP_OUT_SPEED));
-            goingLeft = true;
-            goingRight = false;
+            shooter.setControl(m_output.withOutput(RobotMap.MOTOR_SHOOTER_TOP_OUT_SPEED));
+            shooterTurning = true;
         }).finallyDo(() -> stopMotors());
     }
 
-    /**
-     * Moves the bottom Shooter Counter Clockwise.
-     */
-    public Command bottomShooterTurnLeft() {
+    public Command hoodUp() {
         return this.run(() -> {
-            bottomShooter.setControl(m_output.withOutput(RobotMap.MOTOR_SHOOTER_BOTTOM_OUT_SPEED));
-            goingLeft = true;
-            goingRight = false;
+            hood.setControl(m_output.withOutput(RobotMap.HOOD_SPEED));
+            hoodUp = true;
+            hoodDown = false;
+        }).finallyDo(() -> stopMotors());
+    }
+
+    public Command hoodDown() {
+        return this.run(() -> {
+            hood.setControl(m_output.withOutput(-RobotMap.HOOD_SPEED));   
+            hoodUp = true;
+            hoodDown = false;
         }).finallyDo(() -> stopMotors());
     }
 
@@ -88,8 +99,7 @@ public class ShooterOne extends SubsystemBase {
             () -> {
                 System.out.println("Bam!");
                 System.out.println("Kapoooooooooooooow!");
-                topShooter.set(RobotMap.MOTOR_SHOOTER_TOP_OUT_SPEED);
-                bottomShooter.set(RobotMap.MOTOR_SHOOTER_BOTTOM_OUT_SPEED);
+                shooter.set(RobotMap.MOTOR_SHOOTER_TOP_OUT_SPEED);
             },
             // When command ends:
             () -> {
@@ -99,10 +109,8 @@ public class ShooterOne extends SubsystemBase {
     }
 
     public void stopMotors() {
-        topShooter.stopMotor();
-        bottomShooter.stopMotor();
-        goingLeft = false;
-        goingRight = false;
+        shooter.stopMotor();
+        shooterTurning = false;
     }
 
     /**
@@ -119,12 +127,13 @@ public class ShooterOne extends SubsystemBase {
         SmartDashboard.putNumber("kP", RobotMap.SHOOTER_P_VALUE);
         SmartDashboard.putNumber("kI", RobotMap.SHOOTER_I_VALUE);
         SmartDashboard.putNumber("kD", RobotMap.SHOOTER_D_VALUE);
-        SmartDashboard.putBoolean("Shooter Turning Left?", goingLeft);
-        SmartDashboard.putBoolean("Shooter Turning Right?", goingRight);
+        SmartDashboard.putBoolean("Shooter Turning?", shooterTurning);
+        SmartDashboard.putBoolean("Hood Going Up?", hoodUp);
+        SmartDashboard.putBoolean("Hood Going Down?", hoodDown);
         
-        SmartDashboard.putNumber("Top Shooter Battery Draw", topShooter.getSupplyCurrent().getValueAsDouble());
-        SmartDashboard.putNumber("Top Shooter Motor Draw", topShooter.getStatorCurrent().getValueAsDouble());
-        SmartDashboard.putNumber("Bottom Shooter Battery Draw", bottomShooter.getSupplyCurrent().getValueAsDouble());
-        SmartDashboard.putNumber("Bottom Shooter Motor Draw", bottomShooter.getStatorCurrent().getValueAsDouble());
+        SmartDashboard.putNumber("Shooter Battery Draw", shooter.getSupplyCurrent().getValueAsDouble());
+        SmartDashboard.putNumber("Shooter Motor Draw", shooter.getStatorCurrent().getValueAsDouble());
+        SmartDashboard.putNumber("Hood Battery Draw", hood.getSupplyCurrent().getValueAsDouble());
+        SmartDashboard.putNumber("Hood Motor Draw", hood.getStatorCurrent().getValueAsDouble());
     } 
 }

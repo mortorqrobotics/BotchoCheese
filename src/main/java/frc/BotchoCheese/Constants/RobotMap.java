@@ -83,32 +83,29 @@ public class RobotMap {
     
     // Feeder Motor ID and Speed
     // TODO PID
-    public static final int FEEDER_MOTOR_ID = 22;
+    public static final int FEEDER_MOTOR_ID = 23;
     public static final double FEEDER_P_VALUE = 0.12;
     public static final double FEEDER_I_VALUE = 0.0;
     public static final double FEEDER_D_VALUE = 0.001;
     public static final double FEEDER_SPEED = 0.5; 
 
+    //TODO: Re-assign IDs
     // Shooter Motor IDs
-    public static final int TOP_SHOOTER_ONE_MOTOR_ID = 20;
-    public static final int BOTTOM_SHOOTER_ONE_MOTOR_ID = 31;
-
-    public static final int TOP_SHOOTER_TWO_MOTOR_ID = 32;
-    public static final int BOTTOM_SHOOTER_TWO_MOTOR_ID = 33;
+    public static final int SHOOTER_MOTOR_ID = 24;
     
     // Hood Motor IDs
     // TODO Change Hood ID
     public static final int HOOD_MOTOR_ID = 999;
+
     public static final double HOOD_P_VALUE = 0.4;
     public static final double HOOD_I_VALUE = 0.0;
     public static final double HOOD_D_VALUE = 0.2;
+    public static final double HOOD_SPEED = 0.25;
 
     // Shooter speeds
     public static final double MOTOR_SHOOTER_TOP_OUT_SPEED = 0.6;
-    public static final double MOTOR_SHOOTER_BOTTOM_OUT_SPEED = 0.6;
 
     public static final double MOTOR_SHOOTER_TOP_IN_SPEED = -0.2;
-    public static final double MOTOR_SHOOTER_BOTTOM_IN_SPEED = -0.2;
 
     public static final double SHOOTER_SPEED = 0.1;
 
