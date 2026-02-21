@@ -15,7 +15,7 @@ public class RobotMap {
     public static final double kVisionStdDevY = 1;
     public static final double kVisionStdDevTheta = 99999;
 
-    public static final String LIMELIGHT_NAME = "limelight";
+    public static final String LIMELIGHT_NAME = "limelight-two";
     public static final double DIFFERENCE_CUTOFF_THRESHOLD = 0.15; // Normalized from 1.5 for scale consistency
     public static final double[] TAG_HEIGHTS = {
     1.4859, 1.4859, /*ID: 1 - 2*/
@@ -27,8 +27,7 @@ public class RobotMap {
     1.30175, /*ID: 16*/
     0.308102, 0.308102, 0.308102, 0.308102, 0.308102, 0.308102 /*ID: 17 - 22*/};
 
-    public static final AprilTagFieldLayout ANDYMARK_FIELD2025 = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeAndyMark);
-    public static final AprilTagFieldLayout WELDED_FIELD2025 = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded);
+    public static final AprilTagFieldLayout WELDED_FIELD2026 = AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltWelded);
 
     //Gyro
     public static final int PIGEON_ID = 30;

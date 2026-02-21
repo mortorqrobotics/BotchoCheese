@@ -33,11 +33,11 @@ public class RotateToTag extends Command {
         addRequirements(drivetrainSubsystem);
     }
 
-    @Override
-    public void initialize(){
-        var tagPose = RobotMap.ANDYMARK_FIELD2025.getTagPose((int) LimelightHelpers.getFiducialID("limelight")).get();
-        angleSetpoint = tagPose.getRotation().getAngle() + Math.PI + angleOffset;
-    }
+    // @Override
+    // public void initialize(){
+    //     var tagPose = RobotMap.ANDYMARK_FIELD2025.getTagPose((int) LimelightHelpers.getFiducialID("limelight")).get();
+    //     angleSetpoint = tagPose.getRotation().getAngle() + Math.PI + angleOffset;
+    // }
 
     @Override
     public void execute() {
