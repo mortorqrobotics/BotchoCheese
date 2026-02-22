@@ -7,19 +7,19 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Example Path"
+            "pathName": "Auto 3 Path"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "Pivot"
+            "name": "Climb"
           }
         }
       ]
     }
   },
-  "resetOdom": false,
-  "folder": null,
+  "resetOdom": true,
+  "folder": "Auto 3 Autos",
   "choreoAuto": false
 }

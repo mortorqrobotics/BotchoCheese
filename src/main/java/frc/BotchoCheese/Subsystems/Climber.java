@@ -15,8 +15,6 @@ public class Climber extends SubsystemBase {
     // Motor controllers
     private final TalonFX lClimber;
     private final TalonFX rClimber;
-    private final TalonFX l2Climber;
-    private final TalonFX r2Climber;
 
     // Control requests (Phoenix 6 uses request objects instead of passing doubles directly)
     private final DutyCycleOut m_output = new DutyCycleOut(0);
@@ -27,8 +25,6 @@ public class Climber extends SubsystemBase {
     public Climber() {
         lClimber = new TalonFX(RobotMap.LEFT_CLIMBER_MOTOR_ID);
         rClimber = new TalonFX(RobotMap.RIGHT_CLIMBER_MOTOR_ID);
-        l2Climber = new TalonFX(RobotMap.LEFT_CLIMBER_TWO_MOTOR_ID);
-        r2Climber = new TalonFX(RobotMap.RIGHT_CLIMBER_TWO_MOTOR_ID);
 
         // Apply basic configuration
         TalonFXConfiguration config = new TalonFXConfiguration();
@@ -44,8 +40,6 @@ public class Climber extends SubsystemBase {
 
         lClimber.getConfigurator().apply(config);
         rClimber.getConfigurator().apply(config);
-        l2Climber.getConfigurator().apply(config);
-        r2Climber.getConfigurator().apply(config);
     }
 
     //Commands to move the left climber.
@@ -64,21 +58,6 @@ public class Climber extends SubsystemBase {
             goingDown = true;
         }).finallyDo(() -> stopMotors());
     }
-    public Command left2ClimberUp() {
-        return this.run(() -> {
-            l2Climber.setControl(m_output.withOutput(RobotMap.TEST_MOTOR_LEFT_TWO_UP_SPEED));
-            goingUp = true;
-            goingDown = false;
-        }).finallyDo(() -> stopMotors());
-    }
-    public Command left2ClimberDown() {
-        return this.run(() -> {
-            l2Climber.setControl(m_output.withOutput(RobotMap.TEST_MOTOR_LEFT_TWO_DOWN_SPEED));
-            goingUp = false;
-            goingDown = true;
-        }).finallyDo(() -> stopMotors());
-    }
-    
     // Commands to move the right climber.
     public Command rightClimberUp() {
         return this.run(() -> {
@@ -95,26 +74,9 @@ public class Climber extends SubsystemBase {
             goingDown = true;
         }).finallyDo(() -> stopMotors());
     }
-     public Command right2ClimberUp() {
-        return this.run(() -> {
-            r2Climber.setControl(m_output.withOutput(RobotMap.TEST_MOTOR_RIGHT_TWO_UP_SPEED));
-            goingUp = true;
-            goingDown = false;
-        }).finallyDo(() -> stopMotors());
-    }
-    public Command right2ClimberDown() {
-        return this.run(() -> {
-            r2Climber.setControl(m_output.withOutput(RobotMap.TEST_MOTOR_RIGHT_TWO_DOWN_SPEED));
-            goingUp = false;
-            goingDown = true;
-        }).finallyDo(() -> stopMotors());
-    }
-
     public void stopMotors() {
         lClimber.stopMotor();
-        l2Climber.stopMotor();
         rClimber.stopMotor();
-        r2Climber.stopMotor();
         goingUp = false;
         goingDown = false;
     }
@@ -125,8 +87,6 @@ public class Climber extends SubsystemBase {
         SmartDashboard.putBoolean("Climber Going Down?", goingDown);
         
         SmartDashboard.putNumber("Left Climber 1 Battery Draw", lClimber.getSupplyCurrent().getValueAsDouble());
-        SmartDashboard.putNumber("Left Climber 2 Battery Draw", l2Climber.getSupplyCurrent().getValueAsDouble());
         SmartDashboard.putNumber("Right Climber 1 Motor Draw", rClimber.getStatorCurrent().getValueAsDouble());
-        SmartDashboard.putNumber("Right Climber 2 Motor Draw", r2Climber.getStatorCurrent().getValueAsDouble());
-    } 
+    }
 }

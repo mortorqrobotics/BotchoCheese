@@ -1,0 +1,75 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 8.26,
+        "y": 2.46
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 7.801036144578314,
+        "y": 0.5695060240963856
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 4.314168674698795,
+        "y": 0.6146265060240956
+      },
+      "prevControl": {
+        "x": 5.986108433734939,
+        "y": 0.6583373493975899
+      },
+      "nextControl": {
+        "x": 2.586341601852756,
+        "y": 0.5694545564072057
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 0.6,
+        "y": 0.735
+      },
+      "prevControl": {
+        "x": 1.0176128511321965,
+        "y": 0.735
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": null
+    }
+  ],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.8366533864541729,
+      "rotationDegrees": 176.0
+    }
+  ],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 1.5,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 179.2654789657452
+  },
+  "reversed": false,
+  "folder": "Auto 5; Collect NZ and Outpost Paths",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": -90.0
+  },
+  "useDefaultConstraints": false
+}

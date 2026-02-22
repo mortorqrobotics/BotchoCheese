@@ -12,6 +12,7 @@ import com.ctre.phoenix6.hardware.Pigeon2;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
 
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -24,6 +25,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.BotchoCheese.Commands.RotateToTag;
 import frc.BotchoCheese.Subsystems.Shooter;
+import frc.BotchoCheese.Subsystems.Climber;
 import frc.BotchoCheese.Commands.StrafeToTag;
 import frc.BotchoCheese.Subsystems.CommandSwerveDrivetrain;
 import frc.BotchoCheese.Constants.TunerConstants;
@@ -47,7 +49,7 @@ public class RobotContainer {
     private final Telemetry logger = new Telemetry(MaxSpeed);
 
     private final static CommandXboxController JOYSTICK1_CONTROLLER = new CommandXboxController(0);
-     private final static CommandXboxController JOYSTICK2_CONTROLLER = new CommandXboxController(1);
+    private final static CommandXboxController JOYSTICK2_CONTROLLER = new CommandXboxController(1);
     
     public final static CommandSwerveDrivetrain drivetrain = createDrivetrain();
     public static Pigeon2 gyro = new Pigeon2(RobotMap.PIGEON_ID);
@@ -58,15 +60,21 @@ public class RobotContainer {
     // Initializing the Feeder subsystem
     public final Feeder feeder = new Feeder();
 
+    public final Climber lClimber = new Climber();
+    public final Climber rClimber = new Climber();
 
     /* Path follower */
     private final SendableChooser<Command> autoChooser;
 
     public RobotContainer() {
+        
+        // TODO Figure out how to implement both climber motors.
+        NamedCommands.registerCommand("Shoot", shooter.shoot());
+        NamedCommands.registerCommand("Climb", lClimber.leftClimberUp());
+        NamedCommands.registerCommand("Climb", lClimber.rightClimberUp());
 
         autoChooser = AutoBuilder.buildAutoChooser("New Auto");
         SmartDashboard.putData("Auto Mode", autoChooser);
-
 
         configureBindings();
     }

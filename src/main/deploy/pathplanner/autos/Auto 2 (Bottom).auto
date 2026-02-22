@@ -1,0 +1,49 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Auto 2; Path 1 (Bottom)"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Shoot"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 8.0
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Auto 2; Path 2 (Bottom)"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Auto 2; Path 3 (Bottom)"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Auto 2; Path 4 (Bottom)"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": "Auto 2 Autos",
+  "choreoAuto": false
+}

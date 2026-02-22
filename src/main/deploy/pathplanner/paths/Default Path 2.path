@@ -1,0 +1,54 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 2.23,
+        "y": 3.8603281027104144
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 1.781792088337025,
+        "y": 3.5699992000555727
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 1.560385542168675,
+        "y": 3.718096385542169
+      },
+      "prevControl": {
+        "x": 2.3483994647345376,
+        "y": 3.8573661788616516
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": null
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 1.5,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 180.0
+  },
+  "reversed": false,
+  "folder": "Auto 1; Shoot and Climb Paths",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 5.840943635017903
+  },
+  "useDefaultConstraints": false
+}

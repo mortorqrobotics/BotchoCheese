@@ -1,0 +1,43 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Auto 7; Path 1 (MT)"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Auto 7; Path 1 (Top)"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Auto 7; Path 2 (Top) "
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Shoot"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 9.0
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": "Auto 7 Autos",
+  "choreoAuto": false
+}
