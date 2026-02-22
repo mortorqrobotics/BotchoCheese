@@ -7,13 +7,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Auto 6; Path 1"
+            "pathName": "Auto 6 Path 1"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Auto 6; Path 2"
+            "pathName": "Auto 6 Path 2"
           }
         },
         {
@@ -32,6 +32,6 @@
     }
   },
   "resetOdom": true,
-  "folder": "Auto 6 Autos",
+  "folder": null,
   "choreoAuto": false
 }

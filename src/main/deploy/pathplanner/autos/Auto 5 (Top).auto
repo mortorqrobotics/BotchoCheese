@@ -7,19 +7,19 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Auto 5; Path 2 (MT, T)"
+            "pathName": "Auto 5 Path 2 (MT, T)"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Auto 5; Path 3(MT, T)"
+            "pathName": "Auto 5 Path 3 (MT, T)"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Auto 5; Path 4 (MT, T)"
+            "pathName": "Auto 5 Path 4 (MT, T)"
           }
         },
         {
@@ -32,6 +32,6 @@
     }
   },
   "resetOdom": true,
-  "folder": "Auto 5 Autos",
+  "folder": null,
   "choreoAuto": false
 }

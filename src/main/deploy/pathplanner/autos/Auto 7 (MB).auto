@@ -7,19 +7,19 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Auto 7; Path 1 (MB)"
+            "pathName": "Auto 7 Path 1 (MB)"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Auto 7; Path 1 (Bottom)"
+            "pathName": "Auto 7 Path 2 (MB, B)"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Auto 7; Path 2 (Bottom) "
+            "pathName": "Auto 7 Path 3 (MB, B)"
           }
         },
         {
@@ -38,6 +38,6 @@
     }
   },
   "resetOdom": true,
-  "folder": "Auto 7 Autos",
+  "folder": null,
   "choreoAuto": false
 }

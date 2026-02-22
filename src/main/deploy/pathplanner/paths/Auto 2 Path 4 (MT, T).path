@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 8.062373493975903,
-        "y": 1.2593614457831324
+        "x": 8.26,
+        "y": 1.6
       },
       "prevControl": null,
       "nextControl": {
-        "x": 8.21536144578313,
-        "y": 0.9533855421686752
+        "x": 8.412987951807226,
+        "y": 1.294024096385543
       },
       "isLocked": false,
       "linkedName": null
@@ -66,10 +66,10 @@
     "rotation": 137.03091423685305
   },
   "reversed": false,
-  "folder": "Auto 2; Shoot, Collect NZ, Hold Paths",
+  "folder": null,
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -125.83765295427824
+    "rotation": -90.0
   },
   "useDefaultConstraints": true
 }

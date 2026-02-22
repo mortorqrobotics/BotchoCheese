@@ -3,41 +3,41 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.283,
-        "y": 1.543
+        "x": 7.778,
+        "y": 6.810638554216868
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.408663338088445,
-        "y": 0.9879457917261072
+        "x": 6.548905333172919,
+        "y": 7.716048502139801
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 4.802439372325249,
-        "y": 0.6256633380884444
+        "x": 4.412518072289157,
+        "y": 7.422590361445783
       },
       "prevControl": {
-        "x": 3.042781740370898,
-        "y": 0.6256633380884447
+        "x": 5.32294262785446,
+        "y": 7.427793685085975
       },
       "nextControl": {
-        "x": 5.682268188302424,
-        "y": 0.6256633380884444
+        "x": 3.689714693295292,
+        "y": 7.41845934379458
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 8.281,
-        "y": 1.543
+        "x": 2.030277108439558,
+        "y": 6.624867469882473
       },
       "prevControl": {
-        "x": 8.244122681883024,
-        "y": 0.7679885877318122
+        "x": 1.7024457831383533,
+        "y": 6.876204819283018
       },
       "nextControl": null,
       "isLocked": false,
@@ -47,11 +47,11 @@
   "rotationTargets": [
     {
       "waypointRelativePos": 0.5,
-      "rotationDegrees": -25.0
+      "rotationDegrees": -176.51422495983988
     },
     {
-      "waypointRelativePos": 0.95,
-      "rotationDegrees": 0.0
+      "waypointRelativePos": 1.15,
+      "rotationDegrees": -172.75498483256007
     }
   ],
   "constraintZones": [],
@@ -67,13 +67,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 92.51091785936315
+    "rotation": -57.285916080996614
   },
   "reversed": false,
-  "folder": "Auto 2; Shoot, Collect NZ, Hold Paths",
+  "folder": null,
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 40.22511778611908
+    "rotation": 125.00000000000001
   },
-  "useDefaultConstraints": true
+  "useDefaultConstraints": false
 }

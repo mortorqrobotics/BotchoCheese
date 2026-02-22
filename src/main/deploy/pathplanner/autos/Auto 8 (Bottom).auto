@@ -7,13 +7,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Auto 8; Path 1 (B)"
+            "pathName": "Auto 8 Path 1 (B)"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Auto 8; Path 2 (M, B)"
+            "pathName": "Auto 8 Path 2 (M, B)"
           }
         },
         {
@@ -25,7 +25,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Auto 8; Path 3 (M, B)"
+            "pathName": "Auto 8 Path 3 (M, B)"
           }
         },
         {
@@ -44,6 +44,6 @@
     }
   },
   "resetOdom": true,
-  "folder": "Auto 8 Autos",
+  "folder": null,
   "choreoAuto": false
 }

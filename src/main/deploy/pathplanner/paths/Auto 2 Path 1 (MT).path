@@ -3,41 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 8.292,
-        "y": 2.56
+        "x": 3.4050641940085593,
+        "y": 4.054407988587732
       },
       "prevControl": null,
       "nextControl": {
-        "x": 8.279162337513462,
-        "y": 3.3609823422470675
+        "x": 2.1094135915989205,
+        "y": 3.840853771720262
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 8.292,
-        "y": 4.854578313253012
+        "x": 1.78,
+        "y": 6.1
       },
       "prevControl": {
-        "x": 8.334830333282538,
-        "y": 4.118480573506723
-      },
-      "nextControl": {
-        "x": 8.249169666717462,
-        "y": 5.590676052999301
-      },
-      "isLocked": false,
-      "linkedName": null
-    },
-    {
-      "anchor": {
-        "x": 7.7345421686746985,
-        "y": 6.789
-      },
-      "prevControl": {
-        "x": 7.761745732806736,
-        "y": 6.426017953476326
+        "x": 2.36455421686747,
+        "y": 6.265216867469878
       },
       "nextControl": null,
       "isLocked": false,
@@ -58,13 +42,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 125.265
+    "rotation": -36.0
   },
   "reversed": false,
-  "folder": "Auto 2; Shoot, Collect NZ, Hold Paths",
+  "folder": null,
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 90.0
+    "rotation": 0.0
   },
   "useDefaultConstraints": false
 }

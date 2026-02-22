@@ -20,6 +20,6 @@
     }
   },
   "resetOdom": true,
-  "folder": "Auto 3 Autos",
+  "folder": null,
   "choreoAuto": false
 }

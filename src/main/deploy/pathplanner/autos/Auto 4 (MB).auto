@@ -7,31 +7,25 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Auto 4; Path 1 (MB)"
+            "pathName": "Auto 4 Path 1 (MB)"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Auto 4; Path 2 (MB, B)"
+            "pathName": "Auto 4 Path 2 (MB, B)"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Auto 4; Path 3 (MB, B)"
+            "pathName": "Auto 2 Path 3 (MB, B)"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Auto 4; Path 4 (MB, B)"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Auto 4; Path 5 (MB, B)"
+            "pathName": "Auto 2 Path 4 (MB, B)"
           }
         },
         {
@@ -50,6 +44,6 @@
     }
   },
   "resetOdom": true,
-  "folder": "Auto 4 Autos",
+  "folder": null,
   "choreoAuto": false
 }
