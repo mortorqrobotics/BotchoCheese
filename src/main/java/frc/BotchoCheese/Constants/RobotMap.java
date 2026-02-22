@@ -52,11 +52,6 @@ public class RobotMap {
     public static final double TEST_MOTOR_RIGHT_UP_SPEED = 0.2;
     public static final double TEST_MOTOR_RIGHT_DOWN_SPEED = -0.2;
 
-    public static final double TEST_MOTOR_LEFT_TWO_UP_SPEED = 0.2;
-    public static final double TEST_MOTOR_LEFT_TWO_DOWN_SPEED = -0.2;
-    public static final double TEST_MOTOR_RIGHT_TWO_UP_SPEED = 0.2;
-    public static final double TEST_MOTOR_RIGHT_TWO_DOWN_SPEED = -0.2;
-
     // TODO: Comfirm the new Climber Extension Limit
     public static final double CLIMBER_EXTENSION_LIMIT = 0.5; 
     
