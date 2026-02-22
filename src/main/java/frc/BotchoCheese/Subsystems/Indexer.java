@@ -14,6 +14,8 @@ import frc.BotchoCheese.Constants.RobotMap; // Assuming your IDs are here
 public class Indexer extends SubsystemBase {
     // Motor controllers
     private final TalonFX indexer;
+    private final TalonFX pivot1;
+    private final TalonFX pivot2;
     //No sensor specified due to immense quantity of balls
 
     // Control requests (Phoenix 6 uses request objects instead of passing doubles directly)
@@ -25,6 +27,8 @@ public class Indexer extends SubsystemBase {
     public Indexer() {
         
         indexer = new TalonFX(RobotMap.INDEXER_MOTOR_ID);
+        pivot1 = new TalonFX(RobotMap.PIVOT_1_MOTOR_ID);
+        pivot2 = new TalonFX(RobotMap.PIVOT_2_MOTOR_ID);
 
         // Apply basic configuration
         TalonFXConfiguration config = new TalonFXConfiguration();
@@ -51,6 +55,8 @@ public class Indexer extends SubsystemBase {
 
     public void stopMotors() {
         indexer.stopMotor();
+        pivot1.stopMotor();
+        pivot2.stopMotor();
         isOn = false;
     }
 

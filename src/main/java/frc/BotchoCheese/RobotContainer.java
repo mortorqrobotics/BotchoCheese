@@ -68,10 +68,13 @@ public class RobotContainer {
 
     public RobotContainer() {
         
-        // TODO Figure out how to implement both climber motors.
         NamedCommands.registerCommand("Shoot", shooter.shoot());
-        NamedCommands.registerCommand("Climb", lClimber.leftClimberUp());
-        NamedCommands.registerCommand("Climb", lClimber.rightClimberUp());
+        NamedCommands.registerCommand("Climb", 
+        Commands.parallel(
+            lClimber.leftClimberUp(), 
+            rClimber.rightClimberUp()
+        )
+        );
 
         autoChooser = AutoBuilder.buildAutoChooser("New Auto");
         SmartDashboard.putData("Auto Mode", autoChooser);

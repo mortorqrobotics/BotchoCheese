@@ -16,7 +16,9 @@ import frc.BotchoCheese.Constants.RobotMap; // Assuming your IDs are here
 
 public class Shooter extends SubsystemBase {
     // Motor controllers
-    private final TalonFX shooter;
+    private final TalonFX leftShooter;
+    private final TalonFX middleShooter;
+    private final TalonFX rightShooter;
     //private final TalonFX bottomShooter;
     private final TalonFX hood;
 
@@ -28,7 +30,9 @@ public class Shooter extends SubsystemBase {
     private boolean hoodDown = false;
     
     public Shooter() {
-        shooter = new TalonFX(RobotMap.SHOOTER_MOTOR_ID);
+        leftShooter = new TalonFX(RobotMap.LEFT_SHOOTER_MOTOR_ID);
+        middleShooter = new TalonFX(RobotMap.MIDDLE_SHOOTER_MOTOR_ID);
+        rightShooter = new TalonFX(RobotMap.RIGHT_SHOOTER_MOTOR_ID);
         hood = new TalonFX(RobotMap.HOOD_MOTOR_ID);
 
         // Apply basic configuration
@@ -63,7 +67,10 @@ public class Shooter extends SubsystemBase {
         /* Set motors to Brake mode so the climber doesn't slide down */
         config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
-        shooter.getConfigurator().apply(config);
+        leftShooter.getConfigurator().apply(config);
+        middleShooter.getConfigurator().apply(config);
+        rightShooter.getConfigurator().apply(config);
+        hood.getConfigurator().apply(config);
     }
 
     /**
@@ -71,7 +78,9 @@ public class Shooter extends SubsystemBase {
      */
     public Command turnShooter() {
         return this.run(() -> {
-            shooter.setControl(m_output.withOutput(RobotMap.MOTOR_SHOOTER_TOP_OUT_SPEED));
+            leftShooter.setControl(m_output.withOutput(RobotMap.MOTOR_SHOOTER_TOP_OUT_SPEED));
+            middleShooter.setControl(m_output.withOutput(RobotMap.MOTOR_SHOOTER_TOP_OUT_SPEED));
+            rightShooter.setControl(m_output.withOutput(RobotMap.MOTOR_SHOOTER_TOP_OUT_SPEED));
             shooterTurning = true;
         }).finallyDo(() -> stopMotors());
     }
@@ -99,7 +108,9 @@ public class Shooter extends SubsystemBase {
             () -> {
                 System.out.println("Bam!");
                 System.out.println("Kapoooooooooooooow!");
-                shooter.set(RobotMap.MOTOR_SHOOTER_TOP_OUT_SPEED);
+                leftShooter.set(RobotMap.MOTOR_SHOOTER_TOP_OUT_SPEED);
+                middleShooter.set(RobotMap.MOTOR_SHOOTER_TOP_OUT_SPEED);
+                rightShooter.set(RobotMap.MOTOR_SHOOTER_TOP_OUT_SPEED);
             },
             // When command ends:
             () -> {
@@ -109,7 +120,10 @@ public class Shooter extends SubsystemBase {
     }
 
     public void stopMotors() {
-        shooter.stopMotor();
+        leftShooter.stopMotor();
+        middleShooter.stopMotor();
+        rightShooter.stopMotor();
+        hood.stopMotor();
         shooterTurning = false;
     }
 
@@ -131,8 +145,8 @@ public class Shooter extends SubsystemBase {
         SmartDashboard.putBoolean("Hood Going Up?", hoodUp);
         SmartDashboard.putBoolean("Hood Going Down?", hoodDown);
         
-        SmartDashboard.putNumber("Shooter Battery Draw", shooter.getSupplyCurrent().getValueAsDouble());
-        SmartDashboard.putNumber("Shooter Motor Draw", shooter.getStatorCurrent().getValueAsDouble());
+        SmartDashboard.putNumber("Shooter Battery Draw", leftShooter.getSupplyCurrent().getValueAsDouble());
+        SmartDashboard.putNumber("Shooter Motor Draw", leftShooter.getStatorCurrent().getValueAsDouble());
         SmartDashboard.putNumber("Hood Battery Draw", hood.getSupplyCurrent().getValueAsDouble());
         SmartDashboard.putNumber("Hood Motor Draw", hood.getStatorCurrent().getValueAsDouble());
     } 

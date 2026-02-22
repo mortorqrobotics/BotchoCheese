@@ -86,7 +86,9 @@ public class RobotMap {
 
     //TODO: Re-assign IDs
     // Shooter Motor IDs
-    public static final int SHOOTER_MOTOR_ID = 24;
+    public static final int LEFT_SHOOTER_MOTOR_ID = 24;
+    public static final int MIDDLE_SHOOTER_MOTOR_ID = 25;
+    public static final int RIGHT_SHOOTER_MOTOR_ID = 26;
     
     // Hood Motor IDs
     // TODO Change Hood ID
@@ -111,7 +113,9 @@ public class RobotMap {
     public static final double SHOOTER_D_VALUE = 0.2;
 
     // Indexer ID
-    public static final int INDEXER_MOTOR_ID = 40;
+    public static final int INDEXER_MOTOR_ID = 30;
+    public static final int PIVOT_1_MOTOR_ID = 31;
+    public static final int PIVOT_2_MOTOR_ID = 32;
 
     // Indexer speeds
     public static final double INDEXER_MOTOR_SPEED = 0.5;
