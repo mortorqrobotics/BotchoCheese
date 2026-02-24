@@ -12,6 +12,7 @@ import com.ctre.phoenix6.hardware.Pigeon2;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
 
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -23,7 +24,9 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.BotchoCheese.Commands.RotateToTag;
-import frc.BotchoCheese.Subsystems.ShooterOne;
+import frc.BotchoCheese.Subsystems.Shooter;
+import frc.BotchoCheese.Subsystems.Climber;
+import frc.BotchoCheese.Subsystems.Intake;
 import frc.BotchoCheese.Commands.StrafeToTag;
 import frc.BotchoCheese.Subsystems.CommandSwerveDrivetrain;
 import frc.BotchoCheese.Constants.TunerConstants;
@@ -47,26 +50,32 @@ public class RobotContainer {
     private final Telemetry logger = new Telemetry(MaxSpeed);
 
     private final static CommandXboxController JOYSTICK1_CONTROLLER = new CommandXboxController(0);
-     private final static CommandXboxController JOYSTICK2_CONTROLLER = new CommandXboxController(1);
+    private final static CommandXboxController JOYSTICK2_CONTROLLER = new CommandXboxController(1);
     
     public final static CommandSwerveDrivetrain drivetrain = createDrivetrain();
     public static Pigeon2 gyro = new Pigeon2(RobotMap.PIGEON_ID);
 
     // Initializing the Shooter subsystem here so it persists
-    public final ShooterOne shooter1 = new ShooterOne();
+    public final Shooter shooter = new Shooter();
 
     // Initializing the Feeder subsystem
     public final Feeder feeder = new Feeder();
 
+    public final Climber climber = new Climber();
+
+    public final Intake intake = new Intake();
 
     /* Path follower */
     private final SendableChooser<Command> autoChooser;
 
     public RobotContainer() {
+        
+        NamedCommands.registerCommand("Shoot", shooter.shoot());
+        NamedCommands.registerCommand("Climb", climber.climberUp());
+        NamedCommands.registerCommand("IntakeOn", intake.intakeIn());
 
         autoChooser = AutoBuilder.buildAutoChooser("New Auto");
         SmartDashboard.putData("Auto Mode", autoChooser);
-
 
         configureBindings();
     }
@@ -105,13 +114,15 @@ public class RobotContainer {
         // joystick.start().and(joystick.y()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
         // joystick.start().and(joystick.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
         // reset the field-centric heading on left bumper press
-        // JOYSTICK1_CONTROLLER.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
+        // JOYSTICK1_CONTROLLER.leftBumper().onTrue(new InstantCommand(()->drivetrain.seedFieldCentric()));
         // JOYSTICK1_CONTROLLER.leftBumper().onTrue(new InstantCommand(() -> gyro.setYaw(0)));
         // JOYSTICK1_CONTROLLER.x().onTrue(Commands.sequence(new RotateToTag(drivetrain, 0), new StrafeToTag(drivetrain, 0.5)));
-        // TODO
+        // TODO Do Left Bumper for StrafeToTag command
+        // Pass in your drivetrain and the offset you want (e.g., 0.5 meters)
+        JOYSTICK1_CONTROLLER.rightBumper().onTrue(new StrafeToTag(drivetrain, 0.5));
         
         // Correctly binding the shoot command
-        JOYSTICK1_CONTROLLER.y().whileTrue(shooter1.shoot());
+        JOYSTICK1_CONTROLLER.y().whileTrue(shooter.shoot());
 
         // Binding the feeder to the X button
         JOYSTICK1_CONTROLLER.x().whileTrue(feeder.runFeeder());

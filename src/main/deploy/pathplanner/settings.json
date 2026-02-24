@@ -2,8 +2,26 @@
   "robotWidth": 0.9,
   "robotLength": 0.9,
   "holonomicMode": true,
-  "pathFolders": [],
-  "autoFolders": [],
+  "pathFolders": [
+    "Auto 1; Shoot and Climb",
+    "Auto 2; Shoot and Intake",
+    "Auto 3; Climb",
+    "Auto 4; Intake and Shoot",
+    "Auto 5; Collect",
+    "Auto 6; Depot and Shoot",
+    "Auto 7; NZ Shoot",
+    "Auto 8 Shoot Outpost Shoot (SOS)"
+  ],
+  "autoFolders": [
+    "Autos 1",
+    "Autos 2",
+    "Autos 3",
+    "Autos 4",
+    "Autos 5",
+    "Autos 6",
+    "Autos 7",
+    "Autos 8"
+  ],
   "defaultMaxVel": 3.5,
   "defaultMaxAccel": 3.0,
   "defaultMaxAngVel": 540.0,
@@ -28,5 +46,7 @@
   "brModuleY": -0.3375,
   "bumperOffsetX": 0.0,
   "bumperOffsetY": 0.0,
-  "robotFeatures": []
+  "robotFeatures": [
+    "{\"name\":\"Circle\",\"type\":\"circle\",\"data\":{\"center\":{\"x\":0.0,\"y\":0.0},\"radius\":0.1,\"strokeWidth\":0.02,\"filled\":false}}"
+  ]
 }

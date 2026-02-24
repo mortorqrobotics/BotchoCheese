@@ -15,7 +15,7 @@ public class RobotMap {
     public static final double kVisionStdDevY = 1;
     public static final double kVisionStdDevTheta = 99999;
 
-    public static final String LIMELIGHT_NAME = "limelight";
+    public static final String LIMELIGHT_NAME = "limelight-two";
     public static final double DIFFERENCE_CUTOFF_THRESHOLD = 0.15; // Normalized from 1.5 for scale consistency
     public static final double[] TAG_HEIGHTS = {
     1.4859, 1.4859, /*ID: 1 - 2*/
@@ -27,8 +27,7 @@ public class RobotMap {
     1.30175, /*ID: 16*/
     0.308102, 0.308102, 0.308102, 0.308102, 0.308102, 0.308102 /*ID: 17 - 22*/};
 
-    public static final AprilTagFieldLayout ANDYMARK_FIELD2025 = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeAndyMark);
-    public static final AprilTagFieldLayout WELDED_FIELD2025 = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded);
+    public static final AprilTagFieldLayout WELDED_FIELD2026 = AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltWelded);
 
     //Gyro
     public static final int PIGEON_ID = 30;
@@ -52,11 +51,6 @@ public class RobotMap {
     public static final double TEST_MOTOR_LEFT_DOWN_SPEED = -0.2;
     public static final double TEST_MOTOR_RIGHT_UP_SPEED = 0.2;
     public static final double TEST_MOTOR_RIGHT_DOWN_SPEED = -0.2;
-
-    public static final double TEST_MOTOR_LEFT_TWO_UP_SPEED = 0.2;
-    public static final double TEST_MOTOR_LEFT_TWO_DOWN_SPEED = -0.2;
-    public static final double TEST_MOTOR_RIGHT_TWO_UP_SPEED = 0.2;
-    public static final double TEST_MOTOR_RIGHT_TWO_DOWN_SPEED = -0.2;
 
     // TODO: Comfirm the new Climber Extension Limit
     public static final double CLIMBER_EXTENSION_LIMIT = 0.5; 
@@ -84,25 +78,31 @@ public class RobotMap {
     
     // Feeder Motor ID and Speed
     // TODO PID
-    public static final int FEEDER_MOTOR_ID = 22;
+    public static final int FEEDER_MOTOR_ID = 23;
     public static final double FEEDER_P_VALUE = 0.12;
     public static final double FEEDER_I_VALUE = 0.0;
     public static final double FEEDER_D_VALUE = 0.001;
     public static final double FEEDER_SPEED = 0.5; 
 
+    //TODO: Re-assign IDs
     // Shooter Motor IDs
-    public static final int TOP_SHOOTER_ONE_MOTOR_ID = 20;
-    public static final int BOTTOM_SHOOTER_ONE_MOTOR_ID = 31;
+    public static final int LEFT_SHOOTER_MOTOR_ID = 24;
+    public static final int MIDDLE_SHOOTER_MOTOR_ID = 25;
+    public static final int RIGHT_SHOOTER_MOTOR_ID = 26;
+    
+    // Hood Motor IDs
+    // TODO Change Hood ID
+    public static final int HOOD_MOTOR_ID = 999;
 
-    public static final int TOP_SHOOTER_TWO_MOTOR_ID = 32;
-    public static final int BOTTOM_SHOOTER_TWO_MOTOR_ID = 33;
+    public static final double HOOD_P_VALUE = 0.4;
+    public static final double HOOD_I_VALUE = 0.0;
+    public static final double HOOD_D_VALUE = 0.2;
+    public static final double HOOD_SPEED = 0.25;
 
     // Shooter speeds
     public static final double MOTOR_SHOOTER_TOP_OUT_SPEED = 0.6;
-    public static final double MOTOR_SHOOTER_BOTTOM_OUT_SPEED = 0.6;
 
     public static final double MOTOR_SHOOTER_TOP_IN_SPEED = -0.2;
-    public static final double MOTOR_SHOOTER_BOTTOM_IN_SPEED = -0.2;
 
     public static final double SHOOTER_SPEED = 0.1;
 
@@ -113,7 +113,9 @@ public class RobotMap {
     public static final double SHOOTER_D_VALUE = 0.2;
 
     // Indexer ID
-    public static final int INDEXER_MOTOR_ID = 40;
+    public static final int INDEXER_MOTOR_ID = 30;
+    public static final int PIVOT_1_MOTOR_ID = 31;
+    public static final int PIVOT_2_MOTOR_ID = 32;
 
     // Indexer speeds
     public static final double INDEXER_MOTOR_SPEED = 0.5;

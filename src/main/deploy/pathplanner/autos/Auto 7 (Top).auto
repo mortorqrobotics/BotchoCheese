@@ -1,0 +1,37 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "named",
+          "data": {
+            "name": "IntakeOn"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Auto 7 Path 2 (MT, T)"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Auto 7 Path 3 (MT, T)"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Shoot"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": "Autos 7",
+  "choreoAuto": false
+}

@@ -33,17 +33,20 @@ public class RotateToTag extends Command {
         addRequirements(drivetrainSubsystem);
     }
 
+    // Gets the specific position of the AprilTag
     @Override
     public void initialize(){
-        var tagPose = RobotMap.ANDYMARK_FIELD2025.getTagPose((int) LimelightHelpers.getFiducialID("limelight")).get();
+        var tagPose = RobotMap.WELDED_FIELD2026.getTagPose((int) LimelightHelpers.getFiducialID("limelight")).get();
         angleSetpoint = tagPose.getRotation().getAngle() + Math.PI + angleOffset;
+        System.out.println("Tag Pose: " + tagPose);
+        System.out.println("Angle Setpoint: " + angleSetpoint);
     }
 
     @Override
     public void execute() {
         double rotation = angleController.calculate(drivetrainSubsystem.getState().Pose.getRotation().getRadians(), angleSetpoint);
-                
-        drivetrainSubsystem.setControl(
+        System.out.println("Rotation: " + rotation);
+        drivetrainSubsystem.setControl( //Does it need to move to rotate (drive with x/y 0)?
             RobotContainer.drive.withVelocityX(0) // Drive forward with negative Y (forward)
             .withVelocityY(0) // Drive left with negative X (left)
             .withRotationalRate(rotation)

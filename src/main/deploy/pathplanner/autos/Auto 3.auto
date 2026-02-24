@@ -1,0 +1,25 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Auto 3 Path"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Climb"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": "Autos 3",
+  "choreoAuto": false
+}
