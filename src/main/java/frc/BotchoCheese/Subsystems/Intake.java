@@ -6,84 +6,120 @@ import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
+import com.ctre.phoenix6.controls.Follower;
+import com.ctre.phoenix6.controls.PositionVoltage;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.BotchoCheese.Constants.RobotMap; // Assuming your IDs are here
+import frc.BotchoCheese.Constants.RobotMap;
 
 public class Intake extends SubsystemBase {
-    // Motor controllers
-    private final TalonFX topIntake;
-    private final TalonFX bottomIntake;
-    private final TalonFX insideIntake;
+    // Hardware: 2x Kraken X44s for Pivot, 1x Minion for Intake
+    private final TalonFX pivotLeader;
+    private final TalonFX pivotFollower;
+    private final TalonFX intakeMotor;
 
-    // Control requests (Phoenix 6 uses request objects instead of passing doubles directly)
-    private final DutyCycleOut m_output = new DutyCycleOut(0);
+    // Control requests
+    private final DutyCycleOut intakeOutput = new DutyCycleOut(0);
+    private final PositionVoltage pivotPositionRequest = new PositionVoltage(0);
 
+    // Telemetry state variables
     private boolean goingIn = false;
     private boolean goingOut = false;
     
     public Intake() {
-        topIntake = new TalonFX(RobotMap.TOP_INTAKE_MOTOR_ID);
-        bottomIntake = new TalonFX(RobotMap.BOTTOM_INTAKE_MOTOR_ID);
-        insideIntake = new TalonFX(RobotMap.INSIDE_INTAKE_MOTOR_ID);
-        //TODO: Verify if limits should be put in place for motors (like 2024 version)
+        // Initialize motors (You will need to add these new IDs to your RobotMap)
+        pivotLeader = new TalonFX(RobotMap.PIVOT_1_MOTOR_ID);
+        pivotFollower = new TalonFX(RobotMap.PIVOT_2_MOTOR_ID);
+        intakeMotor = new TalonFX(RobotMap.INDEXER_MOTOR_ID);
 
-        // Apply basic configuration
-        TalonFXConfiguration config = new TalonFXConfiguration();
-
-        Slot0Configs slot0Configs = new Slot0Configs();
-        slot0Configs.kP = RobotMap.INTAKE_P_VALUE;
-        slot0Configs.kI = RobotMap.INTAKE_I_VALUE;
-        slot0Configs.kD = RobotMap.INTAKE_D_VALUE;
-        config.Slot0 = slot0Configs;
-
-        // Verify
-        CurrentLimitsConfigs currentLimits = new CurrentLimitsConfigs();
-        currentLimits.StatorCurrentLimit = 40.0; // Minions generally stay in the 30-50A range
-        currentLimits.StatorCurrentLimitEnable = true;
-        currentLimits.SupplyCurrentLimit = 30.0;
-        currentLimits.SupplyCurrentLimitEnable = true;
+        // --- PIVOT CONFIGURATION (Kraken X44s) ---
+        TalonFXConfiguration pivotConfig = new TalonFXConfiguration();
         
-        // Set motors to Brake mode so the climber doesn't slide down 
-        config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+        // PID configuration for moving the pivot to set positions
+        Slot0Configs pivotSlot0 = new Slot0Configs();
+        pivotSlot0.kP = RobotMap.PIVOT_P_VALUE;
+        pivotSlot0.kI = RobotMap.PIVOT_I_VALUE;
+        pivotSlot0.kD = RobotMap.PIVOT_D_VALUE;
+        pivotConfig.Slot0 = pivotSlot0;
 
-        topIntake.getConfigurator().apply(config);
-        bottomIntake.getConfigurator().apply(config);
-        insideIntake.getConfigurator().apply(config);
+        // Current limits to protect the X44s and the pivot mechanism
+        CurrentLimitsConfigs pivotLimits = new CurrentLimitsConfigs();
+        pivotLimits.StatorCurrentLimit = 60.0; 
+        pivotLimits.StatorCurrentLimitEnable = true;
+        pivotLimits.SupplyCurrentLimit = 40.0;
+        pivotLimits.SupplyCurrentLimitEnable = true;
+        pivotConfig.CurrentLimits = pivotLimits;
+
+        // Pivot MUST be in brake mode to hold its position against gravity
+        pivotConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+
+        pivotLeader.getConfigurator().apply(pivotConfig);
+        pivotFollower.getConfigurator().apply(pivotConfig);
+
+        // Set the second X44 to strictly follow the leader. 
+        // Note: Change 'false' to 'true' if the follower motor needs to be inverted relative to the leader!
+        pivotFollower.setControl(new Follower(pivotLeader.getDeviceID(), false));
+
+        // --- INTAKE CONFIGURATION (Minion) ---
+        TalonFXConfiguration intakeConfig = new TalonFXConfiguration();
+        
+        CurrentLimitsConfigs intakeLimits = new CurrentLimitsConfigs();
+        intakeLimits.StatorCurrentLimit = 40.0; // Minions generally stay in the 30-50A range
+        intakeLimits.StatorCurrentLimitEnable = true;
+        intakeLimits.SupplyCurrentLimit = 30.0;
+        intakeLimits.SupplyCurrentLimitEnable = true;
+        intakeConfig.CurrentLimits = intakeLimits;
+        
+        // Typically intakes run in Coast mode so objects don't get stuck, 
+        // but keeping it Brake if your game piece requires firm holding.
+        intakeConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+
+        intakeMotor.getConfigurator().apply(intakeConfig);
     }
 
-    // Verify if values are correct and go in the right directions
+    // --- PIVOT METHODS ---
 
-    // Pulls the game objects in the Intake.
+    /**
+     * Moves the pivot to a target position (in rotations).
+     */
+    public Command setPivotPosition(double targetRotations) {
+        return this.run(() -> {
+            pivotLeader.setControl(pivotPositionRequest.withPosition(targetRotations));
+        });
+    }
+
+    // --- INTAKE METHODS ---
+
+    // Pulls the game objects into the Intake using the single Minion.
     public Command intakeIn() {
         return this.run(() -> {
-            topIntake.setControl(m_output.withOutput(RobotMap.TEST_TOP_MOTOR_IN_SPEED));
-            bottomIntake.setControl(m_output.withOutput(RobotMap.TEST_BOTTOM_MOTOR_IN_SPEED));
-            insideIntake.setControl(m_output.withOutput(RobotMap.TEST_INSIDE_MOTOR_IN_SPEED));
+            intakeMotor.setControl(intakeOutput.withOutput(RobotMap.INTAKE_SPEED));
             goingIn = true;
             goingOut = false;
-        }).finallyDo(() -> stopMotors());
+        }).finallyDo(() -> stopIntake());
     }
 
-    // Ejects the game objects from Intake.
+    // Ejects the game objects from the Intake.
     public Command intakeOut() {
         return this.run(() -> {
-            topIntake.setControl(m_output.withOutput(RobotMap.TEST_TOP_MOTOR_OUT_SPEED));
-            bottomIntake.setControl(m_output.withOutput(RobotMap.TEST_BOTTOM_MOTOR_OUT_SPEED));
-            insideIntake.setControl(m_output.withOutput(RobotMap.TEST_INSIDE_MOTOR_OUT_SPEED));
+            intakeMotor.setControl(intakeOutput.withOutput(-RobotMap.INTAKE_SPEED));
             goingIn = false;
             goingOut = true;
-        }).finallyDo(() -> stopMotors());
+        }).finallyDo(() -> stopIntake());
     }
     
-    public void stopMotors() {
-        topIntake.stopMotor();
-        bottomIntake.stopMotor();
-        insideIntake.stopMotor();
+    public void stopIntake() {
+        intakeMotor.stopMotor();
         goingIn = false;
         goingOut = false;
+    }
+
+    // Completely stop everything (Useful for an emergency stop or disable command)
+    public void stopAll() {
+        stopIntake();
+        pivotLeader.stopMotor(); // Follower will automatically stop
     }
 
     @Override
@@ -91,11 +127,13 @@ public class Intake extends SubsystemBase {
         SmartDashboard.putBoolean("Intake Going In?", goingIn);
         SmartDashboard.putBoolean("Intake Going Out?", goingOut);
 
-        SmartDashboard.putNumber("Top Intake Battery Draw", topIntake.getSupplyCurrent().getValueAsDouble());
-        SmartDashboard.putNumber("Top Intake Motor Draw", topIntake.getStatorCurrent().getValueAsDouble());
-        SmartDashboard.putNumber("Bottom Intake Battery Draw", bottomIntake.getSupplyCurrent().getValueAsDouble());
-        SmartDashboard.putNumber("Bottom Intake Motor Draw", bottomIntake.getStatorCurrent().getValueAsDouble());
-        SmartDashboard.putNumber("Inside Intake Battery Draw", insideIntake.getSupplyCurrent().getValueAsDouble());
-        SmartDashboard.putNumber("Inside Intake Motor Draw", insideIntake.getStatorCurrent().getValueAsDouble());
+        // Intake Telemetry
+        SmartDashboard.putNumber("Intake Battery Draw", intakeMotor.getSupplyCurrent().getValueAsDouble());
+        SmartDashboard.putNumber("Intake Motor Draw", intakeMotor.getStatorCurrent().getValueAsDouble());
+        
+        // Pivot Telemetry
+        SmartDashboard.putNumber("Pivot Position (Rot)", pivotLeader.getPosition().getValueAsDouble());
+        SmartDashboard.putNumber("Pivot Leader Draw", pivotLeader.getStatorCurrent().getValueAsDouble());
+        SmartDashboard.putNumber("Pivot Follower Draw", pivotFollower.getStatorCurrent().getValueAsDouble());
     } 
 }
