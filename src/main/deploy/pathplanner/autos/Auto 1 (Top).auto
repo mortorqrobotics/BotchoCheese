@@ -17,21 +17,21 @@
           }
         },
         {
-          "type": "wait",
-          "data": {
-            "waitTime": 8.0
-          }
-        },
-        {
           "type": "path",
           "data": {
             "pathName": "Auto 1 Path 2 (Top)"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Climb"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": null,
+  "folder": "Autos 1",
   "choreoAuto": false
 }

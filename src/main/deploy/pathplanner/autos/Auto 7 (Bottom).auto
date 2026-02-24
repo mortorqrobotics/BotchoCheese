@@ -5,6 +5,12 @@
     "data": {
       "commands": [
         {
+          "type": "named",
+          "data": {
+            "name": "IntakeOn"
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "Auto 7 Path 2 (MB, B)"
@@ -21,17 +27,11 @@
           "data": {
             "name": "Shoot"
           }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 12.0
-          }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": null,
+  "folder": "Autos 7",
   "choreoAuto": false
 }

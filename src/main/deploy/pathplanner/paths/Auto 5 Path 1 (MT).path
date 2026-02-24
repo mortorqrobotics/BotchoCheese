@@ -45,7 +45,7 @@
     "rotation": 0.0
   },
   "reversed": false,
-  "folder": "Auto 5; Collect NZ and Outpost Paths",
+  "folder": "Auto 5; Collect",
   "idealStartingState": {
     "velocity": 0,
     "rotation": 0.0

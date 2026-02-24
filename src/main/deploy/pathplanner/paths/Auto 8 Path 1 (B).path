@@ -33,7 +33,7 @@
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 1.5,
+    "maxVelocity": 3.5,
     "maxAcceleration": 3.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
@@ -45,7 +45,7 @@
     "rotation": 29.999999999999996
   },
   "reversed": false,
-  "folder": "Auto 8; Shoot, Outpost, Shoot (SOS)",
+  "folder": "Auto 8 Shoot Outpost Shoot (SOS)",
   "idealStartingState": {
     "velocity": 0,
     "rotation": 0.0

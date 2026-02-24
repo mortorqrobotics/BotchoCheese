@@ -32,12 +32,12 @@
     },
     {
       "anchor": {
-        "x": 8.291855421686748,
-        "y": 6.766927710843373
+        "x": 8.281,
+        "y": 6.636
       },
       "prevControl": {
-        "x": 8.480777692384201,
-        "y": 6.603195076238912
+        "x": 8.469922270697454,
+        "y": 6.472267365395539
       },
       "nextControl": null,
       "isLocked": false,
@@ -58,7 +58,7 @@
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 1.5,
+    "maxVelocity": 3.5,
     "maxAcceleration": 3.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
@@ -67,10 +67,10 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -84.80557109226521
+    "rotation": -90.0
   },
   "reversed": false,
-  "folder": null,
+  "folder": "Auto 2; Shoot and Intake",
   "idealStartingState": {
     "velocity": 0,
     "rotation": -39.207203504967914

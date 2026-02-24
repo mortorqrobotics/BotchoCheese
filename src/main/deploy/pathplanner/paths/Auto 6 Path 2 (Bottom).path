@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 0.525,
-        "y": 4.985710843373495
+        "x": 0.5,
+        "y": 5.0
       },
       "prevControl": null,
       "nextControl": {
-        "x": 0.658107681863355,
-        "y": 4.722703434876753
+        "x": 0.633107681863355,
+        "y": 4.736992591503259
       },
       "isLocked": false,
       "linkedName": null
@@ -58,10 +58,10 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -40.462227492093376
+    "rotation": -35.0
   },
   "reversed": false,
-  "folder": "Auto 6; Depot and Shoot Paths",
+  "folder": "Auto 6; Depot and Shoot",
   "idealStartingState": {
     "velocity": 0,
     "rotation": 89.51030440687076

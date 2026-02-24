@@ -45,7 +45,7 @@
     "rotation": -90.0
   },
   "reversed": false,
-  "folder": "Auto 6; Depot and Shoot Paths",
+  "folder": "Auto 6; Depot and Shoot",
   "idealStartingState": {
     "velocity": 0,
     "rotation": 0.0

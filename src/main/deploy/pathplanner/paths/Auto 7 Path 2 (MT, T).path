@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.4945903614457823,
-        "y": 7.346096385542169
+        "x": 3.5,
+        "y": 7.335
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.701987951807228,
-        "y": 7.389807228915663
+        "x": 5.707397590361445,
+        "y": 7.378710843373494
       },
       "isLocked": false,
       "linkedName": null
@@ -54,7 +54,7 @@
     "rotation": -90.0
   },
   "reversed": false,
-  "folder": "Auto 7; Collect and Shoot Bump Paths",
+  "folder": "Auto 7; NZ Shoot",
   "idealStartingState": {
     "velocity": 0,
     "rotation": 0.0

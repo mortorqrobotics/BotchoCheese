@@ -11,6 +11,12 @@
           }
         },
         {
+          "type": "named",
+          "data": {
+            "name": "IntakeOn"
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "Auto 7 Path 2 (MT, T)"
@@ -27,17 +33,11 @@
           "data": {
             "name": "Shoot"
           }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 9.0
-          }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": null,
+  "folder": "Autos 7",
   "choreoAuto": false
 }

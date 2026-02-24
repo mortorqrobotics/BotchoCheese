@@ -26,6 +26,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.BotchoCheese.Commands.RotateToTag;
 import frc.BotchoCheese.Subsystems.Shooter;
 import frc.BotchoCheese.Subsystems.Climber;
+import frc.BotchoCheese.Subsystems.Intake;
 import frc.BotchoCheese.Commands.StrafeToTag;
 import frc.BotchoCheese.Subsystems.CommandSwerveDrivetrain;
 import frc.BotchoCheese.Constants.TunerConstants;
@@ -60,8 +61,9 @@ public class RobotContainer {
     // Initializing the Feeder subsystem
     public final Feeder feeder = new Feeder();
 
-    public final Climber lClimber = new Climber();
-    public final Climber rClimber = new Climber();
+    public final Climber climber = new Climber();
+
+    public final Intake intake = new Intake();
 
     /* Path follower */
     private final SendableChooser<Command> autoChooser;
@@ -69,12 +71,8 @@ public class RobotContainer {
     public RobotContainer() {
         
         NamedCommands.registerCommand("Shoot", shooter.shoot());
-        NamedCommands.registerCommand("Climb", 
-        Commands.parallel(
-            lClimber.leftClimberUp(), 
-            rClimber.rightClimberUp()
-        )
-        );
+        NamedCommands.registerCommand("Climb", climber.climberUp());
+        NamedCommands.registerCommand("IntakeOn", intake.intakeIn());
 
         autoChooser = AutoBuilder.buildAutoChooser("New Auto");
         SmartDashboard.putData("Auto Mode", autoChooser);

@@ -47,7 +47,7 @@
   "rotationTargets": [
     {
       "waypointRelativePos": 0.8366533864541729,
-      "rotationDegrees": 176.0
+      "rotationDegrees": 180.0
     }
   ],
   "constraintZones": [],
@@ -66,7 +66,7 @@
     "rotation": 179.2654789657452
   },
   "reversed": false,
-  "folder": "Auto 5; Collect NZ and Outpost Paths",
+  "folder": "Auto 5; Collect",
   "idealStartingState": {
     "velocity": 0,
     "rotation": -90.0

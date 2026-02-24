@@ -16,12 +16,12 @@
     },
     {
       "anchor": {
-        "x": 3.495,
-        "y": 7.335168674698796
+        "x": 3.5,
+        "y": 7.335
       },
       "prevControl": {
-        "x": 2.7733614457831326,
-        "y": 7.411662650602409
+        "x": 2.7783614457831325,
+        "y": 7.411493975903613
       },
       "nextControl": null,
       "isLocked": false,
@@ -45,7 +45,7 @@
     "rotation": 0.0
   },
   "reversed": false,
-  "folder": "Auto 7; Collect and Shoot Bump Paths",
+  "folder": "Auto 7; NZ Shoot",
   "idealStartingState": {
     "velocity": 0,
     "rotation": 0.0

@@ -17,6 +17,12 @@
           }
         },
         {
+          "type": "named",
+          "data": {
+            "name": "IntakeOn"
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "Auto 5 Path 3 (MT, T)"
@@ -38,6 +44,6 @@
     }
   },
   "resetOdom": true,
-  "folder": null,
+  "folder": "Autos 5",
   "choreoAuto": false
 }

@@ -17,15 +17,15 @@
           }
         },
         {
-          "type": "wait",
-          "data": {
-            "waitTime": 8.0
-          }
-        },
-        {
           "type": "path",
           "data": {
             "pathName": "Auto 2 Path 2 (MT, T)"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "IntakeOn"
           }
         },
         {
@@ -44,6 +44,6 @@
     }
   },
   "resetOdom": true,
-  "folder": null,
+  "folder": "Autos 2",
   "choreoAuto": false
 }

@@ -8,8 +8,8 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.4125106990014262,
-        "y": 1.5701854493580605
+        "x": 1.4112392097305282,
+        "y": 1.571073532344586
       },
       "isLocked": false,
       "linkedName": null
@@ -38,7 +38,7 @@
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 1.5,
+    "maxVelocity": 3.5,
     "maxAcceleration": 3.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
@@ -50,7 +50,7 @@
     "rotation": 180.0
   },
   "reversed": false,
-  "folder": "Auto 8; Shoot, Outpost, Shoot (SOS)",
+  "folder": "Auto 8 Shoot Outpost Shoot (SOS)",
   "idealStartingState": {
     "velocity": 0,
     "rotation": 29.999999999999996

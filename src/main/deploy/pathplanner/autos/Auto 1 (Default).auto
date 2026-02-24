@@ -7,7 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Default Path 1"
+            "pathName": "Auto 1 Path 1"
           }
         },
         {
@@ -17,21 +17,21 @@
           }
         },
         {
-          "type": "wait",
+          "type": "path",
           "data": {
-            "waitTime": 8.0
+            "pathName": "Auto 1 Path 2"
           }
         },
         {
-          "type": "path",
+          "type": "named",
           "data": {
-            "pathName": "Default Path 2"
+            "name": "Climb"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": null,
+  "folder": "Autos 1",
   "choreoAuto": false
 }

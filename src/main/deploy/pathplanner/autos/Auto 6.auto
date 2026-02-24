@@ -11,6 +11,12 @@
           }
         },
         {
+          "type": "named",
+          "data": {
+            "name": "IntakeOn"
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "Auto 6 Path 2"
@@ -21,17 +27,11 @@
           "data": {
             "name": "Shoot"
           }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 8.0
-          }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": null,
+  "folder": "Autos 6",
   "choreoAuto": false
 }

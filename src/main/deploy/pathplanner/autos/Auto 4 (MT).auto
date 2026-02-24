@@ -17,6 +17,12 @@
           }
         },
         {
+          "type": "named",
+          "data": {
+            "name": "IntakeOn"
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "Auto 4 Path 3 (MT, T)"
@@ -39,17 +45,11 @@
           "data": {
             "name": "Shoot"
           }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 8.0
-          }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": null,
+  "folder": "Autos 4",
   "choreoAuto": false
 }

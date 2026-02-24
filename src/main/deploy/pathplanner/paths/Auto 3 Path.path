@@ -28,7 +28,12 @@
       "linkedName": null
     }
   ],
-  "rotationTargets": [],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.6157480314960614,
+      "rotationDegrees": -45.0
+    }
+  ],
   "constraintZones": [],
   "pointTowardsZones": [],
   "eventMarkers": [],
@@ -45,7 +50,7 @@
     "rotation": 180.0
   },
   "reversed": false,
-  "folder": "Auto 3; Climb Paths",
+  "folder": "Auto 3; Climb",
   "idealStartingState": {
     "velocity": 0,
     "rotation": 0.0

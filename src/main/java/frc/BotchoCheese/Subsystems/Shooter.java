@@ -1,10 +1,12 @@
 package frc.BotchoCheese.Subsystems;
 
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.hardware.TalonFXS;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.configs.TalonFXSConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -20,7 +22,7 @@ public class Shooter extends SubsystemBase {
     private final TalonFX middleShooter;
     private final TalonFX rightShooter;
     //private final TalonFX bottomShooter;
-    private final TalonFX hood;
+    private final TalonFXS hood;
 
     // Control requests (Phoenix 6 uses request objects instead of passing doubles directly)
     private final DutyCycleOut m_output = new DutyCycleOut(0);
@@ -33,10 +35,11 @@ public class Shooter extends SubsystemBase {
         leftShooter = new TalonFX(RobotMap.LEFT_SHOOTER_MOTOR_ID);
         middleShooter = new TalonFX(RobotMap.MIDDLE_SHOOTER_MOTOR_ID);
         rightShooter = new TalonFX(RobotMap.RIGHT_SHOOTER_MOTOR_ID);
-        hood = new TalonFX(RobotMap.HOOD_MOTOR_ID);
+        hood = new TalonFXS(RobotMap.HOOD_MOTOR_ID);
 
         // Apply basic configuration
         TalonFXConfiguration config = new TalonFXConfiguration();
+        TalonFXSConfiguration hoodConfig = new TalonFXSConfiguration();
 
         // PID Shooter Values
         // in init function, set slot 0 gains
@@ -53,7 +56,7 @@ public class Shooter extends SubsystemBase {
         slot1Configs.kP = RobotMap.HOOD_P_VALUE;
         slot1Configs.kI = RobotMap.HOOD_I_VALUE;
         slot1Configs.kD = RobotMap.HOOD_D_VALUE;
-        config.Slot0 = slot1Configs;
+        hoodConfig.Slot0 = slot1Configs;
         
         // Verify
         CurrentLimitsConfigs currentLimits = new CurrentLimitsConfigs();
@@ -70,7 +73,7 @@ public class Shooter extends SubsystemBase {
         leftShooter.getConfigurator().apply(config);
         middleShooter.getConfigurator().apply(config);
         rightShooter.getConfigurator().apply(config);
-        hood.getConfigurator().apply(config);
+        hood.getConfigurator().apply(hoodConfig);
     }
 
     /**

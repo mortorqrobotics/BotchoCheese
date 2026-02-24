@@ -32,12 +32,12 @@
     },
     {
       "anchor": {
-        "x": 0.4894698795180723,
-        "y": 4.952927710843373
+        "x": 0.5,
+        "y": 5.0
       },
       "prevControl": {
-        "x": 2.314397590361445,
-        "y": 5.105915662650604
+        "x": 2.2597590361445787,
+        "y": 4.974783132530121
       },
       "nextControl": null,
       "isLocked": false,
@@ -61,7 +61,7 @@
     "rotation": 91.12330271407546
   },
   "reversed": false,
-  "folder": "Auto 6; Depot and Shoot Paths",
+  "folder": "Auto 6; Depot and Shoot",
   "idealStartingState": {
     "velocity": 0,
     "rotation": 0.0

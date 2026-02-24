@@ -43,37 +43,39 @@ public class Climber extends SubsystemBase {
     }
 
     //Commands to move the left climber.
-    public Command leftClimberUp() {
+    public Command climberUp() {
         return this.run(() -> {
             lClimber.setControl(m_output.withOutput(RobotMap.TEST_MOTOR_LEFT_UP_SPEED));
-            goingUp = true;
-            goingDown = false;
-        }).finallyDo(() -> stopMotors());
-    }
-
-    public Command leftClimberDown() {
-        return this.run(() -> {
-            lClimber.setControl(m_output.withOutput(RobotMap.TEST_MOTOR_LEFT_DOWN_SPEED));
-            goingUp = false;
-            goingDown = true;
-        }).finallyDo(() -> stopMotors());
-    }
-    // Commands to move the right climber.
-    public Command rightClimberUp() {
-        return this.run(() -> {
             rClimber.setControl(m_output.withOutput(RobotMap.TEST_MOTOR_RIGHT_UP_SPEED));
             goingUp = true;
             goingDown = false;
         }).finallyDo(() -> stopMotors());
     }
 
-    public Command rightClimberDown() {
+    public Command climberDown() {
         return this.run(() -> {
+            lClimber.setControl(m_output.withOutput(RobotMap.TEST_MOTOR_LEFT_DOWN_SPEED));
             rClimber.setControl(m_output.withOutput(RobotMap.TEST_MOTOR_RIGHT_DOWN_SPEED));
             goingUp = false;
             goingDown = true;
         }).finallyDo(() -> stopMotors());
     }
+    // // Commands to move the right climber.
+    // public Command rightClimberUp() {
+    //     return this.run(() -> {
+    //         rClimber.setControl(m_output.withOutput(RobotMap.TEST_MOTOR_RIGHT_UP_SPEED));
+    //         goingUp = true;
+    //         goingDown = false;
+    //     }).finallyDo(() -> stopMotors());
+    // }
+
+    // public Command rightClimberDown() {
+    //     return this.run(() -> {
+    //         rClimber.setControl(m_output.withOutput(RobotMap.TEST_MOTOR_RIGHT_DOWN_SPEED));
+    //         goingUp = false;
+    //         goingDown = true;
+    //     }).finallyDo(() -> stopMotors());
+    // }
     public void stopMotors() {
         lClimber.stopMotor();
         rClimber.stopMotor();

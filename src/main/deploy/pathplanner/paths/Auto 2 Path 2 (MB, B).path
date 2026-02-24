@@ -32,12 +32,12 @@
     },
     {
       "anchor": {
-        "x": 8.3,
-        "y": 2.56
+        "x": 7.9,
+        "y": 1.9
       },
       "prevControl": {
-        "x": 7.600620870461542,
-        "y": 1.062906247142311
+        "x": 7.200620870461542,
+        "y": 0.4029062471423108
       },
       "nextControl": null,
       "isLocked": false,
@@ -70,7 +70,7 @@
     "rotation": 91.14601547542843
   },
   "reversed": false,
-  "folder": null,
+  "folder": "Auto 2; Shoot and Intake",
   "idealStartingState": {
     "velocity": 0,
     "rotation": 34.38034472384488

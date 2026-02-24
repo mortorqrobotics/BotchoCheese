@@ -11,6 +11,12 @@
           }
         },
         {
+          "type": "named",
+          "data": {
+            "name": "Shoot"
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "Auto 8 Path 2 (M, B)"
@@ -33,17 +39,11 @@
           "data": {
             "name": "Shoot"
           }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 8.0
-          }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": null,
+  "folder": "Autos 8",
   "choreoAuto": false
 }
