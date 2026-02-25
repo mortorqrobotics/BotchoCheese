@@ -2,6 +2,7 @@ package frc.BotchoCheese.Subsystems;
 
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
@@ -60,7 +61,7 @@ public class Intake extends SubsystemBase {
 
         // Set the second X44 to strictly follow the leader. 
         // Note: Change 'false' to 'true' if the follower motor needs to be inverted relative to the leader!
-        pivotFollower.setControl(new Follower(pivotLeader.getDeviceID(), false));
+        pivotFollower.setControl(new Follower(pivotLeader.getDeviceID(), MotorAlignmentValue.Aligned));
 
         // --- INTAKE CONFIGURATION (Minion) ---
         TalonFXConfiguration intakeConfig = new TalonFXConfiguration();

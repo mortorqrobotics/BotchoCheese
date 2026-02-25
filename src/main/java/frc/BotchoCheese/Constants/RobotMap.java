@@ -66,15 +66,15 @@ public class RobotMap {
     public static final double INTAKE_I_VALUE = 0.3;
     public static final double INTAKE_D_VALUE = 0.1;
 
+    // Pivot PID Values
+    // TODO
+    public static final double PIVOT_P_VALUE = 0.4;
+    public static final double PIVOT_I_VALUE = 0.3;
+    public static final double PIVOT_D_VALUE = 0.1;
+
     // Intake speeds
     // Verify if values are correct and go in the right directions
-    public static final double TEST_TOP_MOTOR_IN_SPEED = 0.05;
-    public static final double TEST_BOTTOM_MOTOR_IN_SPEED = 0.05;
-    public static final double TEST_INSIDE_MOTOR_IN_SPEED = 0.05;
-
-    public static final double TEST_TOP_MOTOR_OUT_SPEED = -0.05;
-    public static final double TEST_BOTTOM_MOTOR_OUT_SPEED = -0.05;
-    public static final double TEST_INSIDE_MOTOR_OUT_SPEED = -0.05;
+    public static final double INTAKE_SPEED = 0.05;
     
     // Feeder Motor ID and Speed
     // TODO PID
