@@ -25,6 +25,7 @@ import frc.BotchoCheese.Utils.LimelightHelpers;
 public class Robot extends TimedRobot {
 
   public static LimelightHelpers limelight;
+  public static LimelightHelpers limelightTwo;
 
   private Command m_autonomousCommand;
 
@@ -73,8 +74,8 @@ public class Robot extends TimedRobot {
       double omegaRps = Units.radiansToRotations(driveState.Speeds.omegaRadiansPerSecond);
 
       //assuming limelight starts facing red wall (MUST KNOW STARTING ANGLE) TODO
-      LimelightHelpers.SetRobotOrientation(RobotMap.LIMELIGHT_NAME, headingDeg, 0, 0, 0, 0, 0);
-      var llMeasurement = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(RobotMap.LIMELIGHT_NAME);
+      LimelightHelpers.SetRobotOrientation(RobotMap.LIMELIGHT_2_NAME, headingDeg, 0, 0, 0, 0, 0);
+      var llMeasurement = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(RobotMap.LIMELIGHT_2_NAME);
       if (llMeasurement != null && llMeasurement.tagCount > 0 && omegaRps < 2.0) {
         RobotContainer.drivetrain.addVisionMeasurement(llMeasurement.pose, Utils.fpgaToCurrentTime(llMeasurement.timestampSeconds));
       }

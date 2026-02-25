@@ -15,7 +15,8 @@ public class RobotMap {
     public static final double kVisionStdDevY = 1;
     public static final double kVisionStdDevTheta = 99999;
 
-    public static final String LIMELIGHT_NAME = "limelight-two";
+    public static final String LIMELIGHT_NAME = "limelight";
+    public static final String LIMELIGHT_2_NAME = "limelight-two";
     public static final double DIFFERENCE_CUTOFF_THRESHOLD = 0.15; // Normalized from 1.5 for scale consistency
     public static final double[] TAG_HEIGHTS = {
     1.4859, 1.4859, /*ID: 1 - 2*/

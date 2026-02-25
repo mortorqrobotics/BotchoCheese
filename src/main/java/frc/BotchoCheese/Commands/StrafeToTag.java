@@ -47,18 +47,18 @@ public class StrafeToTag extends Command {
     @Override
 
     public void initialize() {
-        var results = LimelightHelpers.getRawFiducials(RobotMap.LIMELIGHT_NAME);
+        var results = LimelightHelpers.getRawFiducials(RobotMap.LIMELIGHT_2_NAME);
         var blah = Arrays.stream(results).map(c -> Integer.toString(c.id)).collect(Collectors.joining(","));
         System.out.println("all results " + blah + " blah");
         System.out.println("Var Results: " + results);
         // Use Limelight "tv" to confirm a valid fiducial target exists right now.
-        if (!LimelightHelpers.getTV(RobotMap.LIMELIGHT_NAME)) {
+        if (!LimelightHelpers.getTV(RobotMap.LIMELIGHT_2_NAME)) {
             System.out.println("StrafeToTag initialize: no valid target (tv=false)");
             xSetpoint = drivetrainSubsystem.getState().Pose.getX();
             ySetpoint = drivetrainSubsystem.getState().Pose.getY();
             System.out.println("Setpoint: (" + xSetpoint + ", " + ySetpoint + ")");
         } else {
-            int fid = (int) LimelightHelpers.getFiducialID(RobotMap.LIMELIGHT_NAME);
+            int fid = (int) LimelightHelpers.getFiducialID(RobotMap.LIMELIGHT_2_NAME);
             var optionalTagPose = RobotMap.WELDED_FIELD2026.getTagPose(fid);
             System.out.println("Fiducial ID: " + fid);
             System.out.println("Optional Tag Pose: " + optionalTagPose);
