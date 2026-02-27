@@ -95,8 +95,9 @@ public class StrafeToTag extends Command {
         var robotPos = drivetrainSubsystem.getState().Pose;
         System.out.println("Robot Pose: " + robotPos);
 
-        double xSpeed = xController.calculate(robotPos.getX());
-        double ySpeed = yController.calculate(robotPos.getY());
+        // TODO Modify changes regarding speed
+        double xSpeed = xController.calculate(robotPos.getX()) * 0.2;
+        double ySpeed = yController.calculate(robotPos.getY()) * 0.2;
         System.out.println("xSpeed: " + xSpeed);
         System.out.println("ySpeed: " + ySpeed);
 
