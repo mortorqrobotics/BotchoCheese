@@ -95,7 +95,6 @@
 //         var robotPos = drivetrainSubsystem.getState().Pose;
 //         System.out.println("Robot Pose: " + robotPos);
 
-//         // TODO Modify changes regarding speed
 //         double xSpeed = xController.calculate(robotPos.getX()) * 0.2;
 //         double ySpeed = yController.calculate(robotPos.getY()) * 0.2;
 //         System.out.println("xSpeed: " + xSpeed);
@@ -220,6 +219,7 @@ public class StrafeToTag extends Command {
         return forwardController.atSetpoint() && strafeController.atSetpoint();
     }
 
+    // TODO Figure out how to make it stop
     @Override
     public void end(boolean interrupted) {
         // Stop the robot when the command ends or the driver lets go of the button
