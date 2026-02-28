@@ -2,6 +2,8 @@
 
 package frc.BotchoCheese.Commands;
 
+import com.ctre.phoenix6.swerve.SwerveRequest;
+
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.BotchoCheese.RobotContainer;
@@ -14,6 +16,9 @@ public class RotateToTag extends Command {
     private PIDController angleController;
     private double angleSetpoint; 
     private double angleOffset;
+    private boolean validTarget = false;
+    private final SwerveRequest.RobotCentric driveRequest = new SwerveRequest.RobotCentric();
+
 
     /**
      * Align robot with the target using the limelight
@@ -28,33 +33,52 @@ public class RotateToTag extends Command {
         // TODO tune PID and tolerance
         angleController.setTolerance(0.025);
         angleController.enableContinuousInput(-Math.PI, Math.PI);
-        angleController.setSetpoint(angleSetpoint);
 
         addRequirements(drivetrainSubsystem);
     }
 
     // Gets the specific position of the AprilTag
     @Override
-    public void initialize(){
-        var tagPose = RobotMap.WELDED_FIELD2026.getTagPose((int) LimelightHelpers.getFiducialID("limelight")).get();
-        angleSetpoint = tagPose.getRotation().getAngle() + Math.PI + angleOffset;
-        System.out.println("Tag Pose: " + tagPose);
-        System.out.println("Angle Setpoint: " + angleSetpoint);
+    public void initialize() {
+        // var tagPose = RobotMap.WELDED_FIELD2026.getTagPose((int) LimelightHelpers.getFiducialID(RobotMap.LIMELIGHT_NAME)).get();
+        // angleSetpoint = tagPose.getRotation().getAngle() + Math.PI + angleOffset;
+        // angleController.setSetpoint(angleSetpoint);
+        // System.out.println("Tag Pose: " + tagPose);
+        // System.out.println("Angle Setpoint: " + angleSetpoint);
+        validTarget = LimelightHelpers.getTV(RobotMap.LIMELIGHT_NAME);
+        if (!validTarget) return;
+
+        int fid = (int) LimelightHelpers.getFiducialID(RobotMap.LIMELIGHT_NAME);
+        var tagPoseOpt = RobotMap.WELDED_FIELD2026.getTagPose(fid);
+        if (tagPoseOpt.isEmpty()) {
+            validTarget = false;
+            return;
+        }
+
+        var tagPose = tagPoseOpt.get();
+        angleSetpoint = tagPose.getRotation().toRotation2d().getRadians() + Math.PI + angleOffset;
+        angleController.reset();
+        angleController.setSetpoint(angleSetpoint);
+
     }
 
     @Override
     public void execute() {
         double rotation = angleController.calculate(drivetrainSubsystem.getState().Pose.getRotation().getRadians(), angleSetpoint);
-        System.out.println("Rotation: " + rotation);
-        drivetrainSubsystem.setControl( //Does it need to move to rotate (drive with x/y 0)?
-            RobotContainer.drive.withVelocityX(0) // Drive forward with negative Y (forward)
-            .withVelocityY(0) // Drive left with negative X (left)
-            .withRotationalRate(rotation)
-        ); // Drive counterclockwise with negative X (left)
+        // System.out.println("Rotation: " + rotation);
+        drivetrainSubsystem.setControl(
+            driveRequest.withVelocityX(0).withVelocityY(0).withRotationalRate(rotation)
+        );
     }
 
     @Override
     public boolean isFinished() {
         return angleController.atSetpoint();
     }
+
+    @Override
+    public void end(boolean interrupted) {
+        drivetrainSubsystem.setControl(new SwerveRequest.Idle());
+    }
+
 }

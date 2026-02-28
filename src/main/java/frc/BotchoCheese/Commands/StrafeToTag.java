@@ -141,6 +141,7 @@ public class StrafeToTag extends Command {
     private final PIDController strafeController;
 
     private final double targetTy;
+    private boolean lostTarget = false;
 
     /**
      * Align robot with the target using the Limelight camera
@@ -181,9 +182,11 @@ public class StrafeToTag extends Command {
     public void execute() {
         // SAFETY CHECK: If the Limelight loses the target, stop moving immediately.
         if (!LimelightHelpers.getTV(RobotMap.LIMELIGHT_NAME)) {
+            lostTarget = true;
             drivetrainSubsystem.setControl(driveRequest.withVelocityX(0).withVelocityY(0).withRotationalRate(0));
             return;
         }
+        lostTarget = false;
 
         // Get live vision data
         double tx = LimelightHelpers.getTX(RobotMap.LIMELIGHT_NAME);
@@ -217,7 +220,7 @@ public class StrafeToTag extends Command {
     @Override
     public boolean isFinished() {
         // Command finishes when the Limelight crosshair is resting on the setpoints
-        return forwardController.atSetpoint() && strafeController.atSetpoint();
+        return lostTarget || (forwardController.atSetpoint() && strafeController.atSetpoint());
     }
 
     // TODO Figure out how to make it stop
