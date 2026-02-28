@@ -42,9 +42,16 @@ public class Indexer extends SubsystemBase {
         indexer.getConfigurator().apply(config);
     }
 
-    public Command turnIndexerOn() {
+    public Command indexerOn() {
         return this.run(() -> {
             indexer.setControl(m_output.withOutput(RobotMap.INDEXER_MOTOR_SPEED));
+            isOn = true;
+        }).finallyDo(() -> stopMotors());
+    }
+
+    public Command reverseIndexer() {
+        return this.run(() -> {
+            indexer.setControl(m_output.withOutput(-RobotMap.INDEXER_MOTOR_SPEED));
             isOn = true;
         }).finallyDo(() -> stopMotors());
     }

@@ -91,6 +91,18 @@ public class Intake extends SubsystemBase {
         });
     }
 
+    public Command setPivotUp() {
+        return this.run(() -> {
+            pivotLeader.setControl(pivotPositionRequest.withPosition(RobotMap.PIVOT_UP_POSITION));
+        });
+    }
+
+    public Command setPivotDown() {
+        return this.run(() -> {
+            pivotLeader.setControl(pivotPositionRequest.withPosition(RobotMap.PIVOT_DOWN_POSITION));
+        });
+    }
+
     // --- INTAKE METHODS ---
 
     // Pulls the game objects into the Intake using the single Minion.
@@ -118,8 +130,7 @@ public class Intake extends SubsystemBase {
     }
 
     // Completely stop everything (Useful for an emergency stop or disable command)
-    public void stopAll() {
-        stopIntake();
+    public void stopPivot() {
         pivotLeader.stopMotor(); // Follower will automatically stop
     }
 

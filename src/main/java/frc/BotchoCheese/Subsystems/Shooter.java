@@ -8,6 +8,7 @@ import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.configs.TalonFXSConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
+import com.ctre.phoenix6.controls.PositionVoltage;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -25,6 +26,7 @@ public class Shooter extends SubsystemBase {
 
     // Control requests (Phoenix 6 uses request objects instead of passing doubles directly)
     private final DutyCycleOut m_output = new DutyCycleOut(0);
+    private final PositionVoltage hoodPositionRequest = new PositionVoltage(0);
 
     private boolean shooterTurning = false;
     private boolean hoodUp = false;
@@ -75,17 +77,16 @@ public class Shooter extends SubsystemBase {
         hood.getConfigurator().apply(hoodConfig);
     }
 
-    /**
-     * Moves the top Shooter counter Clockwise.
-     */
-    public Command turnShooter() {
-        return this.run(() -> {
-            leftShooter.setControl(m_output.withOutput(RobotMap.MOTOR_SHOOTER_TOP_OUT_SPEED));
-            middleShooter.setControl(m_output.withOutput(RobotMap.MOTOR_SHOOTER_TOP_OUT_SPEED));
-            rightShooter.setControl(m_output.withOutput(RobotMap.MOTOR_SHOOTER_TOP_OUT_SPEED));
-            shooterTurning = true;
-        }).finallyDo(() -> stopMotors());
-    }
+    // Moves the Shooter counter Clockwise.
+    
+    // public Command turnShooters() {
+    //     return this.run(() -> {
+    //         leftShooter.setControl(m_output.withOutput(RobotMap.MOTOR_SHOOTER_TOP_OUT_SPEED));
+    //         middleShooter.setControl(m_output.withOutput(RobotMap.MOTOR_SHOOTER_TOP_OUT_SPEED));
+    //         rightShooter.setControl(m_output.withOutput(RobotMap.MOTOR_SHOOTER_TOP_OUT_SPEED));
+    //         shooterTurning = true;
+    //     }).finallyDo(() -> stopMotors());
+    // }
 
     //1. Use tx and ty to get distance from the robot and the tag
     //2. Determine whether the distance is "close," "medium," or "far" away from the tag
@@ -114,9 +115,10 @@ public class Shooter extends SubsystemBase {
             () -> {
                 System.out.println("Bam!");
                 System.out.println("Kapoooooooooooooow!");
-                leftShooter.set(RobotMap.MOTOR_SHOOTER_TOP_OUT_SPEED);
-                middleShooter.set(RobotMap.MOTOR_SHOOTER_TOP_OUT_SPEED);
-                rightShooter.set(RobotMap.MOTOR_SHOOTER_TOP_OUT_SPEED);
+                hood.setControl(hoodPositionRequest.withPosition(RobotMap.HOOD_POSITION));
+                leftShooter.set(RobotMap.SHOOTER_SPEED);
+                middleShooter.set(RobotMap.SHOOTER_SPEED);
+                rightShooter.set(RobotMap.SHOOTER_SPEED);
             },
             // When command ends:
             () -> {
@@ -144,17 +146,33 @@ public class Shooter extends SubsystemBase {
         double distance = rawFiducials[0].distToRobot;
 
        if(distance <= RobotMap.SHORT_DISTANCE_THRESHOLD) {
-            RobotMap.SHOOTER_SPEED = 0.25;
+            RobotMap.SHOOTER_SPEED = 0.25; // TODO
        }
        else if(distance > RobotMap.SHORT_DISTANCE_THRESHOLD && distance <= RobotMap.MEDIUM_DISTANCE_THRESHOLD) {
-            RobotMap.SHOOTER_SPEED = 0.5;
+            RobotMap.SHOOTER_SPEED = 0.5; // TODO
        }
        else {
-            RobotMap.SHOOTER_SPEED = 0.75;
+            RobotMap.SHOOTER_SPEED = 0.75; // TODO
        }
     }
 
+    public void updateHoodPosition() {
+        LimelightHelpers.RawFiducial[] rawFiducials = LimelightHelpers.getRawFiducials(RobotMap.LIMELIGHT_NAME);
+        if (rawFiducials.length == 0) {
+            return;
+        }
+        double distance = rawFiducials[0].distToRobot;
 
+       if(distance <= RobotMap.SHORT_DISTANCE_THRESHOLD) {
+            RobotMap.HOOD_POSITION = 0.25; // TODO
+       }
+       else if(distance > RobotMap.SHORT_DISTANCE_THRESHOLD && distance <= RobotMap.MEDIUM_DISTANCE_THRESHOLD) {
+            RobotMap.HOOD_POSITION = 0.5; // TODO
+       }
+       else {
+            RobotMap.HOOD_POSITION = 0.75; // TODO
+       }
+    }
 
     @Override
     public void periodic() {

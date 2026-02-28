@@ -39,6 +39,7 @@ public class RobotMap {
     public static final int RIGHT_CLIMBER_MOTOR_ID = 11;
     public static final int LEFT_CLIMBER_TWO_MOTOR_ID = 12;
     public static final int RIGHT_CLIMBER_TWO_MOTOR_ID = 13;
+    public static final int ENCODER_ID = 14;
 
     // Climber PID Values
     // TODO
@@ -60,6 +61,11 @@ public class RobotMap {
     public static final int TOP_INTAKE_MOTOR_ID = 20;
     public static final int BOTTOM_INTAKE_MOTOR_ID = 21;
     public static final int INSIDE_INTAKE_MOTOR_ID = 22;
+
+    // Pivot motor values
+    // TODO Edit values
+    public static final double PIVOT_UP_POSITION = 0;
+    public static final double PIVOT_DOWN_POSITION = 0;
 
     // Intake PID Values
     // TODO
@@ -101,12 +107,12 @@ public class RobotMap {
     public static final double HOOD_SPEED = 0.25;
 
     // Shooter speeds
-    public static final double MOTOR_SHOOTER_TOP_OUT_SPEED = 0.6;
 
-    public static final double MOTOR_SHOOTER_TOP_IN_SPEED = -0.2;
-
-    //Notice: Will be dynamically modified in the Shooter's updateSpeed function
+    // Notice: Will be dynamically modified in the Shooter's updateSpeed function
     public static double SHOOTER_SPEED = 0.1;
+    
+    // TODO Edit HOOD_POSITION
+    public static double HOOD_POSITION = 1;
 
     //If the distance between the robot and tag is less than threshold, the distance is "short"
     public static final double SHORT_DISTANCE_THRESHOLD = 5.0;

@@ -39,6 +39,7 @@ import frc.BotchoCheese.Subsystems.Feeder;
 public class RobotContainer {
     public static double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
     
+    public static boolean pivotIsUp = true;
     
     public static double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
 
@@ -77,7 +78,7 @@ public class RobotContainer {
     public RobotContainer() {
         
         NamedCommands.registerCommand("Shoot", shooter.shoot());
-        NamedCommands.registerCommand("Climb", climber.climberUp());
+        NamedCommands.registerCommand("Climb", climber.automaticClimberUp());
         NamedCommands.registerCommand("IntakeOn", intake.intakeIn());
 
         autoChooser = AutoBuilder.buildAutoChooser("New Auto");
@@ -100,57 +101,55 @@ public class RobotContainer {
             )
         );
 
-        //Controller 1
-        JOYSTICK1_CONTROLLER.a().whileTrue(drivetrain.applyRequest(() -> brake));
-        JOYSTICK1_CONTROLLER.b().whileTrue(drivetrain.applyRequest(() ->
-            point.withModuleDirection(new Rotation2d(-JOYSTICK1_CONTROLLER.getLeftY(), -JOYSTICK1_CONTROLLER.getLeftX()))
-        ));
+        // Controller 1
+        JOYSTICK1_CONTROLLER.x().whileTrue(drivetrain.applyRequest(() -> brake));
+        // JOYSTICK1_CONTROLLER.b().whileTrue(drivetrain.applyRequest(() ->
+        //     point.withModuleDirection(new Rotation2d(-JOYSTICK1_CONTROLLER.getLeftY(), -JOYSTICK1_CONTROLLER.getLeftX()))
+        // ));
 
-        JOYSTICK1_CONTROLLER.pov(0).whileTrue(drivetrain.applyRequest(() ->
+        JOYSTICK1_CONTROLLER.povUp().whileTrue(drivetrain.applyRequest(() ->
             forwardStraight.withVelocityX(0.5).withVelocityY(0))
         );
-        JOYSTICK1_CONTROLLER.pov(180).whileTrue(drivetrain.applyRequest(() ->
+        JOYSTICK1_CONTROLLER.povDown().whileTrue(drivetrain.applyRequest(() ->
             forwardStraight.withVelocityX(-0.5).withVelocityY(0))
         );
+        JOYSTICK1_CONTROLLER.povLeft().whileTrue(drivetrain.applyRequest(() ->
+            forwardStraight.withVelocityX(0).withVelocityY(-0.5))
+        );
+        JOYSTICK1_CONTROLLER.povRight().whileTrue(drivetrain.applyRequest(() ->
+            forwardStraight.withVelocityX(0).withVelocityY(0.5))
+        );
         
-
-        // Run SysId routines when holding back/start and X/Y.
-        // Note that each routine should be run exactly once in a single log.
-        // joystick.back().and(joystick.y()).whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
-        // joystick.back().and(joystick.x()).whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
-        // joystick.start().and(joystick.y()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
-        // joystick.start().and(joystick.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
-        // reset the field-centric heading on left bumper press
-        JOYSTICK1_CONTROLLER.leftBumper().onTrue(new InstantCommand(()->drivetrain.seedFieldCentric()));
-        // JOYSTICK1_CONTROLLER.leftBumper().onTrue(new InstantCommand(() -> gyro.setYaw(0)));
-        JOYSTICK1_CONTROLLER.rightBumper().onTrue(Commands.sequence(new RotateToTag(drivetrain, 0), new StrafeToTag(drivetrain, 0.5)));
+        JOYSTICK1_CONTROLLER.y().onTrue(Commands.sequence(climber.automaticClimberUp()));
+        JOYSTICK1_CONTROLLER.a().onTrue(Commands.sequence(climber.automaticClimberDown()));
         
-        JOYSTICK1_CONTROLLER.x().whileTrue(intake.intakeIn());
+        JOYSTICK1_CONTROLLER.rightBumper().onTrue(new StrafeToTag(drivetrain, 0.5));
 
-        JOYSTICK1_CONTROLLER.y().whileTrue(indexer.turnIndexerOn());
+        JOYSTICK1_CONTROLLER.rightTrigger().onTrue(new RotateToTag(drivetrain, 0));
+
+        // reset the field-centric heading on menu button press
+        JOYSTICK1_CONTROLLER.start().onTrue(new InstantCommand(()->drivetrain.seedFieldCentric()));
 
         //Controller 2
-        JOYSTICK2_CONTROLLER.x().whileTrue(feeder.runFeeder());
+        JOYSTICK2_CONTROLLER.rightTrigger().whileTrue(feeder.runFeeder());
 
-        JOYSTICK2_CONTROLLER.leftStick().whileTrue(shooter.turnShooter());
+        JOYSTICK2_CONTROLLER.leftTrigger().whileTrue(shooter.shoot());
 
-        JOYSTICK2_CONTROLLER.y().whileTrue(shooter.shoot());
+        JOYSTICK2_CONTROLLER.povUp().whileTrue(shooter.hoodUp());
 
-        JOYSTICK2_CONTROLLER.a().whileTrue(shooter.hoodUp());
+        JOYSTICK2_CONTROLLER.povDown().whileTrue(shooter.hoodDown());
 
-        JOYSTICK2_CONTROLLER.b().whileTrue(shooter.hoodDown());
+        JOYSTICK2_CONTROLLER.leftBumper().whileTrue(intake.intakeIn());
 
-        JOYSTICK2_CONTROLLER.leftTrigger().whileTrue(climber.climberUp());
+        JOYSTICK2_CONTROLLER.y().whileTrue(indexer.indexerOn());
 
-        JOYSTICK2_CONTROLLER.rightTrigger().whileTrue(climber.climberDown());
-
-        JOYSTICK2_CONTROLLER.rightBumper().onTrue(Commands.runOnce(() -> {
-            CommandScheduler.getInstance().cancelAll();
-            shooter.stopMotors();
-            feeder.stopMotor();
-            climber.stopMotors();
-            intake.stopAll();
-        }));
+        JOYSTICK2_CONTROLLER.rightBumper().onTrue(
+            Commands.either(
+                intake.setPivotDown().andThen(Commands.runOnce(() -> pivotIsUp = false)),
+                intake.setPivotUp().andThen(Commands.runOnce(() -> pivotIsUp = true)),
+                () -> pivotIsUp
+            )
+        );
 
         drivetrain.registerTelemetry(logger::telemeterize);
     }
