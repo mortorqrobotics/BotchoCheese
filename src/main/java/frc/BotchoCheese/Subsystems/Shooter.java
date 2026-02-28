@@ -141,9 +141,20 @@ public class Shooter extends SubsystemBase {
         if (rawFiducials.length == 0) {
             return;
         }
-
         double distance = rawFiducials[0].distToRobot;
+
+       if(distance <= RobotMap.SHORT_DISTANCE_THRESHOLD) {
+            RobotMap.SHOOTER_SPEED = 0.25;
+       }
+       else if(distance > RobotMap.SHORT_DISTANCE_THRESHOLD && distance <= RobotMap.MEDIUM_DISTANCE_THRESHOLD) {
+            RobotMap.SHOOTER_SPEED = 0.5;
+       }
+       else {
+            RobotMap.SHOOTER_SPEED = 0.75;
+       }
     }
+
+
 
     @Override
     public void periodic() {
