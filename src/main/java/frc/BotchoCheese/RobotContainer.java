@@ -21,12 +21,14 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.BotchoCheese.Commands.RotateToTag;
 import frc.BotchoCheese.Subsystems.Shooter;
 import frc.BotchoCheese.Subsystems.Climber;
 import frc.BotchoCheese.Subsystems.Intake;
+import frc.BotchoCheese.Subsystems.Indexer;
 import frc.BotchoCheese.Commands.StrafeToTag;
 import frc.BotchoCheese.Subsystems.CommandSwerveDrivetrain;
 import frc.BotchoCheese.Constants.TunerConstants;
@@ -67,6 +69,8 @@ public class RobotContainer {
 
     public final Intake intake = new Intake();
 
+    public final Indexer indexer = new Indexer();
+
     /* Path follower */
     private final SendableChooser<Command> autoChooser;
 
@@ -96,6 +100,7 @@ public class RobotContainer {
             )
         );
 
+        //Controller 1
         JOYSTICK1_CONTROLLER.a().whileTrue(drivetrain.applyRequest(() -> brake));
         JOYSTICK1_CONTROLLER.b().whileTrue(drivetrain.applyRequest(() ->
             point.withModuleDirection(new Rotation2d(-JOYSTICK1_CONTROLLER.getLeftY(), -JOYSTICK1_CONTROLLER.getLeftX()))
@@ -118,16 +123,34 @@ public class RobotContainer {
         // reset the field-centric heading on left bumper press
         JOYSTICK1_CONTROLLER.leftBumper().onTrue(new InstantCommand(()->drivetrain.seedFieldCentric()));
         // JOYSTICK1_CONTROLLER.leftBumper().onTrue(new InstantCommand(() -> gyro.setYaw(0)));
-        // JOYSTICK1_CONTROLLER.x().onTrue(Commands.sequence(new RotateToTag(drivetrain, 0), new StrafeToTag(drivetrain, 0.5)));
-        // TODO Do Left Bumper for StrafeToTag command
-        // Pass in your drivetrain and the offset you want (e.g., 0.5 meters)
-        JOYSTICK1_CONTROLLER.rightBumper().onTrue(new StrafeToTag(drivetrain, 0.5));
+        JOYSTICK1_CONTROLLER.rightBumper().onTrue(Commands.sequence(new RotateToTag(drivetrain, 0), new StrafeToTag(drivetrain, 0.5)));
         
-        // Correctly binding the shoot command
-        JOYSTICK1_CONTROLLER.y().whileTrue(shooter.shoot());
+        JOYSTICK1_CONTROLLER.x().whileTrue(intake.intakeIn());
 
-        // Binding the feeder to the X button
-        JOYSTICK1_CONTROLLER.x().whileTrue(feeder.runFeeder());
+        JOYSTICK1_CONTROLLER.y().whileTrue(indexer.turnIndexerOn());
+
+        //Controller 2
+        JOYSTICK2_CONTROLLER.x().whileTrue(feeder.runFeeder());
+
+        JOYSTICK2_CONTROLLER.leftStick().whileTrue(shooter.turnShooter());
+
+        JOYSTICK2_CONTROLLER.y().whileTrue(shooter.shoot());
+
+        JOYSTICK2_CONTROLLER.a().whileTrue(shooter.hoodUp());
+
+        JOYSTICK2_CONTROLLER.b().whileTrue(shooter.hoodDown());
+
+        JOYSTICK2_CONTROLLER.leftTrigger().whileTrue(climber.climberUp());
+
+        JOYSTICK2_CONTROLLER.rightTrigger().whileTrue(climber.climberDown());
+
+        JOYSTICK2_CONTROLLER.rightBumper().onTrue(Commands.runOnce(() -> {
+            CommandScheduler.getInstance().cancelAll();
+            shooter.stopMotors();
+            feeder.stopMotor();
+            climber.stopMotors();
+            intake.stopAll();
+        }));
 
         drivetrain.registerTelemetry(logger::telemeterize);
     }

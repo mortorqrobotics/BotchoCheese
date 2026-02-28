@@ -11,11 +11,9 @@ import frc.BotchoCheese.Utils.LimelightHelpers;
 
 public class RotateToTag extends Command {
     private CommandSwerveDrivetrain drivetrainSubsystem;
-    // l
     private PIDController angleController;
     private double angleSetpoint; 
-    private double angleOffset; 
-    
+    private double angleOffset;
 
     /**
      * Align robot with the target using the limelight

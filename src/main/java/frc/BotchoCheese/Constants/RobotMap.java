@@ -107,6 +107,10 @@ public class RobotMap {
 
     public static final double SHOOTER_SPEED = 0.1;
 
+    // //If the distance between the robot and tag is less than threshold, the distance is "short"
+    // public static final double SHORT_DISTANCE_THRESHOLD = 5.0;
+    // public static final double MEDIUM_DISTANCE_THRESHOLD = 10.0;
+
     // Shooter PID Values
     // TODO
     public static final double SHOOTER_P_VALUE = 0.5;

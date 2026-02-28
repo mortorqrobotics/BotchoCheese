@@ -192,12 +192,13 @@ public class StrafeToTag extends Command {
         // --- THE MATH ---
         // Limelight ty is positive when target is HIGH (farther). 
         // We need to drive FORWARD (Positive X velocity) to get closer.
-        double xSpeed = forwardController.calculate(tx);
+        //NOTE: Ty should go with xSpeed and tx should go with ySpeed
+        double xSpeed = forwardController.calculate(ty);
         
         // Limelight tx is positive when target is RIGHT. 
         // We need to strafe RIGHT (Negative Y velocity) to center it. 
         // Notice the negative sign!
-        double ySpeed = -strafeController.calculate(ty); 
+        double ySpeed = -strafeController.calculate(tx); 
 
         // Cap the maximum speeds so the robot doesn't fly out of control during tuning (Max 1.5 m/s)
         // TODO Change the speed caps
@@ -226,4 +227,14 @@ public class StrafeToTag extends Command {
         drivetrainSubsystem.setControl(new SwerveRequest.Idle());
         System.out.println("StrafeToTag Ended");
     }
+    // @Override
+    // public void end(boolean interrupted) {
+    //     drivetrainSubsystem.setControl(
+    //         driveRequest
+    //             .withVelocityX(0.0)
+    //             .withVelocityY(0.0)
+    //             .withRotationalRate(0.0)
+    //     );
+    //     System.out.println("StrafeToTag Ended");
+    // }
 }

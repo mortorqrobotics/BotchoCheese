@@ -13,7 +13,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 //import frc.BotchoCheese.Robot;
-//import frc.BotchoCheese.Utils.LimelightHelpers;
+import frc.BotchoCheese.Utils.LimelightHelpers;
 import frc.BotchoCheese.Constants.RobotMap; // Assuming your IDs are here
 
 public class Shooter extends SubsystemBase {
@@ -21,7 +21,6 @@ public class Shooter extends SubsystemBase {
     private final TalonFX leftShooter;
     private final TalonFX middleShooter;
     private final TalonFX rightShooter;
-    //private final TalonFX bottomShooter;
     private final TalonFXS hood;
 
     // Control requests (Phoenix 6 uses request objects instead of passing doubles directly)
@@ -88,6 +87,10 @@ public class Shooter extends SubsystemBase {
         }).finallyDo(() -> stopMotors());
     }
 
+    //1. Use tx and ty to get distance from the robot and the tag
+    //2. Determine whether the distance is "close," "medium," or "far" away from the tag
+    //3. Change the speed accordingly for each of these situations
+
     public Command hoodUp() {
         return this.run(() -> {
             hood.setControl(m_output.withOutput(RobotMap.HOOD_SPEED));
@@ -134,9 +137,12 @@ public class Shooter extends SubsystemBase {
      * Update shooter speed based on distance from target
      */
     public void updateSpeed() {
-        //TODO: Find what the new version of this function is in the LimelightHelpers file
-        //double distance = LimelightHelpers.getDistance();
-        //speed = calcSpeed(distance);
+        LimelightHelpers.RawFiducial[] rawFiducials = LimelightHelpers.getRawFiducials(RobotMap.LIMELIGHT_NAME);
+        if (rawFiducials.length == 0) {
+            return;
+        }
+
+        double distance = rawFiducials[0].distToRobot;
     }
 
     @Override
@@ -154,3 +160,4 @@ public class Shooter extends SubsystemBase {
         SmartDashboard.putNumber("Hood Motor Draw", hood.getStatorCurrent().getValueAsDouble());
     } 
 }
+
