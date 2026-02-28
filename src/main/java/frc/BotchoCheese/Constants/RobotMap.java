@@ -106,11 +106,19 @@ public class RobotMap {
     public static final double HOOD_D_VALUE = 0.2;
     public static final double HOOD_SPEED = 0.25;
 
+    //TODO
+    public static double HOOD_SPEED_REGRESSION_SLOPE = 1.0;
+    public static double HOOD_SPEED_REGRESSION_Y_INTERCEPT = 1.0;
+
     // Shooter speeds
 
     // Notice: Will be dynamically modified in the Shooter's updateSpeed function
     public static double SHOOTER_SPEED = 0.1;
     
+    //TODO
+    public static double SHOOTER_SPEED_REGRESSION_SLOPE = 1.0;
+    public static double SHOOTER_SPEED_REGRESSION_Y_INTERCEPT = 1.0;
+
     // TODO Edit HOOD_POSITION
     public static double HOOD_POSITION = 1;
 
