@@ -105,6 +105,7 @@ public class RobotMap {
 
     public static final double MOTOR_SHOOTER_TOP_IN_SPEED = -0.2;
 
+    //Notice: Will be dynamically modified in the Shooter's updateSpeed function
     public static double SHOOTER_SPEED = 0.1;
 
     //If the distance between the robot and tag is less than threshold, the distance is "short"
