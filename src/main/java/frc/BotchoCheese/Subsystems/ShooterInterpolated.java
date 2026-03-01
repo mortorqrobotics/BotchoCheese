@@ -36,7 +36,6 @@ public class ShooterInterpolated extends SubsystemBase {
     private final PositionVoltage hoodPositionRequest = new PositionVoltage(0);
 
     private boolean shooterTurning = false;
-    private boolean hoodUp = false;
     private boolean hoodDown = false;
     
     public ShooterInterpolated() {
@@ -102,16 +101,14 @@ public class ShooterInterpolated extends SubsystemBase {
     public Command hoodUp() {
         return this.run(() -> {
             hood.setControl(m_output.withOutput(RobotMap.HOOD_SPEED));
-            hoodUp = true;
             hoodDown = false;
         }).finallyDo(() -> stopMotors());
     }
 
     public Command hoodDown() {
         return this.run(() -> {
-            hood.setControl(m_output.withOutput(-RobotMap.HOOD_SPEED));   
-            hoodUp = true;
-            hoodDown = false;
+            hood.setControl(m_output.withOutput(-RobotMap.HOOD_SPEED));
+            hoodDown = true;
         }).finallyDo(() -> stopMotors());
     }
 
@@ -239,7 +236,6 @@ public class ShooterInterpolated extends SubsystemBase {
         SmartDashboard.putNumber("kI", RobotMap.SHOOTER_I_VALUE);
         SmartDashboard.putNumber("kD", RobotMap.SHOOTER_D_VALUE);
         SmartDashboard.putBoolean("Shooter Turning?", shooterTurning);
-        SmartDashboard.putBoolean("Hood Going Up?", hoodUp);
         SmartDashboard.putBoolean("Hood Going Down?", hoodDown);
         
         SmartDashboard.putNumber("Shooter Battery Draw", leftShooter.getSupplyCurrent().getValueAsDouble());

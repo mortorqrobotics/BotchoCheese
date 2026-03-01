@@ -23,8 +23,7 @@ public class Climber extends SubsystemBase {
     // Control requests (Phoenix 6 uses request objects instead of passing doubles directly)
     private final DutyCycleOut m_output = new DutyCycleOut(0);
 
-    private boolean goingUp = false;
-    private boolean goingDown = false;
+    private boolean goingUp = true;
     
     public Climber() {
         lClimber = new TalonFX(RobotMap.LEFT_CLIMBER_MOTOR_ID);
@@ -62,7 +61,6 @@ public class Climber extends SubsystemBase {
                 lClimber.setControl(m_output.withOutput(RobotMap.TEST_MOTOR_LEFT_UP_SPEED));
                 rClimber.setControl(m_output.withOutput(RobotMap.TEST_MOTOR_RIGHT_UP_SPEED));
                 goingUp = true;
-                goingDown = false;
             }
         }).finallyDo(() -> stopMotors());
     }
@@ -73,7 +71,6 @@ public class Climber extends SubsystemBase {
                 lClimber.setControl(m_output.withOutput(RobotMap.TEST_MOTOR_LEFT_DOWN_SPEED));
                 rClimber.setControl(m_output.withOutput(RobotMap.TEST_MOTOR_RIGHT_DOWN_SPEED));
                 goingUp = false;
-                goingDown = true;
             }
         }).finallyDo(() -> stopMotors());
     }
@@ -83,7 +80,6 @@ public class Climber extends SubsystemBase {
             lClimber.setControl(m_output.withOutput(RobotMap.TEST_MOTOR_LEFT_UP_SPEED));
             rClimber.setControl(m_output.withOutput(RobotMap.TEST_MOTOR_RIGHT_UP_SPEED));
             goingUp = true;
-            goingDown = false;
         }).until(this::atLimit).finallyDo(() -> stopMotors());
     }
 
@@ -92,7 +88,6 @@ public class Climber extends SubsystemBase {
             lClimber.setControl(m_output.withOutput(RobotMap.TEST_MOTOR_LEFT_DOWN_SPEED));
             rClimber.setControl(m_output.withOutput(RobotMap.TEST_MOTOR_RIGHT_DOWN_SPEED));
             goingUp = false;
-            goingDown = true;
         }).until(this::atLimit).finallyDo(() -> stopMotors());
     }
     
@@ -100,13 +95,11 @@ public class Climber extends SubsystemBase {
         lClimber.stopMotor();
         rClimber.stopMotor();
         goingUp = false;
-        goingDown = false;
     }
 
     @Override
     public void periodic() {
         SmartDashboard.putBoolean("Climber Going Up?", goingUp);
-        SmartDashboard.putBoolean("Climber Going Down?", goingDown);
         
         SmartDashboard.putNumber("Left Climber 1 Battery Draw", lClimber.getSupplyCurrent().getValueAsDouble());
         SmartDashboard.putNumber("Right Climber 1 Motor Draw", rClimber.getStatorCurrent().getValueAsDouble());
