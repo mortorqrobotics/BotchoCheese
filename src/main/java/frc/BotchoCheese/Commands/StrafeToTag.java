@@ -230,14 +230,4 @@ public class StrafeToTag extends Command {
         drivetrainSubsystem.setControl(new SwerveRequest.Idle());
         System.out.println("StrafeToTag Ended");
     }
-    // @Override
-    // public void end(boolean interrupted) {
-    //     drivetrainSubsystem.setControl(
-    //         driveRequest
-    //             .withVelocityX(0.0)
-    //             .withVelocityY(0.0)
-    //             .withRotationalRate(0.0)
-    //     );
-    //     System.out.println("StrafeToTag Ended");
-    // }
 }
