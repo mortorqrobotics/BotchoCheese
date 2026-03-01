@@ -1,6 +1,7 @@
 package frc.BotchoCheese.Subsystems;
 
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.hardware.core.CoreCANrange;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
@@ -20,6 +21,7 @@ public class Intake extends SubsystemBase {
     private final TalonFX pivotLeader;
     private final TalonFX pivotFollower;
     private final TalonFX intakeMotor;
+    private final CoreCANrange CANrange;
 
     // Control requests
     private final DutyCycleOut intakeOutput = new DutyCycleOut(0);
@@ -27,13 +29,14 @@ public class Intake extends SubsystemBase {
 
     // Telemetry state variables
     private boolean goingIn = false;
-    private boolean goingOut = false;
+    private boolean pivotUp = true;
     
     public Intake() {
         // Initialize motors (You will need to add these new IDs to your RobotMap)
         pivotLeader = new TalonFX(RobotMap.PIVOT_1_MOTOR_ID);
         pivotFollower = new TalonFX(RobotMap.PIVOT_2_MOTOR_ID);
-        intakeMotor = new TalonFX(RobotMap.INDEXER_MOTOR_ID);
+        intakeMotor = new TalonFX(RobotMap.INTAKE_MOTOR_ID);
+        CANrange = new CoreCANrange(RobotMap.CAN_RANGE_ID);
 
         // --- PIVOT CONFIGURATION (Kraken X44s) ---
         TalonFXConfiguration pivotConfig = new TalonFXConfiguration();
@@ -94,23 +97,24 @@ public class Intake extends SubsystemBase {
     public Command setPivotUp() {
         return this.run(() -> {
             pivotLeader.setControl(pivotPositionRequest.withPosition(RobotMap.PIVOT_UP_POSITION));
+            pivotUp = true;
         });
     }
 
     public Command setPivotDown() {
         return this.run(() -> {
             pivotLeader.setControl(pivotPositionRequest.withPosition(RobotMap.PIVOT_DOWN_POSITION));
+            pivotUp = false;
         });
     }
 
     // --- INTAKE METHODS ---
 
     // Pulls the game objects into the Intake using the single Minion.
-    public Command intakeIn() {
+    public Command startIntake() {
         return this.run(() -> {
             intakeMotor.setControl(intakeOutput.withOutput(RobotMap.INTAKE_SPEED));
             goingIn = true;
-            goingOut = false;
         }).finallyDo(() -> stopIntake());
     }
 
@@ -119,14 +123,29 @@ public class Intake extends SubsystemBase {
         return this.run(() -> {
             intakeMotor.setControl(intakeOutput.withOutput(-RobotMap.INTAKE_SPEED));
             goingIn = false;
-            goingOut = true;
         }).finallyDo(() -> stopIntake());
+    }
+
+    // Checks whether the intake is full or not.
+    // TODO Refine the command later
+    public Command checkIfIntakeFull() {
+        return this.run(() -> {
+            while(!pivotUp) {
+                while(goingIn) {
+                    if(CANrange.getDistance().getValueAsDouble() < RobotMap.CAN_RANGE_DISTANCE_THRESHOLD) {
+                        stopIntake();
+                    }
+                    else {
+                        startIntake();
+                    }
+                }
+            }
+        });
     }
     
     public void stopIntake() {
         intakeMotor.stopMotor();
         goingIn = false;
-        goingOut = false;
     }
 
     // Completely stop everything (Useful for an emergency stop or disable command)
@@ -137,7 +156,6 @@ public class Intake extends SubsystemBase {
     @Override
     public void periodic() {
         SmartDashboard.putBoolean("Intake Going In?", goingIn);
-        SmartDashboard.putBoolean("Intake Going Out?", goingOut);
 
         // Intake Telemetry
         SmartDashboard.putNumber("Intake Battery Draw", intakeMotor.getSupplyCurrent().getValueAsDouble());

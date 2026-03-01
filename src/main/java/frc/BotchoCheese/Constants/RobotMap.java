@@ -58,9 +58,10 @@ public class RobotMap {
     public static final double CLIMBER_EXTENSION_LIMIT = 0.5; 
     
     // Intake motor IDs
-    public static final int TOP_INTAKE_MOTOR_ID = 20;
-    public static final int BOTTOM_INTAKE_MOTOR_ID = 21;
-    public static final int INSIDE_INTAKE_MOTOR_ID = 22;
+    public static final int INTAKE_MOTOR_ID = 20;
+    public static final int PIVOT_1_MOTOR_ID = 21;
+    public static final int PIVOT_2_MOTOR_ID = 22;
+    public static final int CAN_RANGE_ID = 23;
 
     // Pivot motor values
     // TODO Edit values
@@ -82,6 +83,8 @@ public class RobotMap {
     // Intake speeds
     // Verify if values are correct and go in the right directions
     public static final double INTAKE_SPEED = 0.05;
+    // TODO: Comfirm the threshold.
+    public static final double CAN_RANGE_DISTANCE_THRESHOLD = 0.5;
     
     // Feeder Motor ID and Speed
     // TODO PID
@@ -134,8 +137,6 @@ public class RobotMap {
 
     // Indexer ID
     public static final int INDEXER_MOTOR_ID = 30;
-    public static final int PIVOT_1_MOTOR_ID = 31;
-    public static final int PIVOT_2_MOTOR_ID = 32;
 
     // Indexer speeds
     public static final double INDEXER_MOTOR_SPEED = 0.5;

@@ -79,7 +79,7 @@ public class RobotContainer {
         
         NamedCommands.registerCommand("Shoot", shooter.shoot());
         NamedCommands.registerCommand("Climb", climber.automaticClimberUp());
-        NamedCommands.registerCommand("IntakeOn", intake.intakeIn());
+        NamedCommands.registerCommand("IntakeOn", intake.startIntake());
         // NamedCommands.registerCommand("IntakeOff", intake.stopIntake());
 
         autoChooser = AutoBuilder.buildAutoChooser("New Auto");
@@ -140,7 +140,7 @@ public class RobotContainer {
 
         JOYSTICK2_CONTROLLER.povDown().whileTrue(shooter.hoodDown());
 
-        JOYSTICK2_CONTROLLER.leftBumper().whileTrue(intake.intakeIn());
+        JOYSTICK2_CONTROLLER.leftBumper().whileTrue(intake.startIntake());
 
         JOYSTICK2_CONTROLLER.y().whileTrue(indexer.indexerOn());
 
