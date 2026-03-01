@@ -17,6 +17,12 @@
           }
         },
         {
+          "type": "named",
+          "data": {
+            "name": "IntakeOff"
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "Auto 7 Path 3 (MB, B)"

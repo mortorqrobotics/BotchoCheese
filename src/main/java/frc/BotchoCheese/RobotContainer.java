@@ -80,6 +80,7 @@ public class RobotContainer {
         NamedCommands.registerCommand("Shoot", shooter.shoot());
         NamedCommands.registerCommand("Climb", climber.automaticClimberUp());
         NamedCommands.registerCommand("IntakeOn", intake.intakeIn());
+        // NamedCommands.registerCommand("IntakeOff", intake.stopIntake());
 
         autoChooser = AutoBuilder.buildAutoChooser("New Auto");
         SmartDashboard.putData("Auto Mode", autoChooser);

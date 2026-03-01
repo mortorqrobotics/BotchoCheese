@@ -131,7 +131,7 @@ public class Intake extends SubsystemBase {
 
     // Completely stop everything (Useful for an emergency stop or disable command)
     public void stopPivot() {
-        pivotLeader.stopMotor(); // Follower will automatically stop
+        pivotLeader.stopMotor();
     }
 
     @Override
