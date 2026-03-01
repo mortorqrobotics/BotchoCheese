@@ -8,8 +8,8 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.4455301204819277,
-        "y": 1.018951807228916
+        "x": 1.9865662650602407,
+        "y": 1.456060240963856
       },
       "isLocked": false,
       "linkedName": null
@@ -42,7 +42,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 34.62415507994905
+    "rotation": -135.8069294551024
   },
   "reversed": false,
   "folder": "Auto 4; Intake and Shoot",

@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.79,
-        "y": 2.112
+        "x": 1.845,
+        "y": 2.125
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.4112392097305282,
-        "y": 1.571073532344586
+        "x": 1.560385542168675,
+        "y": 1.1828674698795192
       },
       "isLocked": false,
       "linkedName": null
@@ -28,12 +28,7 @@
       "linkedName": null
     }
   ],
-  "rotationTargets": [
-    {
-      "waypointRelativePos": 0.4805725971370117,
-      "rotationDegrees": -29.999999999999996
-    }
-  ],
+  "rotationTargets": [],
   "constraintZones": [],
   "pointTowardsZones": [],
   "eventMarkers": [],
@@ -53,7 +48,7 @@
   "folder": "Auto 8 Shoot Outpost Shoot (SOS)",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 29.999999999999996
+    "rotation": -150.0
   },
   "useDefaultConstraints": true
 }

@@ -48,7 +48,7 @@
   "folder": "Auto 1; Shoot and Climb",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": 180.0
   },
   "useDefaultConstraints": false
 }
