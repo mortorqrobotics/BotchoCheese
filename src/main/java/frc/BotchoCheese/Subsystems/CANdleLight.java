@@ -54,6 +54,7 @@ public class CANdleLight extends SubsystemBase {
         candle.setControl(rainbow);
     }
 
+    // TODO May not need
     public void setDisabledColor() {
         setSolidColor(255, 80, 0);
     }
@@ -68,5 +69,10 @@ public class CANdleLight extends SubsystemBase {
 
     public void setTestColor() {
         setSolidColor(0, 0, 255);
+    }
+
+    public void IndexerFullColor() {
+        candle.setControl(new EmptyAnimation(1));
+        setSolidColor(255, 0, 0);
     }
 }
