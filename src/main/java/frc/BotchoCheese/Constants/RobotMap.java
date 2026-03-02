@@ -140,4 +140,11 @@ public class RobotMap {
 
     // Indexer speeds
     public static final double INDEXER_MOTOR_SPEED = 0.5;
+
+    // CANdle Constants
+    public static final int CANDLE_LED_START_INDEX = 0;
+    public static final int CANDLE_LED_COUNT = 0;
+    public static final int CANDLE_CAN_ID = 40;
+    public static final String CANDLE_CAN_BUS = "Canivore1515";
+    public static final double CANDLE_BRIGHTNESS = 0.5;
 }

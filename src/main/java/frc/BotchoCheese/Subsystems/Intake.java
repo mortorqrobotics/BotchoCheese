@@ -128,7 +128,7 @@ public class Intake extends SubsystemBase {
 
     // Checks whether the intake is full or not.
     // TODO Refine the command later
-    public Command checkIfIntakeFull() {
+    public Command isIndexFull() {
         return this.run(() -> {
             while(!pivotUp) {
                 while(goingIn) {
