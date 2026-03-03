@@ -173,6 +173,9 @@ public class Shooter extends SubsystemBase {
 
     @Override
     public void periodic() {
+        updateHoodPosition();
+        updateSpeed();
+
         SmartDashboard.putNumber("kP", RobotMap.SHOOTER_P_VALUE);
         SmartDashboard.putNumber("kI", RobotMap.SHOOTER_I_VALUE);
         SmartDashboard.putNumber("kD", RobotMap.SHOOTER_D_VALUE);
