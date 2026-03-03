@@ -171,32 +171,6 @@ public class Shooter extends SubsystemBase {
        }
     }
 
-    /**
-     * Calculates optimal shooter speed based on a preset slope-intercept formula
-     */
-    public void regressionSpeedShooter() {
-        LimelightHelpers.RawFiducial[] rawFiducials = LimelightHelpers.getRawFiducials(RobotMap.LIMELIGHT_NAME);
-        if (rawFiducials.length == 0) {
-            return;
-        }
-        double distance = rawFiducials[0].distToRobot;
-
-        // y = mx + b
-        RobotMap.SHOOTER_SPEED = RobotMap.SHOOTER_SPEED_REGRESSION_SLOPE * distance + RobotMap.SHOOTER_SPEED_REGRESSION_Y_INTERCEPT;
-    }
-
-    public void regressionAngleHood() {
-        LimelightHelpers.RawFiducial[] rawFiducials = LimelightHelpers.getRawFiducials(RobotMap.LIMELIGHT_NAME);
-        if (rawFiducials.length == 0) {
-            return;
-        }
-        double distance = rawFiducials[0].distToRobot;
-
-        // y = mx + b
-        RobotMap.HOOD_POSITION = RobotMap.HOOD_SPEED_REGRESSION_SLOPE * distance + RobotMap.HOOD_SPEED_REGRESSION_Y_INTERCEPT;
-    }
-
-
     @Override
     public void periodic() {
         SmartDashboard.putNumber("kP", RobotMap.SHOOTER_P_VALUE);
