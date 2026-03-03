@@ -25,6 +25,12 @@
         {
           "type": "named",
           "data": {
+            "name": "IntakeOff"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
             "name": "Shoot"
           }
         }

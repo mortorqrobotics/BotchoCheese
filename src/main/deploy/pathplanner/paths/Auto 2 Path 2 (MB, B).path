@@ -73,7 +73,7 @@
   "folder": "Auto 2; Shoot and Intake",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 34.38034472384488
+    "rotation": -145.0
   },
   "useDefaultConstraints": false
 }

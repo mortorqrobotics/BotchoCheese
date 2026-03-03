@@ -10,6 +10,7 @@ import com.ctre.phoenix6.configs.TalonFXSConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.PositionVoltage;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -17,7 +18,13 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.BotchoCheese.Utils.LimelightHelpers;
 import frc.BotchoCheese.Constants.RobotMap; // Assuming your IDs are here
 
-public class Shooter extends SubsystemBase {
+public class ShooterInterpolated extends SubsystemBase {
+    // Calibrated lookup points (distance in meters -> setpoint).
+    // Replace with measured values after tuning.
+    private static final double[] DISTANCE_POINTS_METERS = { 2.0, 5.0, 10.0 };
+    private static final double[] SHOOTER_SPEED_POINTS = { 0.25, 0.50, 0.75 };
+    private static final double[] HOOD_POSITION_POINTS = { 0.25, 0.50, 0.75 };
+
     // Motor controllers
     private final TalonFX leftShooter;
     private final TalonFX middleShooter;
@@ -29,9 +36,9 @@ public class Shooter extends SubsystemBase {
     private final PositionVoltage hoodPositionRequest = new PositionVoltage(0);
 
     private boolean shooterTurning = false;
-    private boolean hoodDown = true;
+    private boolean hoodDown = false;
     
-    public Shooter() {
+    public ShooterInterpolated() {
         leftShooter = new TalonFX(RobotMap.LEFT_SHOOTER_MOTOR_ID);
         middleShooter = new TalonFX(RobotMap.MIDDLE_SHOOTER_MOTOR_ID);
         rightShooter = new TalonFX(RobotMap.RIGHT_SHOOTER_MOTOR_ID);
@@ -110,12 +117,18 @@ public class Shooter extends SubsystemBase {
         return this.startEnd(
             // When command starts/runs:
             () -> {
-                System.out.println("Bam!");
-                System.out.println("Kapoooooooooooooow!");
-                hood.setControl(hoodPositionRequest.withPosition(RobotMap.HOOD_POSITION));
-                leftShooter.set(RobotMap.SHOOTER_SPEED);
-                middleShooter.set(RobotMap.SHOOTER_SPEED);
-                rightShooter.set(RobotMap.SHOOTER_SPEED);
+                double distance = getCurrentDistanceMeters();
+                double shooterSpeed = interpolate(distance, DISTANCE_POINTS_METERS, SHOOTER_SPEED_POINTS);
+                double hoodPosition = interpolate(distance, DISTANCE_POINTS_METERS, HOOD_POSITION_POINTS);
+
+                // Safety clamp for motor output and hood target.
+                shooterSpeed = MathUtil.clamp(shooterSpeed, 0.0, 1.0);
+                hoodPosition = MathUtil.clamp(hoodPosition, 0.0, 1.0);
+
+                hood.setControl(hoodPositionRequest.withPosition(hoodPosition));
+                leftShooter.set(shooterSpeed);
+                middleShooter.set(shooterSpeed);
+                rightShooter.set(shooterSpeed);
             },
             // When command ends:
             () -> {
@@ -136,46 +149,89 @@ public class Shooter extends SubsystemBase {
      * Update shooter speed based on distance from target
      */
     public void updateSpeed() {
-        LimelightHelpers.RawFiducial[] rawFiducials = LimelightHelpers.getRawFiducials(RobotMap.LIMELIGHT_NAME);
-        if (rawFiducials.length == 0) {
-            return;
-        }
-        double distance = rawFiducials[0].distToRobot;
-
-       if(distance <= RobotMap.SHORT_DISTANCE_THRESHOLD) {
-            RobotMap.SHOOTER_SPEED = 0.25; // TODO
-       }
-       else if(distance > RobotMap.SHORT_DISTANCE_THRESHOLD && distance <= RobotMap.MEDIUM_DISTANCE_THRESHOLD) {
-            RobotMap.SHOOTER_SPEED = 0.5; // TODO
-       }
-       else {
-            RobotMap.SHOOTER_SPEED = 0.75; // TODO
-       }
+        double distance = getCurrentDistanceMeters();
+        RobotMap.SHOOTER_SPEED = MathUtil.clamp(
+            interpolate(distance, DISTANCE_POINTS_METERS, SHOOTER_SPEED_POINTS),
+            0.0, 1.0
+        );
     }
 
     public void updateHoodPosition() {
+        double distance = getCurrentDistanceMeters();
+        RobotMap.HOOD_POSITION = MathUtil.clamp(
+            interpolate(distance, DISTANCE_POINTS_METERS, HOOD_POSITION_POINTS),
+            0.0, 1.0
+        );
+    }
+
+    /**
+     * Calculates optimal shooter speed based on a preset slope-intercept formula
+     */
+    public void regressionSpeedShooter() {
+        double distance = getCurrentDistanceMeters();
+
+        // y = mx + b
+        RobotMap.SHOOTER_SPEED = MathUtil.clamp(
+            RobotMap.SHOOTER_SPEED_REGRESSION_SLOPE * distance + RobotMap.SHOOTER_SPEED_REGRESSION_Y_INTERCEPT,
+            0.0, 1.0
+        );
+    }
+
+    public void regressionAngleHood() {
+        double distance = getCurrentDistanceMeters();
+
+        // y = mx + b
+        RobotMap.HOOD_POSITION = MathUtil.clamp(
+            RobotMap.HOOD_SPEED_REGRESSION_SLOPE * distance + RobotMap.HOOD_SPEED_REGRESSION_Y_INTERCEPT,
+            0.0, 1.0
+        );
+    }
+
+    private double getCurrentDistanceMeters() {
         LimelightHelpers.RawFiducial[] rawFiducials = LimelightHelpers.getRawFiducials(RobotMap.LIMELIGHT_NAME);
         if (rawFiducials.length == 0) {
-            return;
+            // Fallback distance when vision is unavailable.
+            return DISTANCE_POINTS_METERS[0];
         }
-        double distance = rawFiducials[0].distToRobot;
 
-       if(distance <= RobotMap.SHORT_DISTANCE_THRESHOLD) {
-            RobotMap.HOOD_POSITION = 0.25; // TODO
-       }
-       else if(distance > RobotMap.SHORT_DISTANCE_THRESHOLD && distance <= RobotMap.MEDIUM_DISTANCE_THRESHOLD) {
-            RobotMap.HOOD_POSITION = 0.5; // TODO
-       }
-       else {
-            RobotMap.HOOD_POSITION = 0.75; // TODO
-       }
+        double bestDistance = rawFiducials[0].distToRobot;
+        for (int i = 1; i < rawFiducials.length; i++) {
+            if (rawFiducials[i].distToRobot < bestDistance) {
+                bestDistance = rawFiducials[i].distToRobot;
+            }
+        }
+        return bestDistance;
     }
+
+    private static double interpolate(double x, double[] xPoints, double[] yPoints) {
+        if (xPoints.length != yPoints.length || xPoints.length < 2) {
+            throw new IllegalArgumentException("Interpolation tables must have matching lengths >= 2");
+        }
+
+        if (x <= xPoints[0]) {
+            return yPoints[0];
+        }
+        if (x >= xPoints[xPoints.length - 1]) {
+            return yPoints[yPoints.length - 1];
+        }
+
+        for (int i = 0; i < xPoints.length - 1; i++) {
+            double x0 = xPoints[i];
+            double x1 = xPoints[i + 1];
+            if (x >= x0 && x <= x1) {
+                double y0 = yPoints[i];
+                double y1 = yPoints[i + 1];
+                double t = (x - x0) / (x1 - x0);
+                return y0 + t * (y1 - y0);
+            }
+        }
+
+        return yPoints[yPoints.length - 1];
+    }
+
 
     @Override
     public void periodic() {
-        updateHoodPosition();
-        updateSpeed();
-
         SmartDashboard.putNumber("kP", RobotMap.SHOOTER_P_VALUE);
         SmartDashboard.putNumber("kI", RobotMap.SHOOTER_I_VALUE);
         SmartDashboard.putNumber("kD", RobotMap.SHOOTER_D_VALUE);

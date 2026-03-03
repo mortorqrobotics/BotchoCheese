@@ -3,6 +3,7 @@ package frc.BotchoCheese.Subsystems;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
+import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
@@ -16,15 +17,18 @@ public class Climber extends SubsystemBase {
     private final TalonFX lClimber;
     private final TalonFX rClimber;
 
+    // Limit switches
+    private final CANcoder encoder;
+
     // Control requests (Phoenix 6 uses request objects instead of passing doubles directly)
     private final DutyCycleOut m_output = new DutyCycleOut(0);
 
-    private boolean goingUp = false;
-    private boolean goingDown = false;
+    private boolean goingUp = true;
     
     public Climber() {
         lClimber = new TalonFX(RobotMap.LEFT_CLIMBER_MOTOR_ID);
         rClimber = new TalonFX(RobotMap.RIGHT_CLIMBER_MOTOR_ID);
+        encoder = new CANcoder(RobotMap.ENCODER_ID);
 
         // Apply basic configuration
         TalonFXConfiguration config = new TalonFXConfiguration();
@@ -42,51 +46,60 @@ public class Climber extends SubsystemBase {
         rClimber.getConfigurator().apply(config);
     }
 
-    //Commands to move the left climber.
-    public Command climberUp() {
+    public Boolean atLimit(){
+        if(encoder.getAbsolutePosition().getValueAsDouble() < RobotMap.CLIMBER_EXTENSION_LIMIT 
+        || encoder.getAbsolutePosition().getValueAsDouble() > 0){
+            return true;
+        }
+        return false;
+    }
+
+    // Commands to move the climber.
+    public Command manualClimberUp() {
+        return this.run(() -> {
+            if(!atLimit()) {
+                lClimber.setControl(m_output.withOutput(RobotMap.TEST_MOTOR_LEFT_UP_SPEED));
+                rClimber.setControl(m_output.withOutput(RobotMap.TEST_MOTOR_RIGHT_UP_SPEED));
+                goingUp = true;
+            }
+        }).finallyDo(() -> stopMotors());
+    }
+
+    public Command manualClimberDown() {
+        return this.run(() -> {
+            if(!atLimit()) {
+                lClimber.setControl(m_output.withOutput(RobotMap.TEST_MOTOR_LEFT_DOWN_SPEED));
+                rClimber.setControl(m_output.withOutput(RobotMap.TEST_MOTOR_RIGHT_DOWN_SPEED));
+                goingUp = false;
+            }
+        }).finallyDo(() -> stopMotors());
+    }
+
+    public Command automaticClimberUp(){
         return this.run(() -> {
             lClimber.setControl(m_output.withOutput(RobotMap.TEST_MOTOR_LEFT_UP_SPEED));
             rClimber.setControl(m_output.withOutput(RobotMap.TEST_MOTOR_RIGHT_UP_SPEED));
             goingUp = true;
-            goingDown = false;
-        }).finallyDo(() -> stopMotors());
+        }).until(this::atLimit).finallyDo(() -> stopMotors());
     }
 
-    public Command climberDown() {
+    public Command automaticClimberDown(){
         return this.run(() -> {
             lClimber.setControl(m_output.withOutput(RobotMap.TEST_MOTOR_LEFT_DOWN_SPEED));
             rClimber.setControl(m_output.withOutput(RobotMap.TEST_MOTOR_RIGHT_DOWN_SPEED));
             goingUp = false;
-            goingDown = true;
-        }).finallyDo(() -> stopMotors());
+        }).until(this::atLimit).finallyDo(() -> stopMotors());
     }
-    // // Commands to move the right climber.
-    // public Command rightClimberUp() {
-    //     return this.run(() -> {
-    //         rClimber.setControl(m_output.withOutput(RobotMap.TEST_MOTOR_RIGHT_UP_SPEED));
-    //         goingUp = true;
-    //         goingDown = false;
-    //     }).finallyDo(() -> stopMotors());
-    // }
-
-    // public Command rightClimberDown() {
-    //     return this.run(() -> {
-    //         rClimber.setControl(m_output.withOutput(RobotMap.TEST_MOTOR_RIGHT_DOWN_SPEED));
-    //         goingUp = false;
-    //         goingDown = true;
-    //     }).finallyDo(() -> stopMotors());
-    // }
+    
     public void stopMotors() {
         lClimber.stopMotor();
         rClimber.stopMotor();
         goingUp = false;
-        goingDown = false;
     }
 
     @Override
     public void periodic() {
         SmartDashboard.putBoolean("Climber Going Up?", goingUp);
-        SmartDashboard.putBoolean("Climber Going Down?", goingDown);
         
         SmartDashboard.putNumber("Left Climber 1 Battery Draw", lClimber.getSupplyCurrent().getValueAsDouble());
         SmartDashboard.putNumber("Right Climber 1 Motor Draw", rClimber.getStatorCurrent().getValueAsDouble());

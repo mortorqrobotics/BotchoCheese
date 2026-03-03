@@ -21,12 +21,14 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.BotchoCheese.Commands.RotateToTag;
 import frc.BotchoCheese.Subsystems.Shooter;
 import frc.BotchoCheese.Subsystems.Climber;
 import frc.BotchoCheese.Subsystems.Intake;
+import frc.BotchoCheese.Subsystems.Indexer;
 import frc.BotchoCheese.Commands.StrafeToTag;
 import frc.BotchoCheese.Subsystems.CommandSwerveDrivetrain;
 import frc.BotchoCheese.Constants.TunerConstants;
@@ -36,6 +38,9 @@ import frc.BotchoCheese.Subsystems.Feeder;
 
 public class RobotContainer {
     public static double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
+    
+    public static boolean pivotIsUp = true;
+    
     public static double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
 
     /* Setting up bindings for necessary control of the swerve drive platform */
@@ -65,14 +70,17 @@ public class RobotContainer {
 
     public final Intake intake = new Intake();
 
+    public final Indexer indexer = new Indexer();
+
     /* Path follower */
     private final SendableChooser<Command> autoChooser;
 
     public RobotContainer() {
         
         NamedCommands.registerCommand("Shoot", shooter.shoot());
-        NamedCommands.registerCommand("Climb", climber.climberUp());
-        NamedCommands.registerCommand("IntakeOn", intake.intakeIn());
+        NamedCommands.registerCommand("Climb", climber.automaticClimberUp());
+        NamedCommands.registerCommand("IntakeOn", intake.startIntake());
+        // NamedCommands.registerCommand("IntakeOff", intake.stopIntake());
 
         autoChooser = AutoBuilder.buildAutoChooser("New Auto");
         SmartDashboard.putData("Auto Mode", autoChooser);
@@ -94,38 +102,55 @@ public class RobotContainer {
             )
         );
 
-        JOYSTICK1_CONTROLLER.a().whileTrue(drivetrain.applyRequest(() -> brake));
-        JOYSTICK1_CONTROLLER.b().whileTrue(drivetrain.applyRequest(() ->
-            point.withModuleDirection(new Rotation2d(-JOYSTICK1_CONTROLLER.getLeftY(), -JOYSTICK1_CONTROLLER.getLeftX()))
-        ));
+        // Controller 1
+        JOYSTICK1_CONTROLLER.x().whileTrue(drivetrain.applyRequest(() -> brake));
+        // JOYSTICK1_CONTROLLER.b().whileTrue(drivetrain.applyRequest(() ->
+        //     point.withModuleDirection(new Rotation2d(-JOYSTICK1_CONTROLLER.getLeftY(), -JOYSTICK1_CONTROLLER.getLeftX()))
+        // ));
 
-        JOYSTICK1_CONTROLLER.pov(0).whileTrue(drivetrain.applyRequest(() ->
+        JOYSTICK1_CONTROLLER.povUp().whileTrue(drivetrain.applyRequest(() ->
             forwardStraight.withVelocityX(0.5).withVelocityY(0))
         );
-        JOYSTICK1_CONTROLLER.pov(180).whileTrue(drivetrain.applyRequest(() ->
+        JOYSTICK1_CONTROLLER.povDown().whileTrue(drivetrain.applyRequest(() ->
             forwardStraight.withVelocityX(-0.5).withVelocityY(0))
         );
+        JOYSTICK1_CONTROLLER.povLeft().whileTrue(drivetrain.applyRequest(() ->
+            forwardStraight.withVelocityX(0).withVelocityY(-0.5))
+        );
+        JOYSTICK1_CONTROLLER.povRight().whileTrue(drivetrain.applyRequest(() ->
+            forwardStraight.withVelocityX(0).withVelocityY(0.5))
+        );
         
-
-        // Run SysId routines when holding back/start and X/Y.
-        // Note that each routine should be run exactly once in a single log.
-        // joystick.back().and(joystick.y()).whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
-        // joystick.back().and(joystick.x()).whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
-        // joystick.start().and(joystick.y()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
-        // joystick.start().and(joystick.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
-        // reset the field-centric heading on left bumper press
-        // JOYSTICK1_CONTROLLER.leftBumper().onTrue(new InstantCommand(()->drivetrain.seedFieldCentric()));
-        // JOYSTICK1_CONTROLLER.leftBumper().onTrue(new InstantCommand(() -> gyro.setYaw(0)));
-        // JOYSTICK1_CONTROLLER.x().onTrue(Commands.sequence(new RotateToTag(drivetrain, 0), new StrafeToTag(drivetrain, 0.5)));
-        // TODO Do Left Bumper for StrafeToTag command
-        // Pass in your drivetrain and the offset you want (e.g., 0.5 meters)
+        JOYSTICK1_CONTROLLER.y().onTrue(Commands.sequence(climber.automaticClimberUp()));
+        JOYSTICK1_CONTROLLER.a().onTrue(Commands.sequence(climber.automaticClimberDown()));
+        
         JOYSTICK1_CONTROLLER.rightBumper().onTrue(new StrafeToTag(drivetrain, 0.5));
-        
-        // Correctly binding the shoot command
-        JOYSTICK1_CONTROLLER.y().whileTrue(shooter.shoot());
 
-        // Binding the feeder to the X button
-        JOYSTICK1_CONTROLLER.x().whileTrue(feeder.runFeeder());
+        JOYSTICK1_CONTROLLER.rightTrigger().onTrue(new RotateToTag(drivetrain, 0));
+
+        // reset the field-centric heading on menu button press
+        JOYSTICK1_CONTROLLER.start().onTrue(new InstantCommand(()->drivetrain.seedFieldCentric()));
+
+        //Controller 2
+        JOYSTICK2_CONTROLLER.rightTrigger().whileTrue(feeder.runFeeder());
+
+        JOYSTICK2_CONTROLLER.leftTrigger().whileTrue(shooter.shoot());
+
+        JOYSTICK2_CONTROLLER.povUp().whileTrue(shooter.hoodUp());
+
+        JOYSTICK2_CONTROLLER.povDown().whileTrue(shooter.hoodDown());
+
+        JOYSTICK2_CONTROLLER.leftBumper().whileTrue(intake.startIntake());
+
+        JOYSTICK2_CONTROLLER.y().whileTrue(indexer.indexerOn());
+
+        JOYSTICK2_CONTROLLER.rightBumper().onTrue(
+            Commands.either(
+                intake.setPivotDown().andThen(Commands.runOnce(() -> pivotIsUp = false)),
+                intake.setPivotUp().andThen(Commands.runOnce(() -> pivotIsUp = true)),
+                () -> pivotIsUp
+            )
+        );
 
         drivetrain.registerTelemetry(logger::telemeterize);
     }

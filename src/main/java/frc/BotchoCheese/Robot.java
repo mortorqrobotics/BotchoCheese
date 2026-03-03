@@ -25,6 +25,7 @@ import frc.BotchoCheese.Utils.LimelightHelpers;
 public class Robot extends TimedRobot {
 
   public static LimelightHelpers limelight;
+  public static LimelightHelpers limelightTwo;
 
   private Command m_autonomousCommand;
 

@@ -36,8 +36,8 @@
         "y": 6.417240963855421
       },
       "prevControl": {
-        "x": 1.70244578313253,
-        "y": 6.668578313255965
+        "x": 1.5677746077032806,
+        "y": 6.965606276747503
       },
       "nextControl": null,
       "isLocked": false,
@@ -67,7 +67,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -49.184916125690144
+    "rotation": 130.815
   },
   "reversed": false,
   "folder": "Auto 2; Shoot and Intake",

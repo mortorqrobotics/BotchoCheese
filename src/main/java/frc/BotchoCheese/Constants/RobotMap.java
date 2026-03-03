@@ -15,7 +15,8 @@ public class RobotMap {
     public static final double kVisionStdDevY = 1;
     public static final double kVisionStdDevTheta = 99999;
 
-    public static final String LIMELIGHT_NAME = "limelight-two";
+    public static final String LIMELIGHT_NAME = "limelight";
+    public static final String LIMELIGHT_2_NAME = "limelight-two";
     public static final double DIFFERENCE_CUTOFF_THRESHOLD = 0.15; // Normalized from 1.5 for scale consistency
     public static final double[] TAG_HEIGHTS = {
     1.4859, 1.4859, /*ID: 1 - 2*/
@@ -38,6 +39,7 @@ public class RobotMap {
     public static final int RIGHT_CLIMBER_MOTOR_ID = 11;
     public static final int LEFT_CLIMBER_TWO_MOTOR_ID = 12;
     public static final int RIGHT_CLIMBER_TWO_MOTOR_ID = 13;
+    public static final int ENCODER_ID = 14;
 
     // Climber PID Values
     // TODO
@@ -56,9 +58,15 @@ public class RobotMap {
     public static final double CLIMBER_EXTENSION_LIMIT = 0.5; 
     
     // Intake motor IDs
-    public static final int TOP_INTAKE_MOTOR_ID = 20;
-    public static final int BOTTOM_INTAKE_MOTOR_ID = 21;
-    public static final int INSIDE_INTAKE_MOTOR_ID = 22;
+    public static final int INTAKE_MOTOR_ID = 20;
+    public static final int PIVOT_1_MOTOR_ID = 21;
+    public static final int PIVOT_2_MOTOR_ID = 22;
+    public static final int CAN_RANGE_ID = 23;
+
+    // Pivot motor values
+    // TODO Edit values
+    public static final double PIVOT_UP_POSITION = 0;
+    public static final double PIVOT_DOWN_POSITION = 0;
 
     // Intake PID Values
     // TODO
@@ -66,15 +74,17 @@ public class RobotMap {
     public static final double INTAKE_I_VALUE = 0.3;
     public static final double INTAKE_D_VALUE = 0.1;
 
+    // Pivot PID Values
+    // TODO
+    public static final double PIVOT_P_VALUE = 0.4;
+    public static final double PIVOT_I_VALUE = 0.3;
+    public static final double PIVOT_D_VALUE = 0.1;
+
     // Intake speeds
     // Verify if values are correct and go in the right directions
-    public static final double TEST_TOP_MOTOR_IN_SPEED = 0.05;
-    public static final double TEST_BOTTOM_MOTOR_IN_SPEED = 0.05;
-    public static final double TEST_INSIDE_MOTOR_IN_SPEED = 0.05;
-
-    public static final double TEST_TOP_MOTOR_OUT_SPEED = -0.05;
-    public static final double TEST_BOTTOM_MOTOR_OUT_SPEED = -0.05;
-    public static final double TEST_INSIDE_MOTOR_OUT_SPEED = -0.05;
+    public static final double INTAKE_SPEED = 0.05;
+    // TODO: Comfirm the threshold.
+    public static final double CAN_RANGE_DISTANCE_THRESHOLD = 0.5;
     
     // Feeder Motor ID and Speed
     // TODO PID
@@ -99,12 +109,25 @@ public class RobotMap {
     public static final double HOOD_D_VALUE = 0.2;
     public static final double HOOD_SPEED = 0.25;
 
+    //TODO
+    public static double HOOD_SPEED_REGRESSION_SLOPE = 1.0;
+    public static double HOOD_SPEED_REGRESSION_Y_INTERCEPT = 1.0;
+
     // Shooter speeds
-    public static final double MOTOR_SHOOTER_TOP_OUT_SPEED = 0.6;
 
-    public static final double MOTOR_SHOOTER_TOP_IN_SPEED = -0.2;
+    // Notice: Will be dynamically modified in the Shooter's updateSpeed function
+    public static double SHOOTER_SPEED = 0.1;
+    
+    //TODO
+    public static double SHOOTER_SPEED_REGRESSION_SLOPE = 1.0;
+    public static double SHOOTER_SPEED_REGRESSION_Y_INTERCEPT = 1.0;
 
-    public static final double SHOOTER_SPEED = 0.1;
+    // TODO Edit HOOD_POSITION
+    public static double HOOD_POSITION = 1;
+
+    //If the distance between the robot and tag is less than threshold, the distance is "short"
+    public static final double SHORT_DISTANCE_THRESHOLD = 5.0;
+    public static final double MEDIUM_DISTANCE_THRESHOLD = 10.0;
 
     // Shooter PID Values
     // TODO
@@ -114,9 +137,14 @@ public class RobotMap {
 
     // Indexer ID
     public static final int INDEXER_MOTOR_ID = 30;
-    public static final int PIVOT_1_MOTOR_ID = 31;
-    public static final int PIVOT_2_MOTOR_ID = 32;
 
     // Indexer speeds
     public static final double INDEXER_MOTOR_SPEED = 0.5;
+
+    // CANdle Constants
+    public static final int CANDLE_LED_START_INDEX = 0;
+    public static final int CANDLE_LED_COUNT = 0;
+    public static final int CANDLE_CAN_ID = 40;
+    public static final String CANDLE_CAN_BUS = "Canivore1515";
+    public static final double CANDLE_BRIGHTNESS = 0.5;
 }
