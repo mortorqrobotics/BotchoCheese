@@ -4,6 +4,7 @@ import com.ctre.phoenix6.configs.CANdleConfiguration;
 import com.ctre.phoenix6.controls.EmptyAnimation;
 import com.ctre.phoenix6.controls.RainbowAnimation;
 import com.ctre.phoenix6.controls.SolidColor;
+import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.hardware.CANdle;
 import com.ctre.phoenix6.signals.LossOfSignalBehaviorValue;
 import com.ctre.phoenix6.signals.Enable5VRailValue;
@@ -19,8 +20,7 @@ public class CANdleLight extends SubsystemBase {
     private static final int LED_START_INDEX = RobotMap.CANDLE_LED_START_INDEX;
     private static final int LED_END_INDEX =
         RobotMap.CANDLE_LED_START_INDEX + RobotMap.CANDLE_LED_COUNT - 1;
-    // TODO Find newest Candle constructor
-    private final CANdle candle = new CANdle(RobotMap.CANDLE_CAN_ID, RobotMap.CANDLE_CAN_BUS);
+    private final CANdle candle = new CANdle(RobotMap.CANDLE_CAN_ID, new CANBus(RobotMap.CANDLE_CAN_BUS));
 
     public CANdleLight() {
         CANdleConfiguration config = new CANdleConfiguration();
@@ -56,23 +56,23 @@ public class CANdleLight extends SubsystemBase {
 
     // TODO May not need
     public void setDisabledColor() {
-        setSolidColor(255, 80, 0);
+        setSolidColor(255, 80, 0); //orange
     }
 
     public void setAutonomousColor() {
-        setSolidColor(255, 255, 0);
+        setSolidColor(255, 255, 0); //yellow
     }
 
     public void setTeleopColor() {
-        setSolidColor(0, 255, 0);
+        setSolidColor(0, 255, 0); //green
     }
 
     public void setTestColor() {
-        setSolidColor(0, 0, 255);
+        setSolidColor(0, 0, 255); //blue
     }
 
     public void IndexerFullColor() {
         candle.setControl(new EmptyAnimation(1));
-        setSolidColor(255, 0, 0);
+        setSolidColor(255, 0, 0); //red
     }
 }
