@@ -76,9 +76,18 @@ public class RobotMap {
 
     // Pivot PID Values
     // TODO
+    public static final double PIVOT_S_VALUE = 0.25;
+    public static final double PIVOT_V_VALUE = 0.12;
+    public static final double PIVOT_A_VALUE = 0.01;
     public static final double PIVOT_P_VALUE = 0.4;
     public static final double PIVOT_I_VALUE = 0.3;
     public static final double PIVOT_D_VALUE = 0.1;
+
+    // Intake Motion Magic Values
+
+    public static final double INTAKE_CRUISE_VELOCITY = 80; // Target cruise velocity of 0.5 rps
+    public static final double INTAKE_ACCELERATION = 160; // Target acceleration of 1 rps/s (0.5 seconds)
+    public static final double INTAKE_JERK = 1600; // Target jerk
 
     // Intake speeds
     // Verify if values are correct and go in the right directions
@@ -109,6 +118,12 @@ public class RobotMap {
     public static final double HOOD_D_VALUE = 0.2;
     public static final double HOOD_SPEED = 0.25;
 
+    // Hood Motion Magic Values
+    
+    public static final double HOOD_CRUISE_VELOCITY = 40;
+    public static final double HOOD_ACCELERATION = 80;
+    public static final double HOOD_JERK = 800;
+
     //TODO
     public static double HOOD_SPEED_REGRESSION_SLOPE = 1.0;
     public static double HOOD_SPEED_REGRESSION_Y_INTERCEPT = 1.0;
@@ -134,6 +149,9 @@ public class RobotMap {
     public static final double SHOOTER_P_VALUE = 0.5;
     public static final double SHOOTER_I_VALUE = 0.15;
     public static final double SHOOTER_D_VALUE = 0.2;
+    public static final double SHOOTER_S_VALUE = 0.25;
+    public static final double SHOOTER_V_VALUE = 0.12;
+    public static final double SHOOTER_A_VALUE = 0.01;
 
     // Indexer ID
     public static final int INDEXER_MOTOR_ID = 30;

@@ -5,11 +5,12 @@ import com.ctre.phoenix6.hardware.core.CoreCANrange;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
+import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.Follower;
-import com.ctre.phoenix6.controls.PositionVoltage;
+import com.ctre.phoenix6.controls.MotionMagicVoltage;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -25,7 +26,7 @@ public class Intake extends SubsystemBase {
 
     // Control requests
     private final DutyCycleOut intakeOutput = new DutyCycleOut(0);
-    private final PositionVoltage pivotPositionRequest = new PositionVoltage(0);
+    private final MotionMagicVoltage pivotPositionRequest = new MotionMagicVoltage(0);
 
     // Telemetry state variables
     private boolean goingIn = false;
@@ -43,10 +44,18 @@ public class Intake extends SubsystemBase {
         
         // PID configuration for moving the pivot to set positions
         Slot0Configs pivotSlot0 = new Slot0Configs();
+        pivotSlot0.kS = RobotMap.PIVOT_S_VALUE;
+        pivotSlot0.kV = RobotMap.PIVOT_V_VALUE;
+        pivotSlot0.kA = RobotMap.PIVOT_A_VALUE;
         pivotSlot0.kP = RobotMap.PIVOT_P_VALUE;
         pivotSlot0.kI = RobotMap.PIVOT_I_VALUE;
         pivotSlot0.kD = RobotMap.PIVOT_D_VALUE;
         pivotConfig.Slot0 = pivotSlot0;
+
+        MotionMagicConfigs motionMagicConfigs = pivotConfig.MotionMagic;
+        motionMagicConfigs.MotionMagicCruiseVelocity = RobotMap.INTAKE_CRUISE_VELOCITY; // Target cruise velocity of 80 rps
+        motionMagicConfigs.MotionMagicAcceleration = RobotMap.INTAKE_ACCELERATION; // Target acceleration of 160 rps/s (0.5 seconds)
+        motionMagicConfigs.MotionMagicJerk = RobotMap.INTAKE_JERK; // Target jerk of 1600 rps/s/s (0.1 seconds)
 
         // Current limits to protect the X44s and the pivot mechanism
         CurrentLimitsConfigs pivotLimits = new CurrentLimitsConfigs();

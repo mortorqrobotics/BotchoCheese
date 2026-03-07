@@ -4,12 +4,12 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.hardware.TalonFXS;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
+import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.configs.TalonFXSConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
-import com.ctre.phoenix6.controls.PositionVoltage;
-
+import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -26,7 +26,7 @@ public class Shooter extends SubsystemBase {
 
     // Control requests (Phoenix 6 uses request objects instead of passing doubles directly)
     private final DutyCycleOut m_output = new DutyCycleOut(0);
-    private final PositionVoltage hoodPositionRequest = new PositionVoltage(0);
+    private final MotionMagicVoltage hoodPositionRequest = new MotionMagicVoltage(0);
 
     private boolean shooterTurning = false;
     private boolean hoodDown = true;
@@ -43,20 +43,32 @@ public class Shooter extends SubsystemBase {
 
         // PID Shooter Values
         // in init function, set slot 0 gains
-        Slot0Configs slot0Configs = new Slot0Configs();
-        slot0Configs.kP = RobotMap.SHOOTER_P_VALUE;
-        slot0Configs.kI = RobotMap.SHOOTER_I_VALUE;
-        slot0Configs.kD = RobotMap.SHOOTER_D_VALUE;
-        config.Slot0 = slot0Configs;
+        Slot0Configs shooterSlot0 = new Slot0Configs();
+        shooterSlot0.kP = RobotMap.SHOOTER_P_VALUE;
+        shooterSlot0.kI = RobotMap.SHOOTER_I_VALUE;
+        shooterSlot0.kD = RobotMap.SHOOTER_D_VALUE;
+        shooterSlot0.kS = RobotMap.SHOOTER_S_VALUE;
+        shooterSlot0.kV = RobotMap.SHOOTER_V_VALUE;
+        shooterSlot0.kA = RobotMap.SHOOTER_A_VALUE;
+        config.Slot0 = shooterSlot0;
         //https://v6.docs.ctr-electronics.com/en/stable/docs/api-reference/device-specific/talonfx/basic-pid-control.html
 
         // PID Hood Values
         // in init function, set slot 0 gains
-        Slot0Configs slot1Configs = new Slot0Configs();
-        slot1Configs.kP = RobotMap.HOOD_P_VALUE;
-        slot1Configs.kI = RobotMap.HOOD_I_VALUE;
-        slot1Configs.kD = RobotMap.HOOD_D_VALUE;
-        hoodConfig.Slot0 = slot1Configs;
+        Slot0Configs hoodSlot0 = new Slot0Configs();
+        hoodSlot0.kS = RobotMap.SHOOTER_S_VALUE;
+        hoodSlot0.kV = RobotMap.SHOOTER_V_VALUE;
+        hoodSlot0.kA = RobotMap.SHOOTER_A_VALUE;
+        hoodSlot0.kP = RobotMap.HOOD_P_VALUE;
+        hoodSlot0.kI = RobotMap.HOOD_I_VALUE;
+        hoodSlot0.kD = RobotMap.HOOD_D_VALUE;
+        hoodConfig.Slot0 = hoodSlot0;
+
+        MotionMagicConfigs motionMagicConfigs = new MotionMagicConfigs();
+        motionMagicConfigs.MotionMagicCruiseVelocity = RobotMap.HOOD_CRUISE_VELOCITY; // Target cruise velocity of 80 rps
+        motionMagicConfigs.MotionMagicAcceleration = RobotMap.HOOD_ACCELERATION; // Target acceleration of 160 rps/s (0.5 seconds)
+        motionMagicConfigs.MotionMagicJerk = RobotMap.HOOD_JERK; // Target jerk of 1600 rps/s/s (0.1 seconds)
+        hoodConfig.MotionMagic = motionMagicConfigs;
         
         // Verify
         CurrentLimitsConfigs currentLimits = new CurrentLimitsConfigs();
