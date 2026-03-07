@@ -47,12 +47,12 @@ public class Shooter extends SubsystemBase {
         // PID Shooter Values
         // in init function, set slot 0 gains
         Slot0Configs shooterSlot0 = new Slot0Configs();
-        shooterSlot0.kP = RobotMap.SHOOTER_P_VALUE;
-        shooterSlot0.kI = RobotMap.SHOOTER_I_VALUE;
-        shooterSlot0.kD = RobotMap.SHOOTER_D_VALUE;
         shooterSlot0.kS = RobotMap.SHOOTER_S_VALUE;
         shooterSlot0.kV = RobotMap.SHOOTER_V_VALUE;
         shooterSlot0.kA = RobotMap.SHOOTER_A_VALUE;
+        shooterSlot0.kP = RobotMap.SHOOTER_P_VALUE;
+        shooterSlot0.kI = RobotMap.SHOOTER_I_VALUE;
+        shooterSlot0.kD = RobotMap.SHOOTER_D_VALUE;
         config.Slot0 = shooterSlot0;
         //https://v6.docs.ctr-electronics.com/en/stable/docs/api-reference/device-specific/talonfx/basic-pid-control.html
 
@@ -68,9 +68,9 @@ public class Shooter extends SubsystemBase {
         hoodConfig.Slot0 = hoodSlot0;
 
         MotionMagicConfigs motionMagicConfigs = new MotionMagicConfigs();
-        motionMagicConfigs.MotionMagicCruiseVelocity = RobotMap.HOOD_CRUISE_VELOCITY; // Target cruise velocity of 80 rps
-        motionMagicConfigs.MotionMagicAcceleration = RobotMap.HOOD_ACCELERATION; // Target acceleration of 160 rps/s (0.5 seconds)
-        motionMagicConfigs.MotionMagicJerk = RobotMap.HOOD_JERK; // Target jerk of 1600 rps/s/s (0.1 seconds)
+        motionMagicConfigs.MotionMagicCruiseVelocity = RobotMap.HOOD_CRUISE_VELOCITY; // Target cruise velocity of 40 rps
+        motionMagicConfigs.MotionMagicAcceleration = RobotMap.HOOD_ACCELERATION; // Target acceleration of 80 rps/s
+        motionMagicConfigs.MotionMagicJerk = RobotMap.HOOD_JERK; // Target jerk of 800 rps/s/s
         hoodConfig.MotionMagic = motionMagicConfigs;
         
         // Verify
