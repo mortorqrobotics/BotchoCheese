@@ -112,11 +112,16 @@ public class RobotMap {
     // Hood Motor IDs
     // TODO Change Hood ID
     public static final int HOOD_MOTOR_ID = 999;
+    public static final int HOOD_THROUGHBORE_DIO = 0;
 
     public static final double HOOD_P_VALUE = 0.4;
     public static final double HOOD_I_VALUE = 0.0;
     public static final double HOOD_D_VALUE = 0.2;
     public static final double HOOD_SPEED = 0.25;
+    public static final double HOOD_THROUGHBORE_OFFSET_ROT = 0.0;
+    public static final double HOOD_MIN_ROT = 0.05;
+    public static final double HOOD_MAX_ROT = 0.95;
+    public static final double HOOD_LIMIT_TOLERANCE_ROT = 0.01;
 
     // Hood Motion Magic Values
     
