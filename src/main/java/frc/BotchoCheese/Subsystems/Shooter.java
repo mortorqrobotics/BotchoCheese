@@ -4,16 +4,17 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.hardware.TalonFXS;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
+import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.configs.TalonFXSConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
-import com.ctre.phoenix6.controls.PositionVoltage;
-
+import com.ctre.phoenix6.controls.MotionMagicVoltage;
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-//import frc.BotchoCheese.Robot;
 import frc.BotchoCheese.Utils.LimelightHelpers;
 import frc.BotchoCheese.Constants.RobotMap; // Assuming your IDs are here
 
@@ -23,10 +24,11 @@ public class Shooter extends SubsystemBase {
     private final TalonFX middleShooter;
     private final TalonFX rightShooter;
     private final TalonFXS hood;
+    private final DutyCycleEncoder hoodEncoder;
 
     // Control requests (Phoenix 6 uses request objects instead of passing doubles directly)
     private final DutyCycleOut m_output = new DutyCycleOut(0);
-    private final PositionVoltage hoodPositionRequest = new PositionVoltage(0);
+    private final MotionMagicVoltage hoodPositionRequest = new MotionMagicVoltage(0);
 
     private boolean shooterTurning = false;
     private boolean hoodDown = true;
@@ -36,6 +38,7 @@ public class Shooter extends SubsystemBase {
         middleShooter = new TalonFX(RobotMap.MIDDLE_SHOOTER_MOTOR_ID);
         rightShooter = new TalonFX(RobotMap.RIGHT_SHOOTER_MOTOR_ID);
         hood = new TalonFXS(RobotMap.HOOD_MOTOR_ID);
+        hoodEncoder = new DutyCycleEncoder(RobotMap.HOOD_THROUGHBORE_DIO);
 
         // Apply basic configuration
         TalonFXConfiguration config = new TalonFXConfiguration();
@@ -43,20 +46,32 @@ public class Shooter extends SubsystemBase {
 
         // PID Shooter Values
         // in init function, set slot 0 gains
-        Slot0Configs slot0Configs = new Slot0Configs();
-        slot0Configs.kP = RobotMap.SHOOTER_P_VALUE;
-        slot0Configs.kI = RobotMap.SHOOTER_I_VALUE;
-        slot0Configs.kD = RobotMap.SHOOTER_D_VALUE;
-        config.Slot0 = slot0Configs;
+        Slot0Configs shooterSlot0 = new Slot0Configs();
+        shooterSlot0.kS = RobotMap.SHOOTER_S_VALUE;
+        shooterSlot0.kV = RobotMap.SHOOTER_V_VALUE;
+        shooterSlot0.kA = RobotMap.SHOOTER_A_VALUE;
+        shooterSlot0.kP = RobotMap.SHOOTER_P_VALUE;
+        shooterSlot0.kI = RobotMap.SHOOTER_I_VALUE;
+        shooterSlot0.kD = RobotMap.SHOOTER_D_VALUE;
+        config.Slot0 = shooterSlot0;
         //https://v6.docs.ctr-electronics.com/en/stable/docs/api-reference/device-specific/talonfx/basic-pid-control.html
 
         // PID Hood Values
         // in init function, set slot 0 gains
-        Slot0Configs slot1Configs = new Slot0Configs();
-        slot1Configs.kP = RobotMap.HOOD_P_VALUE;
-        slot1Configs.kI = RobotMap.HOOD_I_VALUE;
-        slot1Configs.kD = RobotMap.HOOD_D_VALUE;
-        hoodConfig.Slot0 = slot1Configs;
+        Slot0Configs hoodSlot0 = new Slot0Configs();
+        hoodSlot0.kS = RobotMap.SHOOTER_S_VALUE;
+        hoodSlot0.kV = RobotMap.SHOOTER_V_VALUE;
+        hoodSlot0.kA = RobotMap.SHOOTER_A_VALUE;
+        hoodSlot0.kP = RobotMap.HOOD_P_VALUE;
+        hoodSlot0.kI = RobotMap.HOOD_I_VALUE;
+        hoodSlot0.kD = RobotMap.HOOD_D_VALUE;
+        hoodConfig.Slot0 = hoodSlot0;
+
+        MotionMagicConfigs motionMagicConfigs = new MotionMagicConfigs();
+        motionMagicConfigs.MotionMagicCruiseVelocity = RobotMap.HOOD_CRUISE_VELOCITY; // Target cruise velocity of 40 rps
+        motionMagicConfigs.MotionMagicAcceleration = RobotMap.HOOD_ACCELERATION; // Target acceleration of 80 rps/s
+        motionMagicConfigs.MotionMagicJerk = RobotMap.HOOD_JERK; // Target jerk of 800 rps/s/s
+        hoodConfig.MotionMagic = motionMagicConfigs;
         
         // Verify
         CurrentLimitsConfigs currentLimits = new CurrentLimitsConfigs();
@@ -91,18 +106,41 @@ public class Shooter extends SubsystemBase {
     //2. Determine whether the distance is "close," "medium," or "far" away from the tag
     //3. Change the speed accordingly for each of these situations
 
+    private double getHoodEncoderPositionRotations() {
+        double adjustedRotations = hoodEncoder.get() - RobotMap.HOOD_THROUGHBORE_OFFSET_ROT;
+        return MathUtil.inputModulus(adjustedRotations, 0.0, 1.0);
+    }
+
+    private boolean atHoodUpperLimit() {
+        return getHoodEncoderPositionRotations()
+            >= RobotMap.HOOD_MAX_ROT - RobotMap.HOOD_LIMIT_TOLERANCE_ROT;
+    }
+
+    private boolean atHoodLowerLimit() {
+        return getHoodEncoderPositionRotations()
+            <= RobotMap.HOOD_MIN_ROT + RobotMap.HOOD_LIMIT_TOLERANCE_ROT;
+    }
+
     public Command hoodUp() {
         return this.run(() -> {
-            hood.setControl(m_output.withOutput(RobotMap.HOOD_SPEED));
+            if (!atHoodUpperLimit()) {
+                hood.setControl(m_output.withOutput(RobotMap.HOOD_SPEED));
+            } else {
+                hood.stopMotor();
+            }
             hoodDown = false;
-        }).finallyDo(() -> stopMotors());
+        }).until(this::atHoodUpperLimit).finallyDo(() -> hood.stopMotor());
     }
 
     public Command hoodDown() {
         return this.run(() -> {
-            hood.setControl(m_output.withOutput(-RobotMap.HOOD_SPEED));
+            if (!atHoodLowerLimit()) {
+                hood.setControl(m_output.withOutput(-RobotMap.HOOD_SPEED));
+            } else {
+                hood.stopMotor();
+            }
             hoodDown = true;
-        }).finallyDo(() -> stopMotors());
+        }).until(this::atHoodLowerLimit).finallyDo(() -> hood.stopMotor());
     }
 
     public Command shoot() {
@@ -186,6 +224,8 @@ public class Shooter extends SubsystemBase {
         SmartDashboard.putNumber("Shooter Motor Draw", leftShooter.getStatorCurrent().getValueAsDouble());
         SmartDashboard.putNumber("Hood Battery Draw", hood.getSupplyCurrent().getValueAsDouble());
         SmartDashboard.putNumber("Hood Motor Draw", hood.getStatorCurrent().getValueAsDouble());
+        SmartDashboard.putNumber("Hood Throughbore Rot", getHoodEncoderPositionRotations());
+        SmartDashboard.putBoolean("Hood At Upper Limit", atHoodUpperLimit());
+        SmartDashboard.putBoolean("Hood At Lower Limit", atHoodLowerLimit());
     } 
 }
-

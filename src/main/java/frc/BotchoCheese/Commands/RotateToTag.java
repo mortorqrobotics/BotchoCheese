@@ -1,12 +1,9 @@
-// DON'T touch file until StrafeToTag code is resolved
-
 package frc.BotchoCheese.Commands;
 
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.BotchoCheese.RobotContainer;
 import frc.BotchoCheese.Constants.RobotMap;
 import frc.BotchoCheese.Subsystems.CommandSwerveDrivetrain;
 import frc.BotchoCheese.Utils.LimelightHelpers;

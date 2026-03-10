@@ -1,25 +1,32 @@
-Joystick1 Controller
---------------------
-Left Stick Y/X: Field-centric translation drive (speed scaled by Left Trigger)
-Right Stick X: Rotation/yaw drive (yaw speed scaled by Left Trigger)
-Left Trigger (>= 0.25): Precision mode (translation 10%, reduced yaw)
-A (hold): Drivetrain brake request
-B (hold): Point wheels at left-stick direction
-D-Pad Up (hold): Drive forward robot-centric at +0.5 m/s
-D-Pad Down (hold): Drive backward robot-centric at -0.5 m/s
-Left Bumper (press): Reseed field-centric heading
-Right Bumper (press): Run StrafeToTag(drivetrain, 0.5) and RotateToTag(drivetrain, 0)
-Y (hold): Shooter shoot command
-X (hold): Feeder run command
+Joystick1 Controller (Port 0)
+-----------------------------
+Default drive behavior:
+- Left Stick Y/X: Field-centric translation drive
+- Right Stick X: Field-centric rotation/yaw
+- Left Trigger Axis >= 0.25: precision mode (translation scale 0.1, yaw scale ~0.1)
+- Left Trigger Axis < 0.25: normal mode (translation scale 1.0, yaw scale ~0.777...)
 
-Joystick2 Controller
---------------------
-Right Bumper (press): Emergency stop
- - Cancels all scheduled commands
- - Stops Shooter motors
- - Stops Feeder motor
- - Stops Climber motors
- - Stops Intake + Pivot (via intake.stopAll())
-Right Bumper (hold): Applies drivetrain brake request while held
+Button bindings:
+- X (hold): Drivetrain brake request
+- D-Pad Up (hold): Robot-centric forward drive (+0.5 X, 0 Y)
+- D-Pad Down (hold): Robot-centric backward drive (-0.5 X, 0 Y)
+- D-Pad Left (hold): Robot-centric left strafe (0 X, -0.5 Y)
+- D-Pad Right (hold): Robot-centric right strafe (0 X, +0.5 Y)
+- Y (press): Run climber automatic up command
+- A (press): Run climber automatic down command
+- Right Bumper (press): Run StrafeToTag(drivetrain, 0.5)
+- Right Trigger (press): Run RotateToTag(drivetrain, 0)
+- Start/Menu (press): Reseed field-centric heading
 
-No other Joystick2 bindings are currently configured in RobotContainer.java.
+Joystick2 Controller (Port 1)
+-----------------------------
+Button bindings:
+- Right Trigger (hold): Run feeder command
+- Left Trigger (hold): Run shooter command
+- D-Pad Up (hold): Hood up command
+- D-Pad Down (hold): Hood down command
+- Left Bumper (hold): Intake start command
+- Y (hold): Indexer on command
+- Right Bumper (press): Toggle intake pivot
+  - If pivot is up: set pivot down, set pivotIsUp=false
+  - If pivot is down: set pivot up, set pivotIsUp=true
