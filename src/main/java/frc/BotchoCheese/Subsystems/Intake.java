@@ -22,7 +22,7 @@ public class Intake extends SubsystemBase {
     private final TalonFX pivotLeader;
     private final TalonFX pivotFollower;
     private final TalonFX intakeMotor;
-    private final CoreCANrange CANrange;
+    // private final CoreCANrange CANrange;
 
     // Control requests
     private final DutyCycleOut intakeOutput = new DutyCycleOut(0);
@@ -34,10 +34,10 @@ public class Intake extends SubsystemBase {
     
     public Intake() {
         // Initialize motors (You will need to add these new IDs to your RobotMap)
-        pivotLeader = new TalonFX(RobotMap.PIVOT_1_MOTOR_ID);
-        pivotFollower = new TalonFX(RobotMap.PIVOT_2_MOTOR_ID);
+        pivotLeader = new TalonFX(RobotMap.LEFT_PIVOT_MOTOR_ID);
+        pivotFollower = new TalonFX(RobotMap.RIGHT_PIVOT_MOTOR_ID);
         intakeMotor = new TalonFX(RobotMap.INTAKE_MOTOR_ID);
-        CANrange = new CoreCANrange(RobotMap.CAN_RANGE_ID);
+        // CANrange = new CoreCANrange(RobotMap.CAN_RANGE_ID);
 
         // --- PIVOT CONFIGURATION (Kraken X44s) ---
         TalonFXConfiguration pivotConfig = new TalonFXConfiguration();
@@ -137,20 +137,20 @@ public class Intake extends SubsystemBase {
 
     // Checks whether the intake is full or not.
     // TODO Refine the command later
-    public Command isIndexFull() {
-        return this.run(() -> {
-            while(!pivotUp) {
-                while(goingIn) {
-                    if(CANrange.getDistance().getValueAsDouble() < RobotMap.CAN_RANGE_DISTANCE_THRESHOLD) {
-                        stopIntake();
-                    }
-                    else {
-                        startIntake();
-                    }
-                }
-            }
-        });
-    }
+    // public Command isIndexFull() {
+    //     return this.run(() -> {
+    //         while(!pivotUp) {
+    //             while(goingIn) {
+    //                 if(CANrange.getDistance().getValueAsDouble() < RobotMap.CAN_RANGE_DISTANCE_THRESHOLD) {
+    //                     stopIntake();
+    //                 }
+    //                 else {
+    //                     startIntake();
+    //                 }
+    //             }
+    //         }
+    //     });
+    // }
     
     public void stopIntake() {
         intakeMotor.stopMotor();

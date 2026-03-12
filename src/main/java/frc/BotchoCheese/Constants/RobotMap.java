@@ -34,12 +34,10 @@ public class RobotMap {
     public static final int PIGEON_ID = 30;
 
     // Climber
-    // Climber motor IDs (fill with actual CAN IDs for your robot hardware)
-    public static final int LEFT_CLIMBER_MOTOR_ID = 10;
-    public static final int RIGHT_CLIMBER_MOTOR_ID = 11;
-    public static final int LEFT_CLIMBER_TWO_MOTOR_ID = 12;
-    public static final int RIGHT_CLIMBER_TWO_MOTOR_ID = 13;
-    public static final int ENCODER_ID = 14;
+    // Climber motor IDs
+    public static final int LEFT_CLIMBER_MOTOR_ID = 27;
+    public static final int RIGHT_CLIMBER_MOTOR_ID = 28;
+    public static final int ENCODER_ID = 100;
 
     // Climber PID Values
     // TODO
@@ -48,7 +46,6 @@ public class RobotMap {
     public static final double CLIMBER_D_VALUE = 0.4;
 
     // Climber speeds
-    // TODO: Check whether new motors (l2Climber and r2Climber) speeds are required in some way
     public static final double TEST_MOTOR_LEFT_UP_SPEED = 0.2;
     public static final double TEST_MOTOR_LEFT_DOWN_SPEED = -0.2;
     public static final double TEST_MOTOR_RIGHT_UP_SPEED = 0.2;
@@ -58,10 +55,10 @@ public class RobotMap {
     public static final double CLIMBER_EXTENSION_LIMIT = 0.5; 
     
     // Intake motor IDs
-    public static final int INTAKE_MOTOR_ID = 20;
-    public static final int PIVOT_1_MOTOR_ID = 21;
-    public static final int PIVOT_2_MOTOR_ID = 22;
-    public static final int CAN_RANGE_ID = 23;
+    public static final int INTAKE_MOTOR_ID = 22;
+    public static final int LEFT_PIVOT_MOTOR_ID = 20;
+    public static final int RIGHT_PIVOT_MOTOR_ID = 21;
+    // public static final int CAN_RANGE_ID = 23;
 
     // Pivot motor values
     // TODO Edit values
@@ -103,15 +100,13 @@ public class RobotMap {
     public static final double FEEDER_D_VALUE = 0.001;
     public static final double FEEDER_SPEED = 0.5; 
 
-    //TODO: Re-assign IDs
     // Shooter Motor IDs
     public static final int LEFT_SHOOTER_MOTOR_ID = 24;
     public static final int MIDDLE_SHOOTER_MOTOR_ID = 25;
     public static final int RIGHT_SHOOTER_MOTOR_ID = 26;
     
     // Hood Motor IDs
-    // TODO Change Hood ID
-    public static final int HOOD_MOTOR_ID = 999;
+    public static final int HOOD_MOTOR_ID = 17;
     public static final int HOOD_THROUGHBORE_DIO = 0;
 
     public static final double HOOD_P_VALUE = 0.4;
@@ -159,7 +154,7 @@ public class RobotMap {
     public static final double SHOOTER_A_VALUE = 0.01;
 
     // Indexer ID
-    public static final int INDEXER_MOTOR_ID = 30;
+    public static final int INDEXER_MOTOR_ID = 18;
 
     // Indexer speeds
     public static final double INDEXER_MOTOR_SPEED = 0.5;
