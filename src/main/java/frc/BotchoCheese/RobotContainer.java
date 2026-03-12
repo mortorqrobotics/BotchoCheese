@@ -140,7 +140,13 @@ public class RobotContainer {
 
         JOYSTICK2_CONTROLLER.leftBumper().whileTrue(intake.startIntake());
 
+        JOYSTICK2_CONTROLLER.x().whileTrue(intake.startIntake());
+
         JOYSTICK2_CONTROLLER.y().whileTrue(indexer.indexerOn());
+
+        JOYSTICK2_CONTROLLER.povLeft().whileTrue(intake.pivotDown());
+
+        JOYSTICK2_CONTROLLER.povRight().whileTrue(intake.pivotUp());
 
         JOYSTICK2_CONTROLLER.rightBumper().onTrue(
             Commands.either(

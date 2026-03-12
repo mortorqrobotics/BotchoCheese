@@ -70,7 +70,8 @@ public class Robot extends TimedRobot {
   
   //AdvantageScope simulation
   Pose2d poseA = RobotContainer.drivetrain.getState().Pose;
-  System.out.println("Current pose: " + poseA);
+  //TODO: Uncomment this later when the console isn't being flooded...
+  //System.out.println("Current pose: " + poseA);
   publisher.set(poseA);
   
 }
