@@ -35,6 +35,8 @@ public class Intake extends SubsystemBase {
     // Telemetry state variables
     private boolean goingIn = false;
     private boolean pivotUp = true;
+    private boolean routineIntakeActive = false;
+    private double lastCommandedIntakeOutput = 0.0;
     
     public Intake() {
         // Initialize motors (You will need to add these new IDs to your RobotMap)
@@ -174,6 +176,7 @@ public class Intake extends SubsystemBase {
             }
             intakeMotor.setControl(intakeOutput.withOutput(RobotMap.INTAKE_SPEED));
             goingIn = true;
+            lastCommandedIntakeOutput = RobotMap.INTAKE_SPEED;
         }).finallyDo(() -> {
             stopPivot();
             stopIntake();
@@ -188,7 +191,26 @@ public class Intake extends SubsystemBase {
         return this.run(() -> {
             intakeMotor.setControl(intakeOutput.withOutput(RobotMap.INTAKE_SPEED));
             goingIn = true;
+            lastCommandedIntakeOutput = RobotMap.INTAKE_SPEED;
         }).finallyDo(() -> stopIntake());
+    }
+
+    public Command routineIntakeOn() {
+        return this.startEnd(
+            () -> {
+                System.out.println("routineIntakeOn started=====================");
+                intakeMotor.setControl(intakeOutput.withOutput(RobotMap.INTAKE_SPEED));
+                goingIn = true;
+                routineIntakeActive = true;
+                lastCommandedIntakeOutput = RobotMap.INTAKE_SPEED;
+                System.out.println("routineIntakeOn commanded output===================== " + RobotMap.INTAKE_SPEED);
+            },
+            () -> {
+                System.out.println("routineIntakeOn ended=====================");
+                routineIntakeActive = false;
+                stopIntake();
+            }
+        );
     }
 
     // Ejects the game objects from the Intake.
@@ -221,6 +243,7 @@ public class Intake extends SubsystemBase {
         System.out.println("stopIntake executed=====================");
         intakeMotor.stopMotor();
         goingIn = false;
+        lastCommandedIntakeOutput = 0.0;
     }
 
     // Completely stop everything (Useful for an emergency stop or disable command)
@@ -262,10 +285,13 @@ public class Intake extends SubsystemBase {
     @Override
     public void periodic() {
         SmartDashboard.putBoolean("Intake Going In?", goingIn);
+        SmartDashboard.putBoolean("Intake Routine Active", routineIntakeActive);
+        SmartDashboard.putNumber("Intake Commanded Output", lastCommandedIntakeOutput);
 
         // Intake Telemetry
         SmartDashboard.putNumber("Intake Battery Draw", intakeMotor.getSupplyCurrent().getValueAsDouble());
         SmartDashboard.putNumber("Intake Motor Draw", intakeMotor.getStatorCurrent().getValueAsDouble());
+        SmartDashboard.putNumber("Intake Motor Voltage", intakeMotor.getMotorVoltage().getValueAsDouble());
         
         // Pivot Telemetry
         SmartDashboard.putNumber("Pivot Position (Rot)", pivotLeader.getPosition().getValueAsDouble());

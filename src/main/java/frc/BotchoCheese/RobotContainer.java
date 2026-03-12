@@ -67,13 +67,6 @@ public class RobotContainer {
 
     public final Indexer indexer = new Indexer();
 
-    private final Command fullIntakeToShooterCommand = Commands.parallel(
-        intake.startIntake(),
-        indexer.indexerOn(),
-        feeder.runFeeder(),
-        shooter.shoot()
-    );
-
     /* Path follower */
     private final SendableChooser<Command> autoChooser;
 
@@ -117,7 +110,7 @@ public class RobotContainer {
             forwardStraight.withVelocityX(0).withVelocityY(0.25))
         );
         
-        JOYSTICK1_CONTROLLER.a().toggleOnTrue(fullIntakeToShooterCommand);
+        JOYSTICK1_CONTROLLER.a().toggleOnTrue(createFullIntakeToShooterCommand());
 
         JOYSTICK1_CONTROLLER.b().onTrue(
             Commands.either(
@@ -139,6 +132,15 @@ public class RobotContainer {
     }
     private static double applyDriveDeadband(double value) {
         return MathUtil.applyDeadband(value, 0.1);
+    }
+
+    private Command createFullIntakeToShooterCommand() {
+        return Commands.parallel(
+            intake.routineIntakeOn(),
+            indexer.indexerOn(),
+            feeder.runFeeder(),
+            shooter.shoot()
+        );
     }
 
     public Command getAutonomousCommand() {
