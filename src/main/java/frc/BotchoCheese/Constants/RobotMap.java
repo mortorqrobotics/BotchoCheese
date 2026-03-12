@@ -35,7 +35,7 @@ public class RobotMap {
 
     //TODO
     // GLOBAL SPEED
-    public static final double GLOBAL_SPEED = 0.3;
+    public static final double GLOBAL_SPEED = 0.5;
 
     // Climber
     // Climber motor IDs
@@ -69,6 +69,8 @@ public class RobotMap {
     public static final double PIVOT_UP_POSITION = 0;
     public static final double PIVOT_DOWN_POSITION = 0;
     public static final double PIVOT_VOLTAGE_SPIKE_THRESHOLD = 10.0;
+    public static final double PIVOT_MANUAL_UP_SPEED = 0.25;
+    public static final double PIVOT_MANUAL_DOWN_SPEED = 0.01;
 
     // Intake PID Values
     // TODO
@@ -85,15 +87,17 @@ public class RobotMap {
     public static final double PIVOT_I_VALUE = 0.3;
     public static final double PIVOT_D_VALUE = 0.1;
 
-    // Intake Motion Magic Values
-
-    public static final double INTAKE_CRUISE_VELOCITY = 80; // Target cruise velocity of 0.5 rps
-    public static final double INTAKE_ACCELERATION = 160; // Target acceleration of 1 rps/s (0.5 seconds)
-    public static final double INTAKE_JERK = 1600; // Target jerk
+    // Pivot Motion Magic Values
+    public static final double PIVOT_UP_CRUISE_VELOCITY = 80;
+    public static final double PIVOT_UP_ACCELERATION = 160;
+    public static final double PIVOT_UP_JERK = 1600;
+    public static final double PIVOT_DOWN_CRUISE_VELOCITY = 20;
+    public static final double PIVOT_DOWN_ACCELERATION = 40;
+    public static final double PIVOT_DOWN_JERK = 400;
 
     // Intake speeds
     // Verify if values are correct and go in the right directions
-    public static final double INTAKE_SPEED = GLOBAL_SPEED;
+    public static final double INTAKE_SPEED = -GLOBAL_SPEED;
     // TODO: Comfirm the threshold.
     public static final double CAN_RANGE_DISTANCE_THRESHOLD = 0.5;
     
@@ -136,7 +140,10 @@ public class RobotMap {
     // Shooter speeds
 
     // Notice: Will be dynamically modified in the Shooter's updateSpeed function
-    public static double SHOOTER_SPEED = GLOBAL_SPEED;
+    public static double SHOOTER_SPEED = 0.9;
+    public static final double SHOOTER_TARGET_RPS = 90.0;
+    public static final double SHOOTER_ACCELERATION = 160.0;
+    public static final double SHOOTER_JERK = 1600.0;
     
     //TODO
     public static double SHOOTER_SPEED_REGRESSION_SLOPE = 1.0;

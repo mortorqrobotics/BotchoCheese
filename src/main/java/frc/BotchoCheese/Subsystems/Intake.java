@@ -11,6 +11,7 @@ import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.hardware.TalonFXS;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
+import com.ctre.phoenix6.signals.MotorArrangementValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -29,6 +30,7 @@ public class Intake extends SubsystemBase {
     private final DutyCycleOut intakeOutput = new DutyCycleOut(0);
     private final MotionMagicVoltage pivotPositionRequest = new MotionMagicVoltage(0);
     private final DutyCycleOut pivot_output = new DutyCycleOut(0);
+    private final MotionMagicConfigs pivotMotionMagicConfigs = new MotionMagicConfigs();
 
     // Telemetry state variables
     private boolean goingIn = false;
@@ -54,10 +56,10 @@ public class Intake extends SubsystemBase {
         pivotSlot0.kD = RobotMap.PIVOT_D_VALUE;
         pivotConfig.Slot0 = pivotSlot0;
 
-        MotionMagicConfigs motionMagicConfigs = pivotConfig.MotionMagic;
-        motionMagicConfigs.MotionMagicCruiseVelocity = RobotMap.INTAKE_CRUISE_VELOCITY; // Target cruise velocity of 80 rps
-        motionMagicConfigs.MotionMagicAcceleration = RobotMap.INTAKE_ACCELERATION; // Target acceleration of 160 rps/s (0.5 seconds)
-        motionMagicConfigs.MotionMagicJerk = RobotMap.INTAKE_JERK; // Target jerk of 1600 rps/s/s (0.1 seconds)
+        pivotMotionMagicConfigs.MotionMagicCruiseVelocity = RobotMap.PIVOT_UP_CRUISE_VELOCITY;
+        pivotMotionMagicConfigs.MotionMagicAcceleration = RobotMap.PIVOT_UP_ACCELERATION;
+        pivotMotionMagicConfigs.MotionMagicJerk = RobotMap.PIVOT_UP_JERK;
+        pivotConfig.MotionMagic = pivotMotionMagicConfigs;
 
         // Current limits to protect the X44s and the pivot mechanism
         CurrentLimitsConfigs pivotLimits = new CurrentLimitsConfigs();
@@ -79,6 +81,7 @@ public class Intake extends SubsystemBase {
 
         // --- INTAKE CONFIGURATION (Minion) ---
         TalonFXSConfiguration intakeConfig = new TalonFXSConfiguration();
+        intakeConfig.Commutation.MotorArrangement = MotorArrangementValue.Minion_JST;
         
         CurrentLimitsConfigs intakeLimits = new CurrentLimitsConfigs();
         intakeLimits.StatorCurrentLimit = 40.0; // Minions generally stay in the 30-50A range
@@ -116,6 +119,11 @@ public class Intake extends SubsystemBase {
                 return;
             }
 
+            applyPivotMotionMagicProfile(
+                RobotMap.PIVOT_UP_CRUISE_VELOCITY,
+                RobotMap.PIVOT_UP_ACCELERATION,
+                RobotMap.PIVOT_UP_JERK
+            );
             pivotLeader.setControl(pivotPositionRequest.withPosition(RobotMap.PIVOT_UP_POSITION));
             pivotUp = true;
         });
@@ -129,6 +137,11 @@ public class Intake extends SubsystemBase {
                 return;
             }
 
+            applyPivotMotionMagicProfile(
+                RobotMap.PIVOT_DOWN_CRUISE_VELOCITY,
+                RobotMap.PIVOT_DOWN_ACCELERATION,
+                RobotMap.PIVOT_DOWN_JERK
+            );
             pivotLeader.setControl(pivotPositionRequest.withPosition(RobotMap.PIVOT_DOWN_POSITION));
             pivotUp = false;
         });
@@ -136,24 +149,35 @@ public class Intake extends SubsystemBase {
 
     public Command pivotUp() {
         return this.run(() -> {
-            if (isPivotVoltageSpiking()) {
-                handlePivotHardStop(RobotMap.PIVOT_UP_POSITION, true);
-                return;
-            }
-
-            pivotLeader.setControl(pivot_output.withOutput(RobotMap.GLOBAL_SPEED));
+            pivotLeader.setControl(pivot_output.withOutput(-RobotMap.PIVOT_MANUAL_UP_SPEED));
         }).finallyDo(() -> stopPivot());
     }
 
     public Command pivotDown() {
         return this.run(() -> {
+            pivotLeader.setControl(pivot_output.withOutput(RobotMap.PIVOT_MANUAL_DOWN_SPEED));
+        }).finallyDo(() -> stopPivot());
+    }
+
+    public Command intakeAndPivotDown() {
+        return this.run(() -> {
             if (isPivotVoltageSpiking()) {
                 handlePivotHardStop(RobotMap.PIVOT_DOWN_POSITION, false);
-                return;
+            } else {
+                applyPivotMotionMagicProfile(
+                    RobotMap.PIVOT_DOWN_CRUISE_VELOCITY,
+                    RobotMap.PIVOT_DOWN_ACCELERATION,
+                    RobotMap.PIVOT_DOWN_JERK
+                );
+                pivotLeader.setControl(pivotPositionRequest.withPosition(RobotMap.PIVOT_DOWN_POSITION));
+                pivotUp = false;
             }
-
-            pivotLeader.setControl(pivot_output.withOutput(-RobotMap.GLOBAL_SPEED));
-        }).finallyDo(() -> stopPivot());
+            intakeMotor.setControl(intakeOutput.withOutput(RobotMap.INTAKE_SPEED));
+            goingIn = true;
+        }).finallyDo(() -> {
+            stopPivot();
+            stopIntake();
+        });
     }
 
     // --- INTAKE METHODS ---
@@ -205,6 +229,16 @@ public class Intake extends SubsystemBase {
         pivotLeader.stopMotor();
     }
 
+    public void setPivotCoastMode() {
+        pivotLeader.setNeutralMode(NeutralModeValue.Coast);
+        pivotFollower.setNeutralMode(NeutralModeValue.Coast);
+    }
+
+    public void setPivotBrakeMode() {
+        pivotLeader.setNeutralMode(NeutralModeValue.Brake);
+        pivotFollower.setNeutralMode(NeutralModeValue.Brake);
+    }
+
     private boolean isPivotVoltageSpiking() {
         return Math.abs(pivotLeader.getMotorVoltage().getValueAsDouble()) >= RobotMap.PIVOT_VOLTAGE_SPIKE_THRESHOLD
             || Math.abs(pivotFollower.getMotorVoltage().getValueAsDouble()) >= RobotMap.PIVOT_VOLTAGE_SPIKE_THRESHOLD;
@@ -215,6 +249,14 @@ public class Intake extends SubsystemBase {
         pivotLeader.setPosition(expectedPosition);
         pivotFollower.setPosition(expectedPosition);
         pivotUp = isPivotUp;
+    }
+
+    private void applyPivotMotionMagicProfile(double cruiseVelocity, double acceleration, double jerk) {
+        pivotMotionMagicConfigs.MotionMagicCruiseVelocity = cruiseVelocity;
+        pivotMotionMagicConfigs.MotionMagicAcceleration = acceleration;
+        pivotMotionMagicConfigs.MotionMagicJerk = jerk;
+        pivotLeader.getConfigurator().apply(pivotMotionMagicConfigs);
+        pivotFollower.getConfigurator().apply(pivotMotionMagicConfigs);
     }
 
     @Override

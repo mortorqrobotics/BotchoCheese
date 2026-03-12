@@ -2,6 +2,7 @@ package frc.BotchoCheese.Subsystems;
 
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.hardware.TalonFXS;
+import com.ctre.phoenix6.signals.MotorArrangementValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
@@ -30,6 +31,7 @@ public class Indexer extends SubsystemBase {
 
         // Apply basic configuration
         TalonFXSConfiguration config = new TalonFXSConfiguration();
+        config.Commutation.MotorArrangement = MotorArrangementValue.Minion_JST;
         
         // Verify
         CurrentLimitsConfigs currentLimits = new CurrentLimitsConfigs();
@@ -37,6 +39,7 @@ public class Indexer extends SubsystemBase {
         currentLimits.StatorCurrentLimitEnable = true;
         currentLimits.SupplyCurrentLimit = 30.0; 
         currentLimits.SupplyCurrentLimitEnable = true;
+        config.CurrentLimits = currentLimits;
         
         /* Set motors to Brake mode so the climber doesn't slide down */
         config.MotorOutput.NeutralMode = NeutralModeValue.Brake;

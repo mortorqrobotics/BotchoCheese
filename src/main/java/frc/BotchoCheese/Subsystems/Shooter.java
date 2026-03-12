@@ -2,6 +2,7 @@ package frc.BotchoCheese.Subsystems;
 
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.hardware.TalonFXS;
+import com.ctre.phoenix6.signals.MotorArrangementValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
@@ -9,6 +10,7 @@ import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.configs.TalonFXSConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
+import com.ctre.phoenix6.controls.MotionMagicVelocityVoltage;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
@@ -29,6 +31,7 @@ public class Shooter extends SubsystemBase {
     // Control requests (Phoenix 6 uses request objects instead of passing doubles directly)
     private final DutyCycleOut m_output = new DutyCycleOut(0);
     private final MotionMagicVoltage hoodPositionRequest = new MotionMagicVoltage(0);
+    private final MotionMagicVelocityVoltage shooterVelocityRequest = new MotionMagicVelocityVoltage(0);
 
     private boolean shooterTurning = false;
     private boolean hoodDown = true;
@@ -43,6 +46,7 @@ public class Shooter extends SubsystemBase {
         // Apply basic configuration
         TalonFXConfiguration config = new TalonFXConfiguration();
         TalonFXSConfiguration hoodConfig = new TalonFXSConfiguration();
+        hoodConfig.Commutation.MotorArrangement = MotorArrangementValue.Minion_JST;
 
         // PID Shooter Values
         // in init function, set slot 0 gains
@@ -67,6 +71,10 @@ public class Shooter extends SubsystemBase {
         hoodSlot0.kD = RobotMap.HOOD_D_VALUE;
         hoodConfig.Slot0 = hoodSlot0;
 
+        MotionMagicConfigs shooterMotionMagicConfigs = config.MotionMagic;
+        shooterMotionMagicConfigs.MotionMagicAcceleration = RobotMap.SHOOTER_ACCELERATION;
+        shooterMotionMagicConfigs.MotionMagicJerk = RobotMap.SHOOTER_JERK;
+
         MotionMagicConfigs motionMagicConfigs = new MotionMagicConfigs();
         motionMagicConfigs.MotionMagicCruiseVelocity = RobotMap.HOOD_CRUISE_VELOCITY; // Target cruise velocity of 40 rps
         motionMagicConfigs.MotionMagicAcceleration = RobotMap.HOOD_ACCELERATION; // Target acceleration of 80 rps/s
@@ -81,6 +89,7 @@ public class Shooter extends SubsystemBase {
         currentLimits.SupplyCurrentLimitEnable = true;
 
         config.CurrentLimits = currentLimits;
+        hoodConfig.CurrentLimits = currentLimits;
         
         /* Set motors to Brake mode so the climber doesn't slide down */
         config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
@@ -157,9 +166,9 @@ public class Shooter extends SubsystemBase {
             () -> {
                 //System.out.println("Kapoooooooooooooow!");
                 hood.setControl(hoodPositionRequest.withPosition(RobotMap.HOOD_POSITION));
-                leftShooter.set(RobotMap.SHOOTER_SPEED);
-                middleShooter.set(RobotMap.SHOOTER_SPEED);
-                rightShooter.set(RobotMap.SHOOTER_SPEED);
+                leftShooter.setControl(shooterVelocityRequest.withVelocity(RobotMap.SHOOTER_TARGET_RPS));
+                middleShooter.setControl(shooterVelocityRequest.withVelocity(RobotMap.SHOOTER_TARGET_RPS));
+                rightShooter.setControl(shooterVelocityRequest.withVelocity(RobotMap.SHOOTER_TARGET_RPS));
             },
             // When command ends:
             () -> {
@@ -181,26 +190,7 @@ public class Shooter extends SubsystemBase {
      * Update shooter speed based on distance from target
      */
     public void updateSpeed() {
-        //System.out.println("shooter updateSpeed executed=====================");
-        LimelightHelpers.RawFiducial[] rawFiducials = LimelightHelpers.getRawFiducials(RobotMap.LIMELIGHT_NAME);
-        if (rawFiducials.length == 0) {
-            //System.out.println("shooter updateSpeed NO RAW FIDUCIALS=====================");
-            return;
-        }
-        double distance = rawFiducials[0].distToRobot;
-
-       if(distance <= RobotMap.SHORT_DISTANCE_THRESHOLD) {
-            RobotMap.SHOOTER_SPEED = 0.25; // TODO
-            //System.out.println("shooter updateSpeed short distance executed=====================");
-       }
-       else if(distance > RobotMap.SHORT_DISTANCE_THRESHOLD && distance <= RobotMap.MEDIUM_DISTANCE_THRESHOLD) {
-            RobotMap.SHOOTER_SPEED = 0.5; // TODO
-            //System.out.println("shooter updateSpeed medium distance executed=====================");
-       }
-       else {
-            RobotMap.SHOOTER_SPEED = 0.75; // TODO
-            //System.out.println("shooter updateSpeed long distance executed=====================");
-       }
+        RobotMap.SHOOTER_SPEED = 0.85;
     }
 
     public void updateHoodPosition() {

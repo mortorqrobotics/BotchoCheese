@@ -77,7 +77,9 @@ public class Robot extends TimedRobot {
 }
 
   @Override
-  public void disabledInit() {}
+  public void disabledInit() {
+    m_robotContainer.intake.setPivotCoastMode();
+  }
 
   @Override
   public void disabledPeriodic() {
@@ -89,6 +91,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousInit() {
+    m_robotContainer.intake.setPivotBrakeMode();
 
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
@@ -105,6 +108,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
+    m_robotContainer.intake.setPivotBrakeMode();
     NetworkTableInstance.getDefault().getTable("limelight").getEntry("throttle_set").setNumber(0);
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
@@ -120,6 +124,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void testInit() {
+    m_robotContainer.intake.setPivotBrakeMode();
     CommandScheduler.getInstance().cancelAll();
   }
 
