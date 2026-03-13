@@ -44,24 +44,18 @@ public class Climber extends SubsystemBase {
 
         lClimber.getConfigurator().apply(config);
         rClimber.getConfigurator().apply(config);
-
-        System.out.println("climber constructed=====================");
     }
 
     public Boolean atLimit(){
-        System.out.println("climber atLimit executed=====================");
         if(encoder.getAbsolutePosition().getValueAsDouble() < RobotMap.CLIMBER_EXTENSION_LIMIT 
         || encoder.getAbsolutePosition().getValueAsDouble() > 0){
-            System.out.println("climber atLimit true executed=====================");
             return true;
         }
-        System.out.println("climber atLimit false=====================");
         return false;
     }
 
     // Commands to move the climber.
     public Command manualClimberUp() {
-        System.out.println("manualClimberUp executed=====================");
         return this.run(() -> {
             if(!atLimit()) {
                 lClimber.setControl(m_output.withOutput(RobotMap.TEST_MOTOR_LEFT_UP_SPEED));
@@ -72,7 +66,6 @@ public class Climber extends SubsystemBase {
     }
 
     public Command manualClimberDown() {
-        System.out.println("manualClimberDown executed=====================");
         return this.run(() -> {
             if(!atLimit()) {
                 lClimber.setControl(m_output.withOutput(RobotMap.TEST_MOTOR_LEFT_DOWN_SPEED));
@@ -83,7 +76,6 @@ public class Climber extends SubsystemBase {
     }
 
     public Command automaticClimberUp(){
-        System.out.println("automaticClimberUp executed=====================");
         return this.run(() -> {
             lClimber.setControl(m_output.withOutput(RobotMap.TEST_MOTOR_LEFT_UP_SPEED));
             rClimber.setControl(m_output.withOutput(RobotMap.TEST_MOTOR_RIGHT_UP_SPEED));
@@ -92,7 +84,6 @@ public class Climber extends SubsystemBase {
     }
 
     public Command automaticClimberDown(){
-        System.out.println("automaticClimberDown executed=====================");
         return this.run(() -> {
             lClimber.setControl(m_output.withOutput(RobotMap.TEST_MOTOR_LEFT_DOWN_SPEED));
             rClimber.setControl(m_output.withOutput(RobotMap.TEST_MOTOR_RIGHT_DOWN_SPEED));
@@ -104,7 +95,6 @@ public class Climber extends SubsystemBase {
         lClimber.stopMotor();
         rClimber.stopMotor();
         goingUp = false;
-        System.out.println("Climber stopMotors executed=====================");
     }
 
     @Override

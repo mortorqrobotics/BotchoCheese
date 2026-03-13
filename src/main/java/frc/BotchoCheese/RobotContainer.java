@@ -52,6 +52,7 @@ public class RobotContainer {
     private final Telemetry logger = new Telemetry(MaxSpeed);
 
     private final static CommandXboxController JOYSTICK1_CONTROLLER = new CommandXboxController(0);
+    private final static CommandXboxController JOYSTICK2_CONTROLLER = new CommandXboxController(1);
     public final static CommandSwerveDrivetrain drivetrain = createDrivetrain();
     public static Pigeon2 gyro = new Pigeon2(RobotMap.PIGEON_ID);
 
@@ -112,7 +113,28 @@ public class RobotContainer {
         
         JOYSTICK1_CONTROLLER.a().toggleOnTrue(createFullIntakeToShooterCommand());
 
-        JOYSTICK1_CONTROLLER.b().onTrue(
+
+
+        JOYSTICK1_CONTROLLER.rightTrigger().onTrue(new RotateToTag(drivetrain, 0));
+
+        // reset the field-centric heading on menu button press
+        JOYSTICK1_CONTROLLER.start().onTrue(new InstantCommand(()->drivetrain.seedFieldCentric()));
+
+        //Controller 2
+        JOYSTICK2_CONTROLLER.rightTrigger().whileTrue(feeder.runFeeder());
+
+        JOYSTICK2_CONTROLLER.leftTrigger().whileTrue(shooter.shoot());
+
+        JOYSTICK2_CONTROLLER.povUp().whileTrue(shooter.hoodUp());
+
+        JOYSTICK2_CONTROLLER.povDown().whileTrue(shooter.hoodDown());
+
+        JOYSTICK2_CONTROLLER.leftBumper().whileTrue(intake.startIntake());
+
+        JOYSTICK2_CONTROLLER.y().whileTrue(indexer.indexerOn());
+
+        JOYSTICK2_CONTROLLER.rightBumper().onTrue(
+
             Commands.either(
                 intake.setPivotDown().andThen(Commands.runOnce(() -> pivotIsUp = false)),
                 intake.setPivotUp().andThen(Commands.runOnce(() -> pivotIsUp = true)),
@@ -136,7 +158,7 @@ public class RobotContainer {
 
     private Command createFullIntakeToShooterCommand() {
         return Commands.parallel(
-            intake.routineIntakeOn(),
+           // intake.routineIntakeOn(),
             indexer.indexerOn(),
             feeder.runFeeder(),
             shooter.shoot()

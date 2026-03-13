@@ -53,15 +53,12 @@ public class Feeder extends SubsystemBase {
 
         // Apply the configuration to the FXS
         feederMotor.getConfigurator().apply(config);
-
-        System.out.println("feeder constructed=====================");
     }
 
     /**
      * Runs the feeder at the defined constant speed.
      */
     public Command runFeeder() {
-        System.out.println("runFeeder executed=====================");
         return this.startEnd(
             () -> {
                 feederMotor.setControl(m_output.withOutput(RobotMap.FEEDER_SPEED));
@@ -77,7 +74,6 @@ public class Feeder extends SubsystemBase {
      * Reverses the feeder to clear a jam or outtake.
      */
     public Command reverseFeeder() {
-        System.out.println("reverseFeeder executed=====================");
         return this.run(() -> {
             feederMotor.setControl(m_output.withOutput(-RobotMap.FEEDER_SPEED));
         }).finallyDo((interrupted) -> stopMotor());
@@ -86,7 +82,6 @@ public class Feeder extends SubsystemBase {
     public void stopMotor() {
         feederMotor.stopMotor();
         isFeeding = false;
-        System.out.println("feeder stopMotor executed=====================");
     }
 
     @Override

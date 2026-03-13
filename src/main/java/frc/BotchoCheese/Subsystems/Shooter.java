@@ -98,8 +98,6 @@ public class Shooter extends SubsystemBase {
         middleShooter.getConfigurator().apply(config);
         rightShooter.getConfigurator().apply(config);
         hood.getConfigurator().apply(hoodConfig);
-
-        //System.out.println("Shooter constructed=====================");
     }
 
     // Moves the Shooter counter Clockwise.
@@ -119,24 +117,20 @@ public class Shooter extends SubsystemBase {
 
     private double getHoodEncoderPositionRotations() {
         double adjustedRotations = hoodEncoder.get() - RobotMap.HOOD_THROUGHBORE_OFFSET_ROT;
-       // System.out.println("shooter getHoodEncoderPositionRotations executed=====================");
         return MathUtil.inputModulus(adjustedRotations, 0.0, 1.0);
     }
 
     private boolean atHoodUpperLimit() {
-        // System.out.println("shooter atHoodUpperLimit executed=====================");
         return getHoodEncoderPositionRotations()
             >= RobotMap.HOOD_MAX_ROT - RobotMap.HOOD_LIMIT_TOLERANCE_ROT;
     }
 
     private boolean atHoodLowerLimit() {
-        //System.out.println("shooter atLowerLimit executed=====================");
         return getHoodEncoderPositionRotations()
             <= RobotMap.HOOD_MIN_ROT + RobotMap.HOOD_LIMIT_TOLERANCE_ROT;
     }
 
     public Command hoodUp() {
-        //System.out.println("shooter hoodUp executed=====================");
         return this.run(() -> {
             if (!atHoodUpperLimit()) {
                 hood.setControl(m_output.withOutput(RobotMap.HOOD_SPEED));
@@ -148,7 +142,6 @@ public class Shooter extends SubsystemBase {
     }
 
     public Command hoodDown() {
-        //System.out.println("shooter hoodDown executed=====================");
         return this.run(() -> {
             if (!atHoodLowerLimit()) {
                 hood.setControl(m_output.withOutput(-RobotMap.HOOD_SPEED));
@@ -164,7 +157,8 @@ public class Shooter extends SubsystemBase {
         return this.startEnd(
             // When command starts/runs:
             () -> {
-                //System.out.println("Kapoooooooooooooow!");
+                System.out.println("Bam!");
+                System.out.println("Kapoooooooooooooow!");
                 hood.setControl(hoodPositionRequest.withPosition(RobotMap.HOOD_POSITION));
                 leftShooter.setControl(shooterVelocityRequest.withVelocity(RobotMap.SHOOTER_TARGET_RPS));
                 middleShooter.setControl(shooterVelocityRequest.withVelocity(RobotMap.SHOOTER_TARGET_RPS));
@@ -183,36 +177,46 @@ public class Shooter extends SubsystemBase {
         rightShooter.stopMotor();
         hood.stopMotor();
         shooterTurning = false;
-        //System.out.println("shooter stopMotors executed=====================");
     }
 
     /**
      * Update shooter speed based on distance from target
      */
     public void updateSpeed() {
-        RobotMap.SHOOTER_SPEED = 0.85;
+
+        LimelightHelpers.RawFiducial[] rawFiducials = LimelightHelpers.getRawFiducials(RobotMap.LIMELIGHT_NAME);
+        if (rawFiducials.length == 0) {
+            return;
+        }
+        double distance = rawFiducials[0].distToRobot;
+
+       if(distance <= RobotMap.SHORT_DISTANCE_THRESHOLD) {
+            RobotMap.SHOOTER_SPEED = 0.25; // TODO
+       }
+       else if(distance > RobotMap.SHORT_DISTANCE_THRESHOLD && distance <= RobotMap.MEDIUM_DISTANCE_THRESHOLD) {
+            RobotMap.SHOOTER_SPEED = 0.5; // TODO
+       }
+       else {
+            RobotMap.SHOOTER_SPEED = 0.75; // TODO
+       }
+
     }
 
     public void updateHoodPosition() {
-        //System.out.println("shooter updateHoodPosition executed=====================");
         LimelightHelpers.RawFiducial[] rawFiducials = LimelightHelpers.getRawFiducials(RobotMap.LIMELIGHT_NAME);
         if (rawFiducials.length == 0) {
-            //System.out.println("shooter updateHoodPosition NO RAW FIDUCIALS executed=====================");
             return;
         }
         double distance = rawFiducials[0].distToRobot;
 
        if(distance <= RobotMap.SHORT_DISTANCE_THRESHOLD) {
             RobotMap.HOOD_POSITION = 0.25; // TODO
-            //System.out.println("shooter updateHoodPosition short executed=====================");
        }
        else if(distance > RobotMap.SHORT_DISTANCE_THRESHOLD && distance <= RobotMap.MEDIUM_DISTANCE_THRESHOLD) {
             RobotMap.HOOD_POSITION = 0.5; // TODO
-            //System.out.println("shooter updateHoodPosition medium executed=====================");
        }
        else {
             RobotMap.HOOD_POSITION = 0.75; // TODO
-            //System.out.println("shooter updateHoodPosition long executed=====================");
        }
     }
 

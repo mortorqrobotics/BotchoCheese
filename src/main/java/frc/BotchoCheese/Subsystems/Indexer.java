@@ -1,8 +1,10 @@
 package frc.BotchoCheese.Subsystems;
 
 import com.ctre.phoenix6.hardware.TalonFX;
+
 import com.ctre.phoenix6.hardware.TalonFXS;
 import com.ctre.phoenix6.signals.MotorArrangementValue;
+
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
@@ -30,8 +32,10 @@ public class Indexer extends SubsystemBase {
         indexer = new TalonFXS(RobotMap.INDEXER_MOTOR_ID);
 
         // Apply basic configuration
+
         TalonFXSConfiguration config = new TalonFXSConfiguration();
         config.Commutation.MotorArrangement = MotorArrangementValue.Minion_JST;
+
         
         // Verify
         CurrentLimitsConfigs currentLimits = new CurrentLimitsConfigs();
@@ -45,12 +49,9 @@ public class Indexer extends SubsystemBase {
         config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
         indexer.getConfigurator().apply(config);
-
-        System.out.println("Indexer constructed=====================");
     }
 
     public Command indexerOn() {
-        System.out.println("indexerOn executed=====================");
         return this.run(() -> {
             indexer.setControl(m_output.withOutput(RobotMap.INDEXER_MOTOR_SPEED));
             isOn = true;
@@ -58,7 +59,6 @@ public class Indexer extends SubsystemBase {
     }
 
     public Command reverseIndexer() {
-        System.out.println("reverseIndexer executed=====================");
         return this.run(() -> {
             indexer.setControl(m_output.withOutput(-RobotMap.INDEXER_MOTOR_SPEED));
             isOn = true;
@@ -68,7 +68,6 @@ public class Indexer extends SubsystemBase {
     public void stopMotors() {
         indexer.stopMotor();
         isOn = false;
-        System.out.println("indexer stopMotors executed=====================");
     }
 
     @Override
