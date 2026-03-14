@@ -55,9 +55,9 @@ public class Intake extends SubsystemBase {
         pivotConfig.Slot0 = pivotSlot0;
 
         MotionMagicConfigs motionMagicConfigs = pivotConfig.MotionMagic;
-        motionMagicConfigs.MotionMagicCruiseVelocity = RobotMap.INTAKE_CRUISE_VELOCITY; // Target cruise velocity of 80 rps
-        motionMagicConfigs.MotionMagicAcceleration = RobotMap.INTAKE_ACCELERATION; // Target acceleration of 160 rps/s (0.5 seconds)
-        motionMagicConfigs.MotionMagicJerk = RobotMap.INTAKE_JERK; // Target jerk of 1600 rps/s/s (0.1 seconds)
+        motionMagicConfigs.MotionMagicCruiseVelocity = RobotMap.PIVOT_CRUISE_VELOCITY; // Target cruise velocity of 20 rps
+        motionMagicConfigs.MotionMagicAcceleration = RobotMap.PIVOT_ACCELERATION; // Target acceleration of 160 rps^2 (0.5 seconds)
+        motionMagicConfigs.MotionMagicJerk = RobotMap.PIVOT_JERK; // Target jerk of 1600 rps^3 (0.1 seconds)
 
         // Current limits to protect the X44s and the pivot mechanism
         CurrentLimitsConfigs pivotLimits = new CurrentLimitsConfigs();
@@ -141,7 +141,7 @@ public class Intake extends SubsystemBase {
                 return;
             }
 
-            pivotLeader.setControl(pivot_output.withOutput(RobotMap.GLOBAL_SPEED));
+            pivotLeader.setControl(pivot_output.withOutput(RobotMap.GLOBAL_SPEED*4));
         }).finallyDo(() -> stopPivot());
     }
 
@@ -152,7 +152,7 @@ public class Intake extends SubsystemBase {
                 return;
             }
 
-            pivotLeader.setControl(pivot_output.withOutput(-RobotMap.GLOBAL_SPEED));
+            pivotLeader.setControl(pivot_output.withOutput(-RobotMap.GLOBAL_SPEED*4));
         }).finallyDo(() -> stopPivot());
     }
 
@@ -177,6 +177,7 @@ public class Intake extends SubsystemBase {
     }
 
     // Checks whether the intake is full or not.
+    // 
     // TODO Refine the command later
     // public Command isIndexFull() {
     //     return this.run(() -> {

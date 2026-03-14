@@ -98,66 +98,87 @@ public class RobotContainer {
                     .withRotationalRate(-applyDriveDeadband(JOYSTICK1_CONTROLLER.getRightX()) * MaxAngularRate)
             )
         );
-        JOYSTICK1_CONTROLLER.leftBumper().onTrue(Commands.runOnce(SignalLogger::start));
-        JOYSTICK1_CONTROLLER.leftBumper().onTrue(Commands.runOnce(SignalLogger::stop));
+        // JOYSTICK1_CONTROLLER.leftBumper().onTrue(Commands.runOnce(SignalLogger::start));
+        // JOYSTICK1_CONTROLLER.leftBumper().onTrue(Commands.runOnce(SignalLogger::stop));
 
-        JOYSTICK1_CONTROLLER.y().whileTrue(drivetrain.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
-        JOYSTICK1_CONTROLLER.a().whileTrue(drivetrain.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
-        JOYSTICK1_CONTROLLER.b().whileTrue(drivetrain.sysIdDynamic(SysIdRoutine.Direction.kForward));
-        JOYSTICK1_CONTROLLER.x().whileTrue(drivetrain.sysIdDynamic(SysIdRoutine.Direction.kReverse));
-        // // Controller 1
-        // JOYSTICK1_CONTROLLER.x().whileTrue(drivetrain.applyRequest(() -> brake));
-        // // JOYSTICK1_CONTROLLER.b().whileTrue(drivetrain.applyRequest(() ->
-        // //     point.withModuleDirection(new Rotation2d(-JOYSTICK1_CONTROLLER.getLeftY(), -JOYSTICK1_CONTROLLER.getLeftX()))
-        // // ));
+        // JOYSTICK1_CONTROLLER.y().whileTrue(drivetrain.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+        // JOYSTICK1_CONTROLLER.a().whileTrue(drivetrain.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+        // JOYSTICK1_CONTROLLER.b().whileTrue(drivetrain.sysIdDynamic(SysIdRoutine.Direction.kForward));
+        // JOYSTICK1_CONTROLLER.x().whileTrue(drivetrain.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+        // Controller 1
+        JOYSTICK1_CONTROLLER.x().whileTrue(drivetrain.applyRequest(() -> brake));
+        // JOYSTICK1_CONTROLLER.b().whileTrue(drivetrain.applyRequest(() ->
+        //     point.withModuleDirection(new Rotation2d(-JOYSTICK1_CONTROLLER.getLeftY(), -JOYSTICK1_CONTROLLER.getLeftX()))
+        // ));
 
-        // JOYSTICK1_CONTROLLER.povUp().whileTrue(intake.pivotUp());
-        // JOYSTICK1_CONTROLLER.povDown().whileTrue(intake.pivotDown());
-        // JOYSTICK1_CONTROLLER.povLeft().whileTrue(drivetrain.applyRequest(() ->
-        //     forwardStraight.withVelocityX(0).withVelocityY(-0.25))
-        // );
-        // JOYSTICK1_CONTROLLER.povRight().whileTrue(drivetrain.applyRequest(() ->
-        //     forwardStraight.withVelocityX(0).withVelocityY(0.25))
-        // );
+        JOYSTICK1_CONTROLLER.povUp().whileTrue(intake.pivotUp());
+        JOYSTICK1_CONTROLLER.povDown().whileTrue(intake.pivotDown());
+        JOYSTICK1_CONTROLLER.povLeft().whileTrue(drivetrain.applyRequest(() ->
+            forwardStraight.withVelocityX(0).withVelocityY(-0.25))
+        );
+        JOYSTICK1_CONTROLLER.povRight().whileTrue(drivetrain.applyRequest(() ->
+            forwardStraight.withVelocityX(0).withVelocityY(0.25))
+        );
         
-        // JOYSTICK1_CONTROLLER.a().toggleOnTrue(createFullIntakeToShooterCommand());
+        JOYSTICK1_CONTROLLER.a().toggleOnTrue(createFullIntakeToShooterCommand());
 
 
 
-        // JOYSTICK1_CONTROLLER.rightTrigger().onTrue(new RotateToTag(drivetrain, 0));
+        JOYSTICK1_CONTROLLER.rightTrigger().onTrue(new RotateToTag(drivetrain, 0));
 
-        // // reset the field-centric heading on menu button press
-        // JOYSTICK1_CONTROLLER.start().onTrue(new InstantCommand(()->drivetrain.seedFieldCentric()));
+        // reset the field-centric heading on menu button press
+        JOYSTICK1_CONTROLLER.start().onTrue(new InstantCommand(()->drivetrain.seedFieldCentric()));
 
-        // //Controller 2
-        // JOYSTICK2_CONTROLLER.rightTrigger().whileTrue(feeder.runFeeder());
+        //Controller 2
+        // Indexer + Feeder + Shooter
+        JOYSTICK2_CONTROLLER.rightTrigger().whileTrue(feeder.runFeeder());
+        JOYSTICK2_CONTROLLER.rightTrigger().whileTrue(indexer.indexerOn());
+        JOYSTICK2_CONTROLLER.rightTrigger().whileTrue(shooter.shoot());
 
-        // JOYSTICK2_CONTROLLER.leftTrigger().whileTrue(shooter.shoot());
+        // Hood Up-PPAD Up/Down-DPAD Down
+        JOYSTICK2_CONTROLLER.povUp().whileTrue(shooter.hoodUp());
+        JOYSTICK2_CONTROLLER.povDown().whileTrue(shooter.hoodDown());
 
-        // JOYSTICK2_CONTROLLER.povUp().whileTrue(shooter.hoodUp());
+        // Intake + Indexer
+        JOYSTICK2_CONTROLLER.leftTrigger().whileTrue(intake.startIntake());
+        JOYSTICK2_CONTROLLER.leftTrigger().whileTrue(indexer.indexerOn());
 
-        // JOYSTICK2_CONTROLLER.povDown().whileTrue(shooter.hoodDown());
+        // Shooter
+        JOYSTICK2_CONTROLLER.leftBumper().whileTrue(shooter.shoot());
 
-        // JOYSTICK2_CONTROLLER.leftBumper().whileTrue(intake.startIntake());
+        // Feeder
+        JOYSTICK2_CONTROLLER.b().whileTrue(feeder.runFeeder());
 
-        // JOYSTICK2_CONTROLLER.y().whileTrue(indexer.indexerOn());
+        // Intake
+        JOYSTICK2_CONTROLLER.x().whileTrue(intake.startIntake());
 
-        // JOYSTICK2_CONTROLLER.rightBumper().onTrue(
+        // Hood Auto
+        // TODO
 
-        //     Commands.either(
-        //         intake.setPivotDown().andThen(Commands.runOnce(() -> pivotIsUp = false)),
-        //         intake.setPivotUp().andThen(Commands.runOnce(() -> pivotIsUp = true)),
-        //         () -> pivotIsUp
-        //     )
-        // );
+        // Indexer
+        JOYSTICK2_CONTROLLER.y().whileTrue(indexer.indexerOn());
 
-        // JOYSTICK1_CONTROLLER.leftBumper().whileTrue(climber.manualClimberUp());
-        // JOYSTICK1_CONTROLLER.rightBumper().whileTrue(climber.manualClimberDown());
-        // JOYSTICK1_CONTROLLER.leftTrigger().whileTrue(shooter.hoodUp());
-        // JOYSTICK1_CONTROLLER.rightTrigger().whileTrue(shooter.hoodDown());
+        // Intake Pivot Up-DPAD Left/Down-DPAD Right
+        JOYSTICK2_CONTROLLER.povLeft().whileTrue(intake.pivotDown().andThen(Commands.runOnce(() -> pivotIsUp = false)));
+        JOYSTICK2_CONTROLLER.povRight().whileTrue(intake.pivotUp().andThen(Commands.runOnce(() -> pivotIsUp = true)));
 
-        // // reset the field-centric heading on menu button press
-        // JOYSTICK1_CONTROLLER.start().onTrue(new InstantCommand(()->drivetrain.seedFieldCentric()));
+        // Intake Auto Pivot
+        JOYSTICK2_CONTROLLER.rightBumper().onTrue(
+
+            Commands.either(
+                intake.setPivotDown().andThen(Commands.runOnce(() -> pivotIsUp = false)),
+                intake.setPivotUp().andThen(Commands.runOnce(() -> pivotIsUp = true)),
+                () -> pivotIsUp
+            )
+        );
+
+        JOYSTICK1_CONTROLLER.leftBumper().whileTrue(climber.manualClimberUp());
+        JOYSTICK1_CONTROLLER.rightBumper().whileTrue(climber.manualClimberDown());
+        JOYSTICK1_CONTROLLER.leftTrigger().whileTrue(shooter.hoodUp());
+        JOYSTICK1_CONTROLLER.rightTrigger().whileTrue(shooter.hoodDown());
+
+        // reset the field-centric heading on menu button press
+        JOYSTICK1_CONTROLLER.start().onTrue(new InstantCommand(()->drivetrain.seedFieldCentric()));
 
         drivetrain.registerTelemetry(logger::telemeterize);
     }
