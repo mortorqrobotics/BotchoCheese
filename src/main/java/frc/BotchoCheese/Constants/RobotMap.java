@@ -93,7 +93,7 @@ public class RobotMap {
 
     // Intake speeds
     // Verify if values are correct and go in the right directions
-    public static final double INTAKE_SPEED = GLOBAL_SPEED*4;
+    public static final double INTAKE_SPEED = GLOBAL_SPEED*0.4;
     // TODO: Comfirm the threshold.
     public static final double CAN_RANGE_DISTANCE_THRESHOLD = 0.5;
     

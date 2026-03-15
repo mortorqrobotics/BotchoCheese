@@ -141,7 +141,7 @@ public class Intake extends SubsystemBase {
                 return;
             }
 
-            pivotLeader.setControl(pivot_output.withOutput(RobotMap.GLOBAL_SPEED*4));
+            pivotLeader.setControl(pivot_output.withOutput(RobotMap.GLOBAL_SPEED*2));
         }).finallyDo(() -> stopPivot());
     }
 
@@ -152,7 +152,7 @@ public class Intake extends SubsystemBase {
                 return;
             }
 
-            pivotLeader.setControl(pivot_output.withOutput(-RobotMap.GLOBAL_SPEED*4));
+            pivotLeader.setControl(pivot_output.withOutput(-RobotMap.GLOBAL_SPEED*2));
         }).finallyDo(() -> stopPivot());
     }
 
@@ -204,6 +204,7 @@ public class Intake extends SubsystemBase {
     public void stopPivot() {
         System.out.println("stopPivot executed=====================");
         pivotLeader.stopMotor();
+        
     }
 
     // private boolean isPivotVoltageSpiking() {
