@@ -123,7 +123,14 @@ public class RobotContainer {
         
         JOYSTICK1_CONTROLLER.a().toggleOnTrue(createFullIntakeToShooterCommand());
 
+        JOYSTICK1_CONTROLLER.leftBumper().whileTrue(climber.manualClimberUp());
+        JOYSTICK1_CONTROLLER.rightBumper().whileTrue(climber.manualClimberDown());
 
+        JOYSTICK1_CONTROLLER.leftTrigger().whileTrue(shooter.hoodUp());
+        JOYSTICK1_CONTROLLER.rightTrigger().whileTrue(shooter.hoodDown());
+
+        // reset the field-centric heading on menu button press
+        JOYSTICK1_CONTROLLER.start().onTrue(new InstantCommand(()->drivetrain.seedFieldCentric()));
 
         JOYSTICK1_CONTROLLER.rightTrigger().onTrue(new RotateToTag(drivetrain, 0));
 
@@ -178,14 +185,6 @@ public class RobotContainer {
                 () -> pivotIsUp
             )
         );
-
-        JOYSTICK1_CONTROLLER.leftBumper().whileTrue(climber.manualClimberUp());
-        JOYSTICK1_CONTROLLER.rightBumper().whileTrue(climber.manualClimberDown());
-        JOYSTICK1_CONTROLLER.leftTrigger().whileTrue(shooter.hoodUp());
-        JOYSTICK1_CONTROLLER.rightTrigger().whileTrue(shooter.hoodDown());
-
-        // reset the field-centric heading on menu button press
-        JOYSTICK1_CONTROLLER.start().onTrue(new InstantCommand(()->drivetrain.seedFieldCentric()));
 
         drivetrain.registerTelemetry(logger::telemeterize);
     }

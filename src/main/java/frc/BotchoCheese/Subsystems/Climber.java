@@ -47,11 +47,12 @@ public class Climber extends SubsystemBase {
     }
 
     public Boolean atLimit(){
-        if(encoder.getAbsolutePosition().getValueAsDouble() < RobotMap.CLIMBER_EXTENSION_LIMIT 
-        || encoder.getAbsolutePosition().getValueAsDouble() > 0){
-            return true;
-        }
-        return false;
+        double position = encoder.getAbsolutePosition().getValueAsDouble();
+        // if(encoder.getAbsolutePosition().getValueAsDouble() < RobotMap.CLIMBER_EXTENSION_LIMIT 
+        // || encoder.getAbsolutePosition().getValueAsDouble() > 0){
+        //     return true;
+        // }
+        return position >= RobotMap.CLIMBER_EXTENSION_LIMIT || position <= 0.0;
     }
 
     // Commands to move the climber.
