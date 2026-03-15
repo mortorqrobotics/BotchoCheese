@@ -11,6 +11,7 @@ import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.hardware.TalonFXS;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
+import com.ctre.phoenix6.signals.MotorArrangementValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -69,6 +70,8 @@ public class Intake extends SubsystemBase {
 
         // Pivot MUST be in brake mode to hold its position against gravity
         pivotConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+        // Commutation/MotorArrangement is not available on TalonFXConfiguration in this CTRE Phoenix version,
+        // so we do not set pivotConfig.Commutation here.
 
         pivotLeader.getConfigurator().apply(pivotConfig);
         pivotFollower.getConfigurator().apply(pivotConfig);
@@ -90,6 +93,8 @@ public class Intake extends SubsystemBase {
         // Typically intakes run in Coast mode so objects don't get stuck, 
         // but keeping it Brake if your game piece requires firm holding.
         intakeConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+        intakeConfig.Commutation.MotorArrangement = MotorArrangementValue.Minion_JST;
+        //TODO pivot minion config 
 
         intakeMotor.getConfigurator().apply(intakeConfig);
 
