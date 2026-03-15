@@ -35,7 +35,7 @@ public class RobotMap {
 
     //TODO
     // GLOBAL SPEED
-    public static final double GLOBAL_SPEED = 0.3;
+    public static final double GLOBAL_SPEED = 0.1;
 
     // Climber
     // Climber motor IDs
@@ -56,7 +56,7 @@ public class RobotMap {
     public static final double TEST_MOTOR_RIGHT_DOWN_SPEED = -0.1;
 
     // TODO: Comfirm the new Climber Extension Limit
-    public static final double CLIMBER_EXTENSION_LIMIT = 0.5; 
+    public static final double CLIMBER_EXTENSION_LIMIT = 30; 
     
     // Intake motor IDs
     public static final int INTAKE_MOTOR_ID = 22;
@@ -67,8 +67,8 @@ public class RobotMap {
     // Pivot motor values
     // TODO Edit values
     public static final double PIVOT_UP_POSITION = 0;
-    public static final double PIVOT_DOWN_POSITION = 0;
-    public static final double PIVOT_VOLTAGE_SPIKE_THRESHOLD = 10.0;
+    public static final double PIVOT_DOWN_POSITION = 18.0;
+    public static final double PIVOT_CURRENT_STALL_THRESHOLD = 60.0;
 
     // Intake PID Values
     // TODO
@@ -87,13 +87,13 @@ public class RobotMap {
 
     // Intake Motion Magic Values
 
-    public static final double INTAKE_CRUISE_VELOCITY = 80; // Target cruise velocity of 0.5 rps
-    public static final double INTAKE_ACCELERATION = 160; // Target acceleration of 1 rps/s (0.5 seconds)
-    public static final double INTAKE_JERK = 1600; // Target jerk
+    public static final double PIVOT_CRUISE_VELOCITY = 5; // Target cruise velocity of 20 rps
+    public static final double PIVOT_ACCELERATION = 5; // Target acceleration of 20 rps^2 (1 seconds)
+    public static final double PIVOT_JERK = 50; // Target jerk
 
     // Intake speeds
     // Verify if values are correct and go in the right directions
-    public static final double INTAKE_SPEED = GLOBAL_SPEED;
+    public static final double INTAKE_SPEED = GLOBAL_SPEED*0.4;
     // TODO: Comfirm the threshold.
     public static final double CAN_RANGE_DISTANCE_THRESHOLD = 0.5;
     
@@ -103,7 +103,7 @@ public class RobotMap {
     public static final double FEEDER_P_VALUE = 0.12;
     public static final double FEEDER_I_VALUE = 0.0;
     public static final double FEEDER_D_VALUE = 0.001;
-    public static final double FEEDER_SPEED = -GLOBAL_SPEED; 
+    public static final double FEEDER_SPEED = -GLOBAL_SPEED*4; 
 
     // Shooter Motor IDs
     public static final int LEFT_SHOOTER_MOTOR_ID = 24;
@@ -142,7 +142,7 @@ public class RobotMap {
     public static final double SHOOTER_JERK = 1600.0;
 
     // Notice: Will be dynamically modified in the Shooter's updateSpeed function
-    public static double SHOOTER_SPEED = GLOBAL_SPEED;
+    public static double SHOOTER_SPEED = GLOBAL_SPEED*10;
     
     //TODO
     public static double SHOOTER_SPEED_REGRESSION_SLOPE = 1.0;
@@ -168,12 +168,12 @@ public class RobotMap {
     public static final int INDEXER_MOTOR_ID = 18;
 
     // Indexer speeds
-    public static final double INDEXER_MOTOR_SPEED = GLOBAL_SPEED;
+    public static final double INDEXER_MOTOR_SPEED = GLOBAL_SPEED*4;
 
     // CANdle Constants
     public static final int CANDLE_LED_START_INDEX = 0;
     public static final int CANDLE_LED_COUNT = 0;
     public static final int CANDLE_CAN_ID = 40;
-    public static final String CANDLE_CAN_BUS = "1515Canivore";
+    public static final String CANDLE_CAN_BUS = "Canivore1515";
     public static final double CANDLE_BRIGHTNESS = 0.5;
 }

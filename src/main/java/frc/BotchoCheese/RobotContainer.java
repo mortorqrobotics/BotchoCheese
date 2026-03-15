@@ -8,6 +8,7 @@ import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 
+import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.hardware.Pigeon2;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
@@ -33,12 +34,15 @@ import frc.BotchoCheese.Subsystems.CommandSwerveDrivetrain;
 import frc.BotchoCheese.Constants.TunerConstants;
 import frc.BotchoCheese.Constants.RobotMap;
 import frc.BotchoCheese.Subsystems.Feeder;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 
 
 public class RobotContainer {
     public static double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
     
     public static boolean pivotIsUp = true;
+    public static boolean hoodIsDown = true;
     
     public static double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
 
@@ -95,7 +99,13 @@ public class RobotContainer {
                     .withRotationalRate(-applyDriveDeadband(JOYSTICK1_CONTROLLER.getRightX()) * MaxAngularRate)
             )
         );
+        // JOYSTICK1_CONTROLLER.leftBumper().onTrue(Commands.runOnce(SignalLogger::start));
+        // JOYSTICK1_CONTROLLER.leftBumper().onTrue(Commands.runOnce(SignalLogger::stop));
 
+        // JOYSTICK1_CONTROLLER.y().whileTrue(drivetrain.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+        // JOYSTICK1_CONTROLLER.a().whileTrue(drivetrain.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+        // JOYSTICK1_CONTROLLER.b().whileTrue(drivetrain.sysIdDynamic(SysIdRoutine.Direction.kForward));
+        // JOYSTICK1_CONTROLLER.x().whileTrue(drivetrain.sysIdDynamic(SysIdRoutine.Direction.kReverse));
         // Controller 1
         JOYSTICK1_CONTROLLER.x().whileTrue(drivetrain.applyRequest(() -> brake));
         // JOYSTICK1_CONTROLLER.b().whileTrue(drivetrain.applyRequest(() ->
@@ -121,18 +131,45 @@ public class RobotContainer {
         JOYSTICK1_CONTROLLER.start().onTrue(new InstantCommand(()->drivetrain.seedFieldCentric()));
 
         //Controller 2
+        // Indexer + Feeder + Shooter
         JOYSTICK2_CONTROLLER.rightTrigger().whileTrue(feeder.runFeeder());
+        JOYSTICK2_CONTROLLER.rightTrigger().whileTrue(indexer.indexerOn());
+        JOYSTICK2_CONTROLLER.rightTrigger().whileTrue(shooter.shoot());
 
-        JOYSTICK2_CONTROLLER.leftTrigger().whileTrue(shooter.shoot());
-
+        // Hood Up-PPAD Up/Down-DPAD Down
         JOYSTICK2_CONTROLLER.povUp().whileTrue(shooter.hoodUp());
-
         JOYSTICK2_CONTROLLER.povDown().whileTrue(shooter.hoodDown());
 
-        JOYSTICK2_CONTROLLER.leftBumper().whileTrue(intake.startIntake());
+        // Intake + Indexer
+        JOYSTICK2_CONTROLLER.leftTrigger().whileTrue(intake.startIntake());
+        JOYSTICK2_CONTROLLER.leftTrigger().whileTrue(indexer.indexerOn());
 
+        // Shooter
+        JOYSTICK2_CONTROLLER.leftBumper().whileTrue(shooter.shoot());
+
+        // Feeder
+        JOYSTICK2_CONTROLLER.b().whileTrue(feeder.runFeeder());
+
+        // Intake
+        JOYSTICK2_CONTROLLER.x().whileTrue(intake.startIntake());
+
+        // Hood Auto
+        JOYSTICK2_CONTROLLER.a().onTrue(
+            Commands.either(
+                shooter.hoodDown().andThen(Commands.runOnce(() -> hoodIsDown = true)),
+                shooter.hoodUp().andThen(Commands.runOnce(() -> hoodIsDown = false)),
+                () -> hoodIsDown
+            )
+        );
+
+        // Indexer
         JOYSTICK2_CONTROLLER.y().whileTrue(indexer.indexerOn());
 
+        // Intake Pivot Up-DPAD Left/Down-DPAD Right
+        JOYSTICK2_CONTROLLER.povLeft().whileTrue(intake.pivotDown().andThen(Commands.runOnce(() -> pivotIsUp = false)));
+        JOYSTICK2_CONTROLLER.povRight().whileTrue(intake.pivotUp().andThen(Commands.runOnce(() -> pivotIsUp = true)));
+
+        // Intake Auto Pivot
         JOYSTICK2_CONTROLLER.rightBumper().onTrue(
 
             Commands.either(

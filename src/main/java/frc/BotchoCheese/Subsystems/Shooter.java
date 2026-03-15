@@ -133,7 +133,7 @@ public class Shooter extends SubsystemBase {
     public Command hoodUp() {
         return this.run(() -> {
             if (!atHoodUpperLimit()) {
-                hood.setControl(m_output.withOutput(RobotMap.HOOD_SPEED));
+                hood.setControl(m_output.withOutput(-RobotMap.HOOD_SPEED));
             } else {
                 hood.stopMotor();
             }
@@ -144,7 +144,7 @@ public class Shooter extends SubsystemBase {
     public Command hoodDown() {
         return this.run(() -> {
             if (!atHoodLowerLimit()) {
-                hood.setControl(m_output.withOutput(-RobotMap.HOOD_SPEED));
+                hood.setControl(m_output.withOutput(RobotMap.HOOD_SPEED));
             } else {
                 hood.stopMotor();
             }
@@ -157,8 +157,6 @@ public class Shooter extends SubsystemBase {
         return this.startEnd(
             // When command starts/runs:
             () -> {
-                System.out.println("Bam!");
-                System.out.println("Kapoooooooooooooow!");
                 hood.setControl(hoodPositionRequest.withPosition(RobotMap.HOOD_POSITION));
                 leftShooter.setControl(shooterVelocityRequest.withVelocity(RobotMap.SHOOTER_TARGET_RPS));
                 middleShooter.setControl(shooterVelocityRequest.withVelocity(RobotMap.SHOOTER_TARGET_RPS));
