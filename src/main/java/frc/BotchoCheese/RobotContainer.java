@@ -42,6 +42,7 @@ public class RobotContainer {
     public static double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
     
     public static boolean pivotIsUp = true;
+    public static boolean hoodIsDown = true;
     
     public static double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
 
@@ -153,7 +154,13 @@ public class RobotContainer {
         JOYSTICK2_CONTROLLER.x().whileTrue(intake.startIntake());
 
         // Hood Auto
-        // TODO
+        JOYSTICK2_CONTROLLER.a().onTrue(
+            Commands.either(
+                shooter.hoodDown().andThen(Commands.runOnce(() -> hoodIsDown = true)),
+                shooter.hoodUp().andThen(Commands.runOnce(() -> hoodIsDown = false)),
+                () -> hoodIsDown
+            )
+        );
 
         // Indexer
         JOYSTICK2_CONTROLLER.y().whileTrue(indexer.indexerOn());

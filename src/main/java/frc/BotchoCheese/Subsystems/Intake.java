@@ -111,7 +111,7 @@ public class Intake extends SubsystemBase {
     public Command setPivotUp() {
         System.out.println("setPivotUp executed=====================");
         return this.run(() -> {
-            if (isPivotVoltageSpiking()) {
+            if (isPivotStalling()) {
                 handlePivotHardStop(RobotMap.PIVOT_UP_POSITION, true);
                 return;
             }
@@ -124,7 +124,7 @@ public class Intake extends SubsystemBase {
     public Command setPivotDown() {
         System.out.println("setPivotDown executed=====================");
         return this.run(() -> {
-            if (isPivotVoltageSpiking()) {
+            if (isPivotStalling()) {
                 handlePivotHardStop(RobotMap.PIVOT_DOWN_POSITION, false);
                 return;
             }
@@ -136,7 +136,7 @@ public class Intake extends SubsystemBase {
 
     public Command pivotUp() {
         return this.run(() -> {
-            if (isPivotVoltageSpiking()) {
+            if (isPivotStalling()) {
                 handlePivotHardStop(RobotMap.PIVOT_UP_POSITION, true);
                 return;
             }
@@ -147,7 +147,7 @@ public class Intake extends SubsystemBase {
 
     public Command pivotDown() {
         return this.run(() -> {
-            if (isPivotVoltageSpiking()) {
+            if (isPivotStalling()) {
                 handlePivotHardStop(RobotMap.PIVOT_DOWN_POSITION, false);
                 return;
             }
@@ -206,9 +206,13 @@ public class Intake extends SubsystemBase {
         pivotLeader.stopMotor();
     }
 
-    private boolean isPivotVoltageSpiking() {
-        return Math.abs(pivotLeader.getMotorVoltage().getValueAsDouble()) >= RobotMap.PIVOT_VOLTAGE_SPIKE_THRESHOLD
-            || Math.abs(pivotFollower.getMotorVoltage().getValueAsDouble()) >= RobotMap.PIVOT_VOLTAGE_SPIKE_THRESHOLD;
+    // private boolean isPivotVoltageSpiking() {
+    //     return Math.abs(pivotLeader.getMotorVoltage().getValueAsDouble()) >= RobotMap.PIVOT_VOLTAGE_SPIKE_THRESHOLD
+    //         || Math.abs(pivotFollower.getMotorVoltage().getValueAsDouble()) >= RobotMap.PIVOT_VOLTAGE_SPIKE_THRESHOLD;
+    // }
+    private boolean isPivotStalling() {
+        return Math.abs(pivotLeader.getStatorCurrent().getValueAsDouble()) >= RobotMap.PIVOT_CURRENT_STALL_THRESHOLD
+            || Math.abs(pivotFollower.getStatorCurrent().getValueAsDouble()) >= RobotMap.PIVOT_CURRENT_STALL_THRESHOLD;
     }
 
     private void handlePivotHardStop(double expectedPosition, boolean isPivotUp) {

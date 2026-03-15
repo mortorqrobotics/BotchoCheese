@@ -56,7 +56,7 @@ public class RobotMap {
     public static final double TEST_MOTOR_RIGHT_DOWN_SPEED = -0.1;
 
     // TODO: Comfirm the new Climber Extension Limit
-    public static final double CLIMBER_EXTENSION_LIMIT = 0.5; 
+    public static final double CLIMBER_EXTENSION_LIMIT = 30; 
     
     // Intake motor IDs
     public static final int INTAKE_MOTOR_ID = 22;
@@ -68,7 +68,7 @@ public class RobotMap {
     // TODO Edit values
     public static final double PIVOT_UP_POSITION = 0;
     public static final double PIVOT_DOWN_POSITION = 18.0;
-    public static final double PIVOT_VOLTAGE_SPIKE_THRESHOLD = 10.0;
+    public static final double PIVOT_CURRENT_STALL_THRESHOLD = 60.0;
 
     // Intake PID Values
     // TODO
@@ -174,6 +174,6 @@ public class RobotMap {
     public static final int CANDLE_LED_START_INDEX = 0;
     public static final int CANDLE_LED_COUNT = 0;
     public static final int CANDLE_CAN_ID = 40;
-    public static final String CANDLE_CAN_BUS = "1515Canivore";
+    public static final String CANDLE_CAN_BUS = "Canivore1515";
     public static final double CANDLE_BRIGHTNESS = 0.5;
 }
