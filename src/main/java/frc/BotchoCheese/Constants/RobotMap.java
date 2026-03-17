@@ -93,7 +93,7 @@ public class RobotMap {
 
     // Intake speeds
     // Verify if values are correct and go in the right directions
-    public static final double INTAKE_SPEED = GLOBAL_SPEED*0.4;
+    public static final double INTAKE_SPEED = 0.04;
     // TODO: Comfirm the threshold.
     public static final double CAN_RANGE_DISTANCE_THRESHOLD = 0.5;
     
@@ -103,7 +103,7 @@ public class RobotMap {
     public static final double FEEDER_P_VALUE = 0.12;
     public static final double FEEDER_I_VALUE = 0.0;
     public static final double FEEDER_D_VALUE = 0.001;
-    public static final double FEEDER_SPEED = -GLOBAL_SPEED*4; 
+    public static final double FEEDER_SPEED = -1; 
 
     // Shooter Motor IDs
     public static final int LEFT_SHOOTER_MOTOR_ID = 24;
@@ -117,7 +117,7 @@ public class RobotMap {
     public static final double HOOD_P_VALUE = 0.4;
     public static final double HOOD_I_VALUE = 0.0;
     public static final double HOOD_D_VALUE = 0.2;
-    public static final double HOOD_SPEED = GLOBAL_SPEED;
+    public static final double HOOD_SPEED = .1;
     public static final double HOOD_THROUGHBORE_OFFSET_ROT = 0.0;
     public static final double HOOD_MIN_ROT = 0.05;
     public static final double HOOD_MAX_ROT = 0.95;
@@ -142,7 +142,7 @@ public class RobotMap {
     public static final double SHOOTER_JERK = 1600.0;
 
     // Notice: Will be dynamically modified in the Shooter's updateSpeed function
-    public static double SHOOTER_SPEED = GLOBAL_SPEED*10;
+    public static double SHOOTER_SPEED = 1;
     
     //TODO
     public static double SHOOTER_SPEED_REGRESSION_SLOPE = 1.0;
@@ -168,7 +168,7 @@ public class RobotMap {
     public static final int INDEXER_MOTOR_ID = 18;
 
     // Indexer speeds
-    public static final double INDEXER_MOTOR_SPEED = GLOBAL_SPEED*4;
+    public static final double INDEXER_MOTOR_SPEED =.4;
 
     // CANdle Constants
     public static final int CANDLE_LED_START_INDEX = 0;

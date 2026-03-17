@@ -46,19 +46,26 @@ public class Climber extends SubsystemBase {
         rClimber.getConfigurator().apply(config);
     }
 
-    public Boolean atLimit(){
-        double position = encoder.getAbsolutePosition().getValueAsDouble();
-        // if(encoder.getAbsolutePosition().getValueAsDouble() < RobotMap.CLIMBER_EXTENSION_LIMIT 
-        // || encoder.getAbsolutePosition().getValueAsDouble() > 0){
-        //     return true;
-        // }
-        return position >= RobotMap.CLIMBER_EXTENSION_LIMIT || position <= 0.0;
+    // public Boolean atLimit(){
+    //     double position = encoder.getAbsolutePosition().getValueAsDouble();
+    //     // if(encoder.getAbsolutePosition().getValueAsDouble() < RobotMap.CLIMBER_EXTENSION_LIMIT 
+    //     // || encoder.getAbsolutePosition().getValueAsDouble() > 0){
+    //     //     return true;
+    //     // }
+    //     return position >= RobotMap.CLIMBER_EXTENSION_LIMIT || position <= 0.0;
+    // }
+    public boolean atUpperLimit() {
+        return encoder.getAbsolutePosition().getValueAsDouble() >= RobotMap.CLIMBER_EXTENSION_LIMIT;
+    }
+
+    public boolean atLowerLimit() {
+        return encoder.getAbsolutePosition().getValueAsDouble() <= 0.0;
     }
 
     // Commands to move the climber.
     public Command manualClimberUp() {
         return this.run(() -> {
-            if(!atLimit()) {
+            if(!atUpperLimit()) {
                 lClimber.setControl(m_output.withOutput(RobotMap.TEST_MOTOR_LEFT_UP_SPEED));
                 rClimber.setControl(m_output.withOutput(RobotMap.TEST_MOTOR_RIGHT_UP_SPEED));
                 goingUp = true;
@@ -68,7 +75,7 @@ public class Climber extends SubsystemBase {
 
     public Command manualClimberDown() {
         return this.run(() -> {
-            if(!atLimit()) {
+            if(!atLowerLimit()) {
                 lClimber.setControl(m_output.withOutput(RobotMap.TEST_MOTOR_LEFT_DOWN_SPEED));
                 rClimber.setControl(m_output.withOutput(RobotMap.TEST_MOTOR_RIGHT_DOWN_SPEED));
                 goingUp = false;
@@ -81,7 +88,7 @@ public class Climber extends SubsystemBase {
             lClimber.setControl(m_output.withOutput(RobotMap.TEST_MOTOR_LEFT_UP_SPEED));
             rClimber.setControl(m_output.withOutput(RobotMap.TEST_MOTOR_RIGHT_UP_SPEED));
             goingUp = true;
-        }).until(this::atLimit).finallyDo(() -> stopMotors());
+        }).until(this::atUpperLimit).finallyDo(() -> stopMotors());
     }
 
     public Command automaticClimberDown(){
@@ -89,7 +96,7 @@ public class Climber extends SubsystemBase {
             lClimber.setControl(m_output.withOutput(RobotMap.TEST_MOTOR_LEFT_DOWN_SPEED));
             rClimber.setControl(m_output.withOutput(RobotMap.TEST_MOTOR_RIGHT_DOWN_SPEED));
             goingUp = false;
-        }).until(this::atLimit).finallyDo(() -> stopMotors());
+        }).until(this::atLowerLimit).finallyDo(() -> stopMotors());
     }
     
     public void stopMotors() {

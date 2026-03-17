@@ -39,7 +39,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 
 
 public class RobotContainer {
-    public static double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
+    public static double MaxSpeed = 1.0 * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
     
     public static boolean pivotIsUp = true;
     public static boolean hoodIsDown = true;
@@ -92,11 +92,19 @@ public class RobotContainer {
         
         // Note that X is defined as forward according to WPILib convention,
         // and Y is defined as to the left according to WPILib convention.
-        drivetrain.setDefaultCommand(
+        /*drivetrain.setDefaultCommand(
             drivetrain.applyRequest(() ->
                 drive.withVelocityX(-applyDriveDeadband(JOYSTICK1_CONTROLLER.getLeftY()) * MaxSpeed)
                     .withVelocityY(-applyDriveDeadband(JOYSTICK1_CONTROLLER.getLeftX()) * MaxSpeed)
                     .withRotationalRate(-applyDriveDeadband(JOYSTICK1_CONTROLLER.getRightX()) * MaxAngularRate)
+            )
+        ); */
+        drivetrain.setDefaultCommand(
+            // Drivetrain will execute this command periodically
+            drivetrain.applyRequest(() ->
+                drive.withVelocityX(-JOYSTICK1_CONTROLLER.getLeftY() * MaxSpeed) // Drive forward with negative Y (forward)
+                    .withVelocityY(-JOYSTICK1_CONTROLLER.getLeftX() * MaxSpeed) // Drive left with negative X (left)
+                    .withRotationalRate(-JOYSTICK1_CONTROLLER.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
             )
         );
         // JOYSTICK1_CONTROLLER.leftBumper().onTrue(Commands.runOnce(SignalLogger::start));
