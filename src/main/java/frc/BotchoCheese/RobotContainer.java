@@ -18,12 +18,14 @@ import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.BotchoCheese.Commands.RotateToTag;
 import frc.BotchoCheese.Subsystems.Shooter;
 import frc.BotchoCheese.Subsystems.Climber;
@@ -101,18 +103,28 @@ public class RobotContainer {
         ); */
         drivetrain.setDefaultCommand(
             // Drivetrain will execute this command periodically
-            drivetrain.applyRequest(() ->
-                drive.withVelocityX(-JOYSTICK1_CONTROLLER.getLeftY() * MaxSpeed) // Drive forward with negative Y (forward)
-                    .withVelocityY(-JOYSTICK1_CONTROLLER.getLeftX() * MaxSpeed) // Drive left with negative X (left)
-                    .withRotationalRate(-JOYSTICK1_CONTROLLER.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
-            )
+            drivetrain.applyRequest(() -> {
+                double velocityX = -applyDriveDeadband(JOYSTICK1_CONTROLLER.getLeftY()) * MaxSpeed;
+                double velocityY = -applyDriveDeadband(JOYSTICK1_CONTROLLER.getLeftX()) * MaxSpeed;
+                double rotationalRate = -applyDriveDeadband(JOYSTICK1_CONTROLLER.getRightX()) * MaxAngularRate;
 
-            
+                SmartDashboard.putBoolean("Driver Controller Connected", JOYSTICK1_CONTROLLER.getHID().isConnected());
+                SmartDashboard.putNumber("Driver Left Y", JOYSTICK1_CONTROLLER.getLeftY());
+                SmartDashboard.putNumber("Driver Left X", JOYSTICK1_CONTROLLER.getLeftX());
+                SmartDashboard.putNumber("Driver Right X", JOYSTICK1_CONTROLLER.getRightX());
+                SmartDashboard.putBoolean(
+                    "Driver Controller Active",
+                    Math.abs(velocityX) > 0.0 || Math.abs(velocityY) > 0.0 || Math.abs(rotationalRate) > 0.0
+                );
+
+                return drive.withVelocityX(velocityX)
+                    .withVelocityY(velocityY)
+                    .withRotationalRate(rotationalRate);
+            })
         );
 
-        if(-JOYSTICK1_CONTROLLER.getLeftY() * MaxSpeed != 0 || -JOYSTICK1_CONTROLLER.getLeftX() * MaxSpeed != 0) {
-                System.out.println("Joystick is being moved");
-        }
+        new Trigger(this::isDriverControllerActive)
+            .onTrue(Commands.runOnce(() -> DriverStation.reportWarning("Driver joystick movement detected", false)));
         // JOYSTICK1_CONTROLLER.leftBumper().onTrue(Commands.runOnce(SignalLogger::start));
         // JOYSTICK1_CONTROLLER.leftBumper().onTrue(Commands.runOnce(SignalLogger::stop));
 
@@ -204,6 +216,12 @@ public class RobotContainer {
     }
     private static double applyDriveDeadband(double value) {
         return MathUtil.applyDeadband(value, 0.1);
+    }
+
+    private boolean isDriverControllerActive() {
+        return Math.abs(applyDriveDeadband(JOYSTICK1_CONTROLLER.getLeftY())) > 0.0
+            || Math.abs(applyDriveDeadband(JOYSTICK1_CONTROLLER.getLeftX())) > 0.0
+            || Math.abs(applyDriveDeadband(JOYSTICK1_CONTROLLER.getRightX())) > 0.0;
     }
 
     private Command createFullIntakeToShooterCommand() {

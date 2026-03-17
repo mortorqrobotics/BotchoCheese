@@ -5,10 +5,13 @@
 package frc.BotchoCheese;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.wpilibj.DataLogManager;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -77,8 +80,6 @@ public class Robot extends TimedRobot {
 
   @Override
   public void disabledInit() {
-    //TODO: Determine whether this is harmful
-    //m_robotContainer.intake.setPivotCoastMode();
   }
 
   @Override
@@ -91,14 +92,20 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousInit() {
-    //TODO: Determine whether this is harmful
-    //m_robotContainer.intake.setPivotBrakeMode();
+    try {  
+      RobotContainer.gyro.setYaw(DriverStation.getAlliance().get() == Alliance.Blue ? Math.PI: 0); // this is esentually directly from the external IMU since we barely trust vision angle
+      RobotContainer.drivetrain.resetRotation(new Rotation2d(DriverStation.getAlliance().get() == Alliance.Blue ? Math.PI: 0));
+    } 
+    catch (Exception e) {
+      System.out.print(e);
+    }
 
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
     if (m_autonomousCommand != null) {
       CommandScheduler.getInstance().schedule(m_autonomousCommand);
     }
+
   }
 
   @Override
@@ -109,8 +116,6 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
-    //TODO: Determine whether this is harmful
-    //m_robotContainer.intake.setPivotBrakeMode();
     NetworkTableInstance.getDefault().getTable("limelight").getEntry("throttle_set").setNumber(0);
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
@@ -126,8 +131,6 @@ public class Robot extends TimedRobot {
 
   @Override
   public void testInit() {
-    //TODO: Determine whether this is harmful
-    //m_robotContainer.intake.setPivotBrakeMode();
     CommandScheduler.getInstance().cancelAll();
   }
 
