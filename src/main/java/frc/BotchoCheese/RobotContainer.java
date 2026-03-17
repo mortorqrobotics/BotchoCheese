@@ -106,7 +106,13 @@ public class RobotContainer {
                     .withVelocityY(-JOYSTICK1_CONTROLLER.getLeftX() * MaxSpeed) // Drive left with negative X (left)
                     .withRotationalRate(-JOYSTICK1_CONTROLLER.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
             )
+
+            
         );
+
+        if(-JOYSTICK1_CONTROLLER.getLeftY() * MaxSpeed != 0 || -JOYSTICK1_CONTROLLER.getLeftX() * MaxSpeed != 0) {
+                System.out.println("Joystick is being moved");
+        }
         // JOYSTICK1_CONTROLLER.leftBumper().onTrue(Commands.runOnce(SignalLogger::start));
         // JOYSTICK1_CONTROLLER.leftBumper().onTrue(Commands.runOnce(SignalLogger::stop));
 
@@ -134,8 +140,8 @@ public class RobotContainer {
         JOYSTICK1_CONTROLLER.leftBumper().whileTrue(climber.manualClimberUp());
         JOYSTICK1_CONTROLLER.rightBumper().whileTrue(climber.manualClimberDown());
 
-        JOYSTICK1_CONTROLLER.leftTrigger().whileTrue(shooter.hoodUp());
-        JOYSTICK1_CONTROLLER.rightTrigger().whileTrue(shooter.hoodDown());
+        // JOYSTICK1_CONTROLLER.leftTrigger().whileTrue(shooter.hoodUp());
+        // JOYSTICK1_CONTROLLER.rightTrigger().whileTrue(shooter.hoodDown());
 
         // reset the field-centric heading on menu button press
         JOYSTICK1_CONTROLLER.start().onTrue(new InstantCommand(()->drivetrain.seedFieldCentric()));
@@ -152,8 +158,8 @@ public class RobotContainer {
         JOYSTICK2_CONTROLLER.rightTrigger().whileTrue(shooter.shoot());
 
         // Hood Up-PPAD Up/Down-DPAD Down
-        JOYSTICK2_CONTROLLER.povUp().whileTrue(shooter.hoodUp());
-        JOYSTICK2_CONTROLLER.povDown().whileTrue(shooter.hoodDown());
+        // JOYSTICK2_CONTROLLER.povUp().whileTrue(shooter.hoodUp());
+        // JOYSTICK2_CONTROLLER.povDown().whileTrue(shooter.hoodDown());
 
         // Intake + Indexer
         JOYSTICK2_CONTROLLER.leftTrigger().whileTrue(intake.startIntake());
@@ -168,14 +174,14 @@ public class RobotContainer {
         // Intake
         JOYSTICK2_CONTROLLER.x().whileTrue(intake.startIntake());
 
-        // Hood Auto
-        JOYSTICK2_CONTROLLER.a().onTrue(
-            Commands.either(
-                shooter.hoodDown().andThen(Commands.runOnce(() -> hoodIsDown = true)),
-                shooter.hoodUp().andThen(Commands.runOnce(() -> hoodIsDown = false)),
-                () -> hoodIsDown
-            )
-        );
+        // // Hood Auto
+        // JOYSTICK2_CONTROLLER.a().onTrue(
+        //     Commands.either(
+        //         shooter.hoodDown().andThen(Commands.runOnce(() -> hoodIsDown = true)),
+        //         shooter.hoodUp().andThen(Commands.runOnce(() -> hoodIsDown = false)),
+        //         () -> hoodIsDown
+        //     )
+        // );
 
         // Indexer
         JOYSTICK2_CONTROLLER.y().whileTrue(indexer.indexerOn());

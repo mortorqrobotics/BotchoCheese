@@ -110,28 +110,24 @@ public class RobotMap {
     public static final int MIDDLE_SHOOTER_MOTOR_ID = 25;
     public static final int RIGHT_SHOOTER_MOTOR_ID = 26;
     
-    // Hood Motor IDs
-    public static final int HOOD_MOTOR_ID = 17;
-    public static final int HOOD_THROUGHBORE_DIO = 0;
+    // // Hood Motor IDs
+    // public static final int HOOD_MOTOR_ID = 17;
+    // public static final int HOOD_THROUGHBORE_DIO = 0;
 
-    public static final double HOOD_P_VALUE = 0.4;
-    public static final double HOOD_I_VALUE = 0.0;
-    public static final double HOOD_D_VALUE = 0.2;
-    public static final double HOOD_SPEED = .1;
-    public static final double HOOD_THROUGHBORE_OFFSET_ROT = 0.0;
-    public static final double HOOD_MIN_ROT = 0.05;
-    public static final double HOOD_MAX_ROT = 0.95;
-    public static final double HOOD_LIMIT_TOLERANCE_ROT = 0.01;
+    // public static final double HOOD_P_VALUE = 0.4;
+    // public static final double HOOD_I_VALUE = 0.0;
+    // public static final double HOOD_D_VALUE = 0.2;
+    // public static final double HOOD_SPEED = .1;
 
-    // Hood Motion Magic Values
+    // // Hood Motion Magic Values
     
-    public static final double HOOD_CRUISE_VELOCITY = 40;
-    public static final double HOOD_ACCELERATION = 80;
-    public static final double HOOD_JERK = 800;
+    // public static final double HOOD_CRUISE_VELOCITY = 40;
+    // public static final double HOOD_ACCELERATION = 80;
+    // public static final double HOOD_JERK = 800;
 
-    //TODO
-    public static double HOOD_SPEED_REGRESSION_SLOPE = 1.0;
-    public static double HOOD_SPEED_REGRESSION_Y_INTERCEPT = 1.0;
+    // //TODO
+    // public static double HOOD_SPEED_REGRESSION_SLOPE = 1.0;
+    // public static double HOOD_SPEED_REGRESSION_Y_INTERCEPT = 1.0;
 
     // Shooter speeds
 
@@ -147,9 +143,6 @@ public class RobotMap {
     //TODO
     public static double SHOOTER_SPEED_REGRESSION_SLOPE = 1.0;
     public static double SHOOTER_SPEED_REGRESSION_Y_INTERCEPT = 1.0;
-
-    // TODO Edit HOOD_POSITION
-    public static double HOOD_POSITION = 1;
 
     //If the distance between the robot and tag is less than threshold, the distance is "short"
     public static final double SHORT_DISTANCE_THRESHOLD = 5.0;

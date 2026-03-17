@@ -1,11 +1,10 @@
 package frc.BotchoCheese.Subsystems;
 
-import com.ctre.phoenix6.hardware.TalonFXS;
+import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-import com.ctre.phoenix6.signals.MotorArrangementValue;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
-import com.ctre.phoenix6.configs.TalonFXSConfiguration;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -15,7 +14,7 @@ import frc.BotchoCheese.Constants.RobotMap;
 
 public class Feeder extends SubsystemBase {
     // Single Minion motor controlled by a Talon FXS
-    private final TalonFXS feederMotor;
+    private final TalonFX feederMotor;
 
     // Control request object
     private final DutyCycleOut m_output = new DutyCycleOut(0);
@@ -24,14 +23,14 @@ public class Feeder extends SubsystemBase {
     
     public Feeder() {
         // Updated to TalonFXS class
-        feederMotor = new TalonFXS(RobotMap.FEEDER_MOTOR_ID);
+        feederMotor = new TalonFX(RobotMap.FEEDER_MOTOR_ID);
 
-        TalonFXSConfiguration config = new TalonFXSConfiguration();
+        TalonFXConfiguration config = new TalonFXConfiguration();
 
-        /** * CRITICAL: Set the Motor Arrangement. 
-         * This tells the FXS it is connected to a Minion via the JST sensor port.
-         */
-        config.Commutation.MotorArrangement = MotorArrangementValue.Minion_JST;
+        // /** * CRITICAL: Set the Motor Arrangement. 
+        //  * This tells the FXS it is connected to a Minion via the JST sensor port.
+        //  */
+        // config.Commutation.MotorArrangement = MotorArrangementValue.Minion_JST;
 
         // PID Values for velocity control
         Slot0Configs slot0Configs = new Slot0Configs();
