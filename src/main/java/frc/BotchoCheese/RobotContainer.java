@@ -15,10 +15,18 @@ import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -41,6 +49,10 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 
 
 public class RobotContainer {
+    private static final String DEFAULT_AUTO_NAME = "Auto 1 (Default)";
+    private static final String AUTO_CHOOSER_KEY = "Auto Mode";
+    private static final String PATHPLANNER_AUTO_FOLDER = "pathplanner/autos";
+
     public static double MaxSpeed = 1.0 * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
     
     public static boolean pivotIsUp = true;
@@ -84,10 +96,49 @@ public class RobotContainer {
         NamedCommands.registerCommand("IntakeOn", intake.startIntake());
         // NamedCommands.registerCommand("IntakeOff", intake.stopIntake());
 
-        autoChooser = AutoBuilder.buildAutoChooser("New Auto");
-        SmartDashboard.putData("Auto Mode", autoChooser);
+        autoChooser = new SendableChooser<>();
+        configureAutoChooser();
+        SmartDashboard.putData(AUTO_CHOOSER_KEY, autoChooser);
 
         configureBindings();
+    }
+
+    private void configureAutoChooser() {
+        List<String> autoNames = getAutoNamesFromDeploy();
+
+        if (autoNames.isEmpty()) {
+            autoChooser.setDefaultOption("Do Nothing", Commands.none());
+            DriverStation.reportWarning("No PathPlanner autos found in deploy/pathplanner/autos", false);
+            return;
+        }
+
+        String defaultAuto = autoNames.contains(DEFAULT_AUTO_NAME) ? DEFAULT_AUTO_NAME : autoNames.get(0);
+        autoChooser.setDefaultOption(defaultAuto, AutoBuilder.buildAuto(defaultAuto));
+
+        for (String autoName : autoNames) {
+            if (!autoName.equals(defaultAuto)) {
+                autoChooser.addOption(autoName, AutoBuilder.buildAuto(autoName));
+            }
+        }
+
+    }
+
+    private List<String> getAutoNamesFromDeploy() {
+        Path autoFolder = Filesystem.getDeployDirectory().toPath().resolve(PATHPLANNER_AUTO_FOLDER);
+        if (!Files.isDirectory(autoFolder)) {
+            return List.of();
+        }
+
+        try (var files = Files.list(autoFolder)) {
+            return files
+                .filter(path -> path.toString().endsWith(".auto"))
+                .map(path -> path.getFileName().toString().replaceFirst("\\.auto$", ""))
+                .sorted(Comparator.naturalOrder())
+                .collect(Collectors.toList());
+        } catch (IOException e) {
+            DriverStation.reportError("Failed to read PathPlanner autos: " + e.getMessage(), e.getStackTrace());
+            return List.of();
+        }
     }
 
     private void configureBindings() {
@@ -235,8 +286,13 @@ public class RobotContainer {
 
     public Command getAutonomousCommand() {
         /* Run the path selected from the auto chooser */
-        System.out.println(autoChooser.getSelected().getName());
-        return autoChooser.getSelected();
+        Command selected = autoChooser.getSelected();
+        if (selected == null) {
+            DriverStation.reportWarning("No autonomous selected; running no-op command.", false);
+            return Commands.none();
+        }
+        System.out.println(selected.getName());
+        return selected;
     }
 
     public static CommandSwerveDrivetrain createDrivetrain() {
