@@ -64,11 +64,11 @@ public class CANdleLight extends SubsystemBase {
     }
 
     public void setTeleopColor() {
-        setSolidColor(0, 255, 0); //green
+        setSolidColor(0, 255, 0); //lime
     }
 
     public void setTestColor() {
-        setSolidColor(0, 0, 255); //blue
+        setSolidColor(0, 0, 255); //cyan
     }
 
     public void IndexerFullColor() {

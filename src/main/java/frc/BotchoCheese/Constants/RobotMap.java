@@ -100,15 +100,16 @@ public class RobotMap {
     // Feeder Motor ID and Speed
     // TODO PID
     public static final int FEEDER_MOTOR_ID = 23;
-    public static final double FEEDER_P_VALUE = 0.12;
+    public static final double FEEDER_P_VALUE = 0.08; //Formerly 0.12
     public static final double FEEDER_I_VALUE = 0.0;
     public static final double FEEDER_D_VALUE = 0.001;
     public static final double FEEDER_SPEED = -0.6; 
 
     //TODO!!!
-    public static final double FEEDER_CRUISE_VELOCITY = 60.0; // Motor-side target cruise velocity in rps
-    public static final double FEEDER_ACCELERATION = 120.0; // Motor-side target acceleration in rps^2
-    public static final double FEEDER_JERK = 1200.0; // Motor-side target jerk in rps^3
+    private static final double FEEDER_MULTIPLIER = 0.5;
+    public static final double FEEDER_CRUISE_VELOCITY = 60.0 * FEEDER_MULTIPLIER; // Motor-side target cruise velocity in rps
+    public static final double FEEDER_ACCELERATION = 120.0 * FEEDER_MULTIPLIER; // Motor-side target acceleration in rps^2
+    public static final double FEEDER_JERK = 1200.0 * FEEDER_MULTIPLIER; // Motor-side target jerk in rps^3
 
     // Shooter Motor IDs
     public static final int LEFT_SHOOTER_MOTOR_ID = 24;
@@ -138,9 +139,10 @@ public class RobotMap {
 
       // Notice: Will be dynamically modified in the Shooter's updateSpeed function
    
-    public static final double SHOOTER_TARGET_RPS = 180.0; // Motor-side target velocity in rps
-    public static final double SHOOTER_ACCELERATION = 360.0; // Motor-side target acceleration in rps^2
-    public static final double SHOOTER_JERK = 3600.0; // Motor-side target jerk in rps^3
+    private static final double SHOOTER_MULTIPLIER = 0.5;
+    public static final double SHOOTER_TARGET_RPS = 90.0 * SHOOTER_MULTIPLIER;
+    public static final double SHOOTER_ACCELERATION = 160.0 * SHOOTER_MULTIPLIER;
+    public static final double SHOOTER_JERK = 1600.0 * SHOOTER_MULTIPLIER;
 
     // Notice: Will be dynamically modified in the Shooter's updateSpeed function
     public static double SHOOTER_SPEED = 0.83;
@@ -155,12 +157,12 @@ public class RobotMap {
 
     // Shooter PID Values
     // TODO
-    public static final double SHOOTER_P_VALUE = 0.5;
-    public static final double SHOOTER_I_VALUE = 0.15;
-    public static final double SHOOTER_D_VALUE = 0.2;
-    public static final double SHOOTER_S_VALUE = 0.25;
-    public static final double SHOOTER_V_VALUE = 0.12;
-    public static final double SHOOTER_A_VALUE = 0.01;
+    public static final double SHOOTER_P_VALUE = 0.5; //Good enough
+    public static final double SHOOTER_I_VALUE = 0.0;  //Formerly 0.15
+    public static final double SHOOTER_D_VALUE = 0.0; //Formerly 0.2
+    public static final double SHOOTER_S_VALUE = 0.2; //Recommended range: 0.2--0.3 (formerly 0.25)
+    public static final double SHOOTER_V_VALUE = 0.05; //TODO: Important! Must be measured (formerly 0.12).
+    public static final double SHOOTER_A_VALUE = 0.01; //Recommended range: Small (<0.05)
 
     // Indexer ID
     public static final int INDEXER_MOTOR_ID = 18;
