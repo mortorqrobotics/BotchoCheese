@@ -51,9 +51,9 @@ public class RobotMap {
 
     // Climber speeds
     public static final double TEST_MOTOR_LEFT_UP_SPEED = 0.1;
-    public static final double TEST_MOTOR_LEFT_DOWN_SPEED = -0.1;
+    public static final double TEST_MOTOR_LEFT_DOWN_SPEED = -0.4;
     public static final double TEST_MOTOR_RIGHT_UP_SPEED = 0.1;
-    public static final double TEST_MOTOR_RIGHT_DOWN_SPEED = -0.1;
+    public static final double TEST_MOTOR_RIGHT_DOWN_SPEED = -0.4;
 
     // TODO: Comfirm the new Climber Extension Limit
     public static final double CLIMBER_EXTENSION_LIMIT = 30; 
@@ -67,7 +67,7 @@ public class RobotMap {
     // Pivot motor values
     // TODO Edit values
     public static final double PIVOT_UP_POSITION = 0;
-    public static final double PIVOT_DOWN_POSITION = 18.0;
+    public static final double PIVOT_DOWN_POSITION = 17.0;
     public static final double PIVOT_CURRENT_STALL_THRESHOLD = 60.0;
 
     // Intake PID Values
@@ -93,23 +93,22 @@ public class RobotMap {
 
     // Intake speeds
     // Verify if values are correct and go in the right directions
-    public static final double INTAKE_SPEED = 0.04;
+    public static final double INTAKE_SPEED = -0.83;
     // TODO: Comfirm the threshold.
     public static final double CAN_RANGE_DISTANCE_THRESHOLD = 0.5;
     
     // Feeder Motor ID and Speed
     // TODO PID
     public static final int FEEDER_MOTOR_ID = 23;
-    public static final double FEEDER_P_VALUE = 0.08; //Formerly 0.12
+    public static final double FEEDER_P_VALUE = 0.12;
     public static final double FEEDER_I_VALUE = 0.0;
     public static final double FEEDER_D_VALUE = 0.001;
-    public static final double FEEDER_SPEED = -0.6; 
+    public static final double FEEDER_SPEED = -0.83; 
 
-    //TODO!!!
-    private static final double FEEDER_MULTIPLIER = 0.5;
-    public static final double FEEDER_CRUISE_VELOCITY = 60.0; // Motor-side target cruise velocity in rps
-    public static final double FEEDER_ACCELERATION = 120.0; // Motor-side target acceleration in rps^2
-    public static final double FEEDER_JERK = 1200.0; // Motor-side target jerk in rps^3
+    // Motion Magic is currently disabled for the feeder.
+    // public static final double FEEDER_CRUISE_VELOCITY = 14;
+    // public static final double FEEDER_ACCELERATION = 5;
+    // public static final double FEEDER_JERK = 50;
 
     // Shooter Motor IDs
     public static final int LEFT_SHOOTER_MOTOR_ID = 24;
