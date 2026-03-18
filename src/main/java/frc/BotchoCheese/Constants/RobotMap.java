@@ -139,12 +139,13 @@ public class RobotMap {
 
       // Notice: Will be dynamically modified in the Shooter's updateSpeed function
    
-    private static final double SHOOTER_MULTIPLIER = 0.5;
-    public static final double SHOOTER_TARGET_RPS = 90.0 * SHOOTER_MULTIPLIER;
+    public static final double SHOOTER_MULTIPLIER = 0.5;
+    public static double SHOOTER_TARGET_RPS = 90.0 * SHOOTER_MULTIPLIER; // Notice: Will be dynamically modified in the Shooter's updateSpeed function
     public static final double SHOOTER_ACCELERATION = 160.0 * SHOOTER_MULTIPLIER;
     public static final double SHOOTER_JERK = 1600.0 * SHOOTER_MULTIPLIER;
 
-    // Notice: Will be dynamically modified in the Shooter's updateSpeed function
+    // Notice 1: Will be dynamically modified in the Shooter's updateSpeed function
+    // Notice 2: This apparently does not control anything
     public static double SHOOTER_SPEED = 0.83;
     
     //TODO

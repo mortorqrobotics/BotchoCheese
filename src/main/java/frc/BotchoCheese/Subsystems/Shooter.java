@@ -152,15 +152,20 @@ public class Shooter extends SubsystemBase {
             return;
         }
         double distance = rawFiducials[0].distToRobot;
-
+        //Short
        if(distance <= RobotMap.SHORT_DISTANCE_THRESHOLD) {
-            RobotMap.SHOOTER_SPEED = 0.25; // TODO
+            //RobotMap.SHOOTER_SPEED = 0.25; 
+            RobotMap.SHOOTER_TARGET_RPS = 60.0 * RobotMap.SHOOTER_MULTIPLIER; //TODO
        }
+       //Medium
        else if(distance > RobotMap.SHORT_DISTANCE_THRESHOLD && distance <= RobotMap.MEDIUM_DISTANCE_THRESHOLD) {
-            RobotMap.SHOOTER_SPEED = 0.5; // TODO
+            //RobotMap.SHOOTER_SPEED = 0.5; 
+            RobotMap.SHOOTER_TARGET_RPS = 75.0 * RobotMap.SHOOTER_MULTIPLIER; //TODO
        }
+       //Long/Regular
        else {
-            RobotMap.SHOOTER_SPEED = 0.75; // TODO
+            //RobotMap.SHOOTER_SPEED = 0.75;
+            RobotMap.SHOOTER_TARGET_RPS = 90.0 * RobotMap.SHOOTER_MULTIPLIER; //TODO
        }
 
     }
