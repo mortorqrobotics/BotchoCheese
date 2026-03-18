@@ -216,9 +216,12 @@ public class RobotContainer {
 
         //Controller 2
         // Indexer + Feeder + Shooter
-        JOYSTICK2_CONTROLLER.rightTrigger().whileTrue(feeder.runFeeder());
-        JOYSTICK2_CONTROLLER.rightTrigger().whileTrue(indexer.indexerOn());
+        JOYSTICK2_CONTROLLER.rightTrigger().whileTrue(Commands.waitSeconds(0.5).andThen(feeder.runFeeder()));
+        JOYSTICK2_CONTROLLER.rightTrigger().whileTrue(Commands.waitSeconds(0.5).andThen(indexer.indexerOn()));
         JOYSTICK2_CONTROLLER.rightTrigger().whileTrue(shooter.shoot());
+
+        // Feeder Reverse
+        JOYSTICK2_CONTROLLER.a().whileTrue(feeder.reverseFeeder());
 
         // Hood Up-PPAD Up/Down-DPAD Down
         // JOYSTICK2_CONTROLLER.povUp().whileTrue(shooter.hoodUp());
@@ -250,8 +253,8 @@ public class RobotContainer {
         JOYSTICK2_CONTROLLER.y().whileTrue(indexer.indexerOn());
 
         // Intake Pivot Up-DPAD Left/Down-DPAD Right
-        JOYSTICK2_CONTROLLER.povLeft().whileTrue(intake.pivotDown().andThen(Commands.runOnce(() -> pivotIsUp = false)));
-        JOYSTICK2_CONTROLLER.povRight().whileTrue(intake.pivotUp().andThen(Commands.runOnce(() -> pivotIsUp = true)));
+        JOYSTICK2_CONTROLLER.povUp().whileTrue(intake.pivotDown().andThen(Commands.runOnce(() -> pivotIsUp = false)));
+        JOYSTICK2_CONTROLLER.povDown().whileTrue(intake.pivotUp().andThen(Commands.runOnce(() -> pivotIsUp = true)));
 
         // Intake Auto Pivot
         JOYSTICK2_CONTROLLER.rightBumper().onTrue(

@@ -12,7 +12,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.BotchoCheese.Constants.RobotMap;
-import com.ctre.phoenix6.controls.MotionMagicVelocityVoltage;
 
 
 public class Feeder extends SubsystemBase {
@@ -23,8 +22,6 @@ public class Feeder extends SubsystemBase {
     private final DutyCycleOut m_output = new DutyCycleOut(0);
 
     private boolean isFeeding = false;
-
-    private final MotionMagicVelocityVoltage feederVelocityRequest = new MotionMagicVelocityVoltage(0);
 
     
     public Feeder() {
@@ -45,10 +42,11 @@ public class Feeder extends SubsystemBase {
         slot0Configs.kD = RobotMap.FEEDER_D_VALUE;
         config.Slot0 = slot0Configs;
 
-        MotionMagicConfigs feederMotionMagicConfigs = config.MotionMagic;
-        feederMotionMagicConfigs.MotionMagicAcceleration = RobotMap.FEEDER_ACCELERATION;
-        feederMotionMagicConfigs.MotionMagicJerk = RobotMap.FEEDER_JERK;
-        feederMotionMagicConfigs.MotionMagicCruiseVelocity = RobotMap.FEEDER_CRUISE_VELOCITY;
+        // Motion Magic is disabled for the feeder while using basic percent output control.
+        // MotionMagicConfigs feederMotionMagicConfigs = config.MotionMagic;
+        // feederMotionMagicConfigs.MotionMagicAcceleration = RobotMap.FEEDER_ACCELERATION;
+        // feederMotionMagicConfigs.MotionMagicJerk = RobotMap.FEEDER_JERK;
+        // feederMotionMagicConfigs.MotionMagicCruiseVelocity = RobotMap.FEEDER_CRUISE_VELOCITY;
         
         // Current Limits optimized for a Minion
         CurrentLimitsConfigs currentLimits = new CurrentLimitsConfigs();
@@ -71,8 +69,7 @@ public class Feeder extends SubsystemBase {
     public Command runFeeder() {
         return this.startEnd(
             () -> {
-                //feederMotor.setControl(m_output.withOutput(RobotMap.FEEDER_SPEED));
-                feederVelocityRequest.withVelocity(RobotMap.FEEDER_CRUISE_VELOCITY);
+                feederMotor.setControl(m_output.withOutput(RobotMap.FEEDER_SPEED));
                 isFeeding = true;
             },
             () -> {
@@ -86,7 +83,7 @@ public class Feeder extends SubsystemBase {
      */
     public Command reverseFeeder() {
         return this.run(() -> {
-            feederMotor.setControl(m_output.withOutput(-RobotMap.FEEDER_SPEED));
+            feederMotor.setControl(m_output.withOutput(-RobotMap.FEEDER_SPEED*0.5));
         }).finallyDo((interrupted) -> stopMotor());
     }
 
