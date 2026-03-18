@@ -107,9 +107,9 @@ public class RobotMap {
 
     //TODO!!!
     private static final double FEEDER_MULTIPLIER = 0.5;
-    public static final double FEEDER_CRUISE_VELOCITY = 60.0 * FEEDER_MULTIPLIER; // Motor-side target cruise velocity in rps
-    public static final double FEEDER_ACCELERATION = 120.0 * FEEDER_MULTIPLIER; // Motor-side target acceleration in rps^2
-    public static final double FEEDER_JERK = 1200.0 * FEEDER_MULTIPLIER; // Motor-side target jerk in rps^3
+    public static final double FEEDER_CRUISE_VELOCITY = 60.0; // Motor-side target cruise velocity in rps
+    public static final double FEEDER_ACCELERATION = 120.0; // Motor-side target acceleration in rps^2
+    public static final double FEEDER_JERK = 1200.0; // Motor-side target jerk in rps^3
 
     // Shooter Motor IDs
     public static final int LEFT_SHOOTER_MOTOR_ID = 24;

@@ -190,6 +190,7 @@ public class Shooter extends SubsystemBase {
 
     @Override
     public void periodic() {
+        //TODO!: Uncomment this if Limelights work
         //updateSpeed();
 
         SmartDashboard.putNumber("kP", RobotMap.SHOOTER_P_VALUE);
