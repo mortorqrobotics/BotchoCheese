@@ -3,6 +3,7 @@ package frc.BotchoCheese.Subsystems;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
+import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
@@ -11,6 +12,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.BotchoCheese.Constants.RobotMap;
+import com.ctre.phoenix6.controls.MotionMagicVelocityVoltage;
+
 
 public class Feeder extends SubsystemBase {
     // Single Minion motor controlled by a Talon FXS
@@ -20,6 +23,9 @@ public class Feeder extends SubsystemBase {
     private final DutyCycleOut m_output = new DutyCycleOut(0);
 
     private boolean isFeeding = false;
+
+    private final MotionMagicVelocityVoltage feederVelocityRequest = new MotionMagicVelocityVoltage(0);
+
     
     public Feeder() {
         // Updated to TalonFXS class
@@ -38,6 +44,11 @@ public class Feeder extends SubsystemBase {
         slot0Configs.kI = RobotMap.FEEDER_I_VALUE;
         slot0Configs.kD = RobotMap.FEEDER_D_VALUE;
         config.Slot0 = slot0Configs;
+
+        MotionMagicConfigs feederMotionMagicConfigs = config.MotionMagic;
+        feederMotionMagicConfigs.MotionMagicAcceleration = RobotMap.FEEDER_ACCELERATION;
+        feederMotionMagicConfigs.MotionMagicJerk = RobotMap.FEEDER_JERK;
+        feederMotionMagicConfigs.MotionMagicCruiseVelocity = RobotMap.FEEDER_CRUISE_VELOCITY;
         
         // Current Limits optimized for a Minion
         CurrentLimitsConfigs currentLimits = new CurrentLimitsConfigs();
@@ -60,7 +71,8 @@ public class Feeder extends SubsystemBase {
     public Command runFeeder() {
         return this.startEnd(
             () -> {
-                feederMotor.setControl(m_output.withOutput(RobotMap.FEEDER_SPEED));
+                //feederMotor.setControl(m_output.withOutput(RobotMap.FEEDER_SPEED));
+                feederVelocityRequest.withVelocity(RobotMap.FEEDER_CRUISE_VELOCITY);
                 isFeeding = true;
             },
             () -> {

@@ -103,7 +103,12 @@ public class RobotMap {
     public static final double FEEDER_P_VALUE = 0.12;
     public static final double FEEDER_I_VALUE = 0.0;
     public static final double FEEDER_D_VALUE = 0.001;
-    public static final double FEEDER_SPEED = -1; 
+    public static final double FEEDER_SPEED = -0.6; 
+
+    //TODO!!!
+    public static final double FEEDER_CRUISE_VELOCITY = 60.0; // Motor-side target cruise velocity in rps
+    public static final double FEEDER_ACCELERATION = 120.0; // Motor-side target acceleration in rps^2
+    public static final double FEEDER_JERK = 1200.0; // Motor-side target jerk in rps^3
 
     // Shooter Motor IDs
     public static final int LEFT_SHOOTER_MOTOR_ID = 24;
@@ -133,12 +138,12 @@ public class RobotMap {
 
       // Notice: Will be dynamically modified in the Shooter's updateSpeed function
    
-    public static final double SHOOTER_TARGET_RPS = 90.0;
-    public static final double SHOOTER_ACCELERATION = 160.0;
-    public static final double SHOOTER_JERK = 1600.0;
+    public static final double SHOOTER_TARGET_RPS = 180.0; // Motor-side target velocity in rps
+    public static final double SHOOTER_ACCELERATION = 360.0; // Motor-side target acceleration in rps^2
+    public static final double SHOOTER_JERK = 3600.0; // Motor-side target jerk in rps^3
 
     // Notice: Will be dynamically modified in the Shooter's updateSpeed function
-    public static double SHOOTER_SPEED = 1;
+    public static double SHOOTER_SPEED = 0.83;
     
     //TODO
     public static double SHOOTER_SPEED_REGRESSION_SLOPE = 1.0;
