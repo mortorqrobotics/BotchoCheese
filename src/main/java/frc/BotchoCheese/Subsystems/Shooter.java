@@ -25,11 +25,17 @@ public class Shooter extends SubsystemBase {
     private final MotionMagicVelocityVoltage shooterVelocityRequest = new MotionMagicVelocityVoltage(0);
 
     private boolean shooterTurning = false;
+
+    private static int buttonPresses = 0;
+    private double shooterSpeed = 90.0;
     
     public Shooter() {
         leftShooter = new TalonFX(RobotMap.LEFT_SHOOTER_MOTOR_ID);
         middleShooter = new TalonFX(RobotMap.MIDDLE_SHOOTER_MOTOR_ID);
         rightShooter = new TalonFX(RobotMap.RIGHT_SHOOTER_MOTOR_ID);
+
+        buttonPresses = 0;
+        shooterSpeed = 90.0;
 
         // Apply basic configuration
         TalonFXConfiguration config = new TalonFXConfiguration();
@@ -124,9 +130,9 @@ public class Shooter extends SubsystemBase {
         return this.startEnd(
             // When command starts/runs:
             () -> {
-                leftShooter.setControl(shooterVelocityRequest.withVelocity(RobotMap.SHOOTER_TARGET_RPS));
-                middleShooter.setControl(shooterVelocityRequest.withVelocity(RobotMap.SHOOTER_TARGET_RPS));
-                rightShooter.setControl(shooterVelocityRequest.withVelocity(RobotMap.SHOOTER_TARGET_RPS));
+                leftShooter.setControl(shooterVelocityRequest.withVelocity(shooterSpeed));
+                middleShooter.setControl(shooterVelocityRequest.withVelocity(shooterSpeed));
+                rightShooter.setControl(shooterVelocityRequest.withVelocity(shooterSpeed));
             },
             // When command ends:
             () -> {
@@ -155,19 +161,36 @@ public class Shooter extends SubsystemBase {
         //Short
        if(distance <= RobotMap.SHORT_DISTANCE_THRESHOLD) {
             //RobotMap.SHOOTER_SPEED = 0.25; 
-            RobotMap.SHOOTER_TARGET_RPS = 60.0 * RobotMap.SHOOTER_MULTIPLIER; //TODO
+            shooterSpeed = RobotMap.SHOOTER_TARGET_RPS_1;
        }
        //Medium
        else if(distance > RobotMap.SHORT_DISTANCE_THRESHOLD && distance <= RobotMap.MEDIUM_DISTANCE_THRESHOLD) {
             //RobotMap.SHOOTER_SPEED = 0.5; 
-            RobotMap.SHOOTER_TARGET_RPS = 75.0 * RobotMap.SHOOTER_MULTIPLIER; //TODO
+            shooterSpeed = RobotMap.SHOOTER_TARGET_RPS_2;
        }
        //Long/Regular
        else {
             //RobotMap.SHOOTER_SPEED = 0.75;
-            RobotMap.SHOOTER_TARGET_RPS = 90.0 * RobotMap.SHOOTER_MULTIPLIER; //TODO
+            shooterSpeed = RobotMap.SHOOTER_TARGET_RPS_3;
        }
+    }
 
+    public void cycleSpeed() {
+        if(buttonPresses == 0) {
+            //Set to speed 1
+            shooterSpeed = RobotMap.SHOOTER_TARGET_RPS_1;
+            buttonPresses = 1;
+        }
+        else if(buttonPresses == 1) {
+            //Set to speed 2
+            shooterSpeed = RobotMap.SHOOTER_TARGET_RPS_2;
+            buttonPresses = 2;
+        }
+        else if(buttonPresses == 2) {
+            //Set to speed 3
+            shooterSpeed = RobotMap.SHOOTER_TARGET_RPS_3;
+            buttonPresses = 0;
+        }
     }
 
     // public void updateHoodPosition() {

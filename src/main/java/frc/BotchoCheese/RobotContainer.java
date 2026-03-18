@@ -238,7 +238,8 @@ public class RobotContainer {
         JOYSTICK2_CONTROLLER.b().whileTrue(feeder.runFeeder());
 
         // Intake
-        JOYSTICK2_CONTROLLER.x().whileTrue(intake.startIntake());
+        //JOYSTICK2_CONTROLLER.x().whileTrue(intake.startIntake());
+        JOYSTICK2_CONTROLLER.x().onTrue(new InstantCommand(()->shooter.cycleSpeed()));
 
         // // Hood Auto
         // JOYSTICK2_CONTROLLER.a().onTrue(
