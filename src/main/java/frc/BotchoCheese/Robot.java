@@ -58,6 +58,11 @@ public class Robot extends TimedRobot {
     SmartDashboard.putNumber("Mod2 Offset", Units.rotationsToDegrees(RobotContainer.drivetrain.getModule(2).getEncoder().getAbsolutePosition().getValueAsDouble()));
     SmartDashboard.putNumber("Mod3 Offset", Units.rotationsToDegrees(RobotContainer.drivetrain.getModule(3).getEncoder().getAbsolutePosition().getValueAsDouble()));
 
+    SmartDashboard.putNumber("Mod0 Drive Speed", RobotContainer.drivetrain.getModule(0).getEncoder().getVelocity().getValueAsDouble());
+    SmartDashboard.putNumber("Mod1 Drive Speed", RobotContainer.drivetrain.getModule(1).getEncoder().getVelocity().getValueAsDouble());
+    SmartDashboard.putNumber("Mod2 Drive Speed", RobotContainer.drivetrain.getModule(2).getEncoder().getVelocity().getValueAsDouble());
+    SmartDashboard.putNumber("Mod3 Drive Speed", RobotContainer.drivetrain.getModule(3).getEncoder().getVelocity().getValueAsDouble());
+
     // SmartDashboard.putNumber("Mod0 Offset", Units.rotationsToDegrees(RobotContainer.drivetrain.getModule(0).getEncoder().getAbsolutePosition().getValueAsDouble()));
     // SmartDashboard.putNumber("Mod1 Offset", Units.rotationsToDegrees(RobotContainer.drivetrain.getModule(1).getEncoder().getAbsolutePosition().getValueAsDouble()));
     // SmartDashboard.putNumber("Mod2 new Offset", Units.rotationsToDegrees(RobotContainer.drivetrain.getModule(2).getEncoder().getAbsolutePosition().getValueAsDouble()));

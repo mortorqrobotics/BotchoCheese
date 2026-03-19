@@ -1,12 +1,14 @@
 package frc.BotchoCheese.Subsystems;
 
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
+import com.ctre.phoenix6.controls.Follower;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -16,7 +18,8 @@ import frc.BotchoCheese.Constants.RobotMap;
 
 public class Feeder extends SubsystemBase {
     // Single Minion motor controlled by a Talon FXS
-    private final TalonFX feederMotor;
+    private final TalonFX feederLMotor;
+    private final TalonFX feederRMotor;
 
     // Control request object
     private final DutyCycleOut m_output = new DutyCycleOut(0);
@@ -26,7 +29,8 @@ public class Feeder extends SubsystemBase {
     
     public Feeder() {
         // Updated to TalonFXS class
-        feederMotor = new TalonFX(RobotMap.FEEDER_MOTOR_ID);
+        feederLMotor = new TalonFX(RobotMap.FEEDER_MOTOR_L_ID);
+        feederRMotor = new TalonFX(RobotMap.FEEDER_MOTOR_R_ID);
 
         TalonFXConfiguration config = new TalonFXConfiguration();
 
@@ -60,7 +64,10 @@ public class Feeder extends SubsystemBase {
         config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
         // Apply the configuration to the FXS
-        feederMotor.getConfigurator().apply(config);
+        feederLMotor.getConfigurator().apply(config);
+        feederRMotor.getConfigurator().apply(config);
+
+        feederRMotor.setControl(new Follower(feederLMotor.getDeviceID(), MotorAlignmentValue.Opposed));
     }
 
     /**
@@ -69,7 +76,7 @@ public class Feeder extends SubsystemBase {
     public Command runFeeder() {
         return this.startEnd(
             () -> {
-                feederMotor.setControl(m_output.withOutput(RobotMap.FEEDER_SPEED));
+                feederLMotor.setControl(m_output.withOutput(RobotMap.FEEDER_SPEED));
                 isFeeding = true;
             },
             () -> {
@@ -83,12 +90,12 @@ public class Feeder extends SubsystemBase {
      */
     public Command reverseFeeder() {
         return this.run(() -> {
-            feederMotor.setControl(m_output.withOutput(-RobotMap.FEEDER_SPEED*0.5));
+            feederLMotor.setControl(m_output.withOutput(-RobotMap.FEEDER_SPEED*0.5));
         }).finallyDo((interrupted) -> stopMotor());
     }
 
     public void stopMotor() {
-        feederMotor.stopMotor();
+        feederLMotor.stopMotor();
         isFeeding = false;
     }
 
@@ -96,6 +103,7 @@ public class Feeder extends SubsystemBase {
     public void periodic() {
         SmartDashboard.putBoolean("Feeder Running?", isFeeding);
         // Using getValueAsDouble() to keep it simple for your dashboard
-        SmartDashboard.putNumber("Feeder Current", feederMotor.getStatorCurrent().getValueAsDouble());
+        SmartDashboard.putNumber("Feeder L Current", feederLMotor.getStatorCurrent().getValueAsDouble());
+        SmartDashboard.putNumber("Feeder R Current", feederRMotor.getStatorCurrent().getValueAsDouble());
     } 
 }

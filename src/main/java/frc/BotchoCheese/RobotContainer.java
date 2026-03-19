@@ -145,14 +145,14 @@ public class RobotContainer {
         
         // Note that X is defined as forward according to WPILib convention,
         // and Y is defined as to the left according to WPILib convention.
-        /*drivetrain.setDefaultCommand(
+        drivetrain.setDefaultCommand(
             drivetrain.applyRequest(() ->
                 drive.withVelocityX(-applyDriveDeadband(JOYSTICK1_CONTROLLER.getLeftY()) * MaxSpeed)
                     .withVelocityY(-applyDriveDeadband(JOYSTICK1_CONTROLLER.getLeftX()) * MaxSpeed)
                     .withRotationalRate(-applyDriveDeadband(JOYSTICK1_CONTROLLER.getRightX()) * MaxAngularRate)
             )
-        ); */
-        drivetrain.setDefaultCommand(
+        ); 
+        /*drivetrain.setDefaultCommand(
             // Drivetrain will execute this command periodically
             drivetrain.applyRequest(() -> {
                 double velocityX = -applyDriveDeadband(JOYSTICK1_CONTROLLER.getLeftY()) * MaxSpeed;
@@ -172,10 +172,10 @@ public class RobotContainer {
                     .withVelocityY(velocityY)
                     .withRotationalRate(rotationalRate);
             })
-        );
+        );*/
 
-        new Trigger(this::isDriverControllerActive)
-            .onTrue(Commands.runOnce(() -> DriverStation.reportWarning("Driver joystick movement detected", false)));
+        // new Trigger(this::isDriverControllerActive)
+        //     .onTrue(Commands.runOnce(() -> DriverStation.reportWarning("Driver joystick movement detected", false)));
         // JOYSTICK1_CONTROLLER.leftBumper().onTrue(Commands.runOnce(SignalLogger::start));
         // JOYSTICK1_CONTROLLER.leftBumper().onTrue(Commands.runOnce(SignalLogger::stop));
 
@@ -189,13 +189,17 @@ public class RobotContainer {
         //     point.withModuleDirection(new Rotation2d(-JOYSTICK1_CONTROLLER.getLeftY(), -JOYSTICK1_CONTROLLER.getLeftX()))
         // ));
 
-        JOYSTICK1_CONTROLLER.povUp().whileTrue(intake.pivotUp());
-        JOYSTICK1_CONTROLLER.povDown().whileTrue(intake.pivotDown());
+        JOYSTICK1_CONTROLLER.povUp().whileTrue(drivetrain.applyRequest(() ->
+            forwardStraight.withVelocityX(0.5).withVelocityY(0))
+        );
+        JOYSTICK1_CONTROLLER.povDown().whileTrue(drivetrain.applyRequest(() ->
+            forwardStraight.withVelocityX(-0.5).withVelocityY(0))
+        );
         JOYSTICK1_CONTROLLER.povLeft().whileTrue(drivetrain.applyRequest(() ->
-            forwardStraight.withVelocityX(0).withVelocityY(-0.25))
+            forwardStraight.withVelocityX(0).withVelocityY(-0.5))
         );
         JOYSTICK1_CONTROLLER.povRight().whileTrue(drivetrain.applyRequest(() ->
-            forwardStraight.withVelocityX(0).withVelocityY(0.25))
+            forwardStraight.withVelocityX(0).withVelocityY(0.5))
         );
         
         JOYSTICK1_CONTROLLER.a().toggleOnTrue(createFullIntakeToShooterCommand());
@@ -273,11 +277,7 @@ public class RobotContainer {
         return MathUtil.applyDeadband(value, 0.1);
     }
 
-    private boolean isDriverControllerActive() {
-        return Math.abs(applyDriveDeadband(JOYSTICK1_CONTROLLER.getLeftY())) > 0.0
-            || Math.abs(applyDriveDeadband(JOYSTICK1_CONTROLLER.getLeftX())) > 0.0
-            || Math.abs(applyDriveDeadband(JOYSTICK1_CONTROLLER.getRightX())) > 0.0;
-    }
+   
 
     private Command createFullIntakeToShooterCommand() {
         return Commands.parallel(

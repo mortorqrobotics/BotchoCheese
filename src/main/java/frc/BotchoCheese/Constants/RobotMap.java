@@ -99,7 +99,8 @@ public class RobotMap {
     
     // Feeder Motor ID and Speed
     // TODO PID
-    public static final int FEEDER_MOTOR_ID = 23;
+    public static final int FEEDER_MOTOR_L_ID = 23;
+    public static final int FEEDER_MOTOR_R_ID = 29;
     public static final double FEEDER_P_VALUE = 0.12;
     public static final double FEEDER_I_VALUE = 0.0;
     public static final double FEEDER_D_VALUE = 0.001;
