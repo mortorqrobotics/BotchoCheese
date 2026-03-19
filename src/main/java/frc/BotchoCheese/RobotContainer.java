@@ -206,6 +206,8 @@ public class RobotContainer {
 
         JOYSTICK1_CONTROLLER.leftBumper().whileTrue(climber.manualClimberUp());
         JOYSTICK1_CONTROLLER.rightBumper().whileTrue(climber.manualClimberDown());
+        // JOYSTICK1_CONTROLLER.leftBumper().whileTrue(climber.manualClimber(true)); // true = up, false = down
+        // JOYSTICK1_CONTROLLER.rightBumper().whileTrue(climber.manualClimber(false)); // true = up, false = down
 
         // JOYSTICK1_CONTROLLER.leftTrigger().whileTrue(shooter.hoodUp());
         // JOYSTICK1_CONTROLLER.rightTrigger().whileTrue(shooter.hoodDown());
@@ -220,8 +222,8 @@ public class RobotContainer {
 
         //Controller 2
         // Indexer + Feeder + Shooter
-        JOYSTICK2_CONTROLLER.rightTrigger().whileTrue(Commands.waitSeconds(0.5).andThen(feeder.runFeeder()));
-        JOYSTICK2_CONTROLLER.rightTrigger().whileTrue(Commands.waitSeconds(0.5).andThen(indexer.indexerOn()));
+        JOYSTICK2_CONTROLLER.rightTrigger().whileTrue(Commands.waitSeconds(1).andThen(feeder.runFeeder()));
+        JOYSTICK2_CONTROLLER.rightTrigger().whileTrue(Commands.waitSeconds(1).andThen(indexer.indexerOn()));
         JOYSTICK2_CONTROLLER.rightTrigger().whileTrue(shooter.shoot());
 
         // Feeder Reverse

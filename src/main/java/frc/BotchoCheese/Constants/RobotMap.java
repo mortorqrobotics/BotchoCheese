@@ -50,10 +50,10 @@ public class RobotMap {
     public static final double CLIMBER_D_VALUE = 0.4;
 
     // Climber speeds
-    public static final double TEST_MOTOR_LEFT_UP_SPEED = 0.1;
-    public static final double TEST_MOTOR_LEFT_DOWN_SPEED = -0.4;
-    public static final double TEST_MOTOR_RIGHT_UP_SPEED = 0.1;
-    public static final double TEST_MOTOR_RIGHT_DOWN_SPEED = -0.4;
+    public static final double TEST_MOTOR_LEFT_UP_SPEED = -0.6;
+    public static final double TEST_MOTOR_LEFT_DOWN_SPEED = 0.6;
+    public static final double TEST_MOTOR_RIGHT_UP_SPEED = -0.6;
+    public static final double TEST_MOTOR_RIGHT_DOWN_SPEED = 0.6;
 
     // TODO: Comfirm the new Climber Extension Limit
     public static final double CLIMBER_EXTENSION_LIMIT = 30; 
@@ -67,8 +67,8 @@ public class RobotMap {
     // Pivot motor values
     // TODO Edit values
     public static final double PIVOT_UP_POSITION = 0;
-    public static final double PIVOT_DOWN_POSITION = 17.0;
-    public static final double PIVOT_CURRENT_STALL_THRESHOLD = 60.0;
+    public static final double PIVOT_DOWN_POSITION = 17.2;
+    public static final double PIVOT_CURRENT_STALL_THRESHOLD = 4.0;
 
     // Intake PID Values
     // TODO
@@ -128,6 +128,7 @@ public class RobotMap {
     // // Hood Motion Magic Values
     
     // public static final double HOOD_CRUISE_VELOCITY = 40;
+    
     // public static final double HOOD_ACCELERATION = 80;
     // public static final double HOOD_JERK = 800;
 

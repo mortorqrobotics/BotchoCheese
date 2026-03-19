@@ -76,18 +76,39 @@ public class Climber extends SubsystemBase {
     public Command manualClimberDown() {
         return this.run(() -> {
             if(!atLowerLimit()) {
-                lClimber.setControl(m_output.withOutput(RobotMap.TEST_MOTOR_LEFT_DOWN_SPEED));
+                lClimber.setControl(m_output.withOutput(RobotMap.TEST_MOTOR_LEFT_UP_SPEED));
                 rClimber.setControl(m_output.withOutput(RobotMap.TEST_MOTOR_RIGHT_DOWN_SPEED));
                 goingUp = false;
             }
         }).finallyDo(() -> stopMotors());
     }
 
+    // public Command manualClimber(boolean direction) {
+    //     if (direction == true) {
+    //         return this.run(() -> {
+    //             if(!atUpperLimit()) {
+    //                 lClimber.setControl(m_output.withOutput(RobotMap.TEST_MOTOR_LEFT_UP_SPEED));
+    //                 rClimber.setControl(m_output.withOutput(RobotMap.TEST_MOTOR_RIGHT_UP_SPEED));
+    //                 goingUp = true;
+    //             }
+    //         }).finallyDo(() -> stopMotors());
+    //     }
+    //     else {
+    //         return this.run(() -> {
+    //             if(!atLowerLimit()) {
+    //                 lClimber.setControl(m_output.withOutput(RobotMap.TEST_MOTOR_LEFT_DOWN_SPEED));
+    //                 rClimber.setControl(m_output.withOutput(RobotMap.TEST_MOTOR_RIGHT_DOWN_SPEED));
+    //                 goingUp = false;
+    //             }
+    //         }).finallyDo(() -> stopMotors());
+    //     }
+    // }
+
     public Command automaticClimberUp(){
         return this.run(() -> {
             lClimber.setControl(m_output.withOutput(RobotMap.TEST_MOTOR_LEFT_UP_SPEED));
             rClimber.setControl(m_output.withOutput(RobotMap.TEST_MOTOR_RIGHT_UP_SPEED));
-            goingUp = true;
+            goingUp = false;
         }).until(this::atUpperLimit).finallyDo(() -> stopMotors());
     }
 
@@ -108,7 +129,7 @@ public class Climber extends SubsystemBase {
     @Override
     public void periodic() {
         SmartDashboard.putBoolean("Climber Going Up?", goingUp);
-        
+        SmartDashboard.putNumber("Climber Position", lClimber.getPosition().getValueAsDouble());
         SmartDashboard.putNumber("Left Climber 1 Battery Draw", lClimber.getSupplyCurrent().getValueAsDouble());
         SmartDashboard.putNumber("Right Climber 1 Motor Draw", rClimber.getStatorCurrent().getValueAsDouble());
     }
