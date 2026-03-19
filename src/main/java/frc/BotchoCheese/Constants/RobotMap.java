@@ -33,13 +33,15 @@ public class RobotMap {
     //Gyro
     public static final int PIGEON_ID = 30;
 
+    //TODO
+    // GLOBAL SPEED
+    public static final double GLOBAL_SPEED = 0.1;
+
     // Climber
-    // Climber motor IDs (fill with actual CAN IDs for your robot hardware)
-    public static final int LEFT_CLIMBER_MOTOR_ID = 10;
-    public static final int RIGHT_CLIMBER_MOTOR_ID = 11;
-    public static final int LEFT_CLIMBER_TWO_MOTOR_ID = 12;
-    public static final int RIGHT_CLIMBER_TWO_MOTOR_ID = 13;
-    public static final int ENCODER_ID = 14;
+    // Climber motor IDs
+    public static final int LEFT_CLIMBER_MOTOR_ID = 27;
+    public static final int RIGHT_CLIMBER_MOTOR_ID = 28;
+    public static final int ENCODER_ID = 100;
 
     // Climber PID Values
     // TODO
@@ -48,25 +50,25 @@ public class RobotMap {
     public static final double CLIMBER_D_VALUE = 0.4;
 
     // Climber speeds
-    // TODO: Check whether new motors (l2Climber and r2Climber) speeds are required in some way
-    public static final double TEST_MOTOR_LEFT_UP_SPEED = 0.2;
-    public static final double TEST_MOTOR_LEFT_DOWN_SPEED = -0.2;
-    public static final double TEST_MOTOR_RIGHT_UP_SPEED = 0.2;
-    public static final double TEST_MOTOR_RIGHT_DOWN_SPEED = -0.2;
+    public static final double TEST_MOTOR_LEFT_UP_SPEED = -0.6;
+    public static final double TEST_MOTOR_LEFT_DOWN_SPEED = 0.6;
+    public static final double TEST_MOTOR_RIGHT_UP_SPEED = -0.6;
+    public static final double TEST_MOTOR_RIGHT_DOWN_SPEED = 0.6;
 
     // TODO: Comfirm the new Climber Extension Limit
-    public static final double CLIMBER_EXTENSION_LIMIT = 0.5; 
+    public static final double CLIMBER_EXTENSION_LIMIT = 30; 
     
     // Intake motor IDs
-    public static final int INTAKE_MOTOR_ID = 20;
-    public static final int PIVOT_1_MOTOR_ID = 21;
-    public static final int PIVOT_2_MOTOR_ID = 22;
-    public static final int CAN_RANGE_ID = 23;
+    public static final int INTAKE_MOTOR_ID = 22;
+    public static final int LEFT_PIVOT_MOTOR_ID = 20;
+    public static final int RIGHT_PIVOT_MOTOR_ID = 21;
+    // public static final int CAN_RANGE_ID = 23;
 
     // Pivot motor values
     // TODO Edit values
     public static final double PIVOT_UP_POSITION = 0;
-    public static final double PIVOT_DOWN_POSITION = 0;
+    public static final double PIVOT_DOWN_POSITION = 17.2;
+    public static final double PIVOT_CURRENT_STALL_THRESHOLD = 4.0;
 
     // Intake PID Values
     // TODO
@@ -85,65 +87,74 @@ public class RobotMap {
 
     // Intake Motion Magic Values
 
-    public static final double INTAKE_CRUISE_VELOCITY = 80; // Target cruise velocity of 0.5 rps
-    public static final double INTAKE_ACCELERATION = 160; // Target acceleration of 1 rps/s (0.5 seconds)
-    public static final double INTAKE_JERK = 1600; // Target jerk
+    public static final double PIVOT_CRUISE_VELOCITY = 5; // Target cruise velocity of 20 rps
+    public static final double PIVOT_ACCELERATION = 5; // Target acceleration of 20 rps^2 (1 seconds)
+    public static final double PIVOT_JERK = 50; // Target jerk
 
     // Intake speeds
     // Verify if values are correct and go in the right directions
-    public static final double INTAKE_SPEED = 0.05;
+    public static final double INTAKE_SPEED = -0.83;
     // TODO: Comfirm the threshold.
     public static final double CAN_RANGE_DISTANCE_THRESHOLD = 0.5;
     
     // Feeder Motor ID and Speed
     // TODO PID
-    public static final int FEEDER_MOTOR_ID = 23;
+    public static final int FEEDER_MOTOR_L_ID = 23;
+    public static final int FEEDER_MOTOR_R_ID = 29;
     public static final double FEEDER_P_VALUE = 0.12;
     public static final double FEEDER_I_VALUE = 0.0;
     public static final double FEEDER_D_VALUE = 0.001;
-    public static final double FEEDER_SPEED = 0.5; 
+    public static final double FEEDER_SPEED = -0.83; 
 
-    //TODO: Re-assign IDs
+    // Motion Magic is currently disabled for the feeder.
+    // public static final double FEEDER_CRUISE_VELOCITY = 14;
+    // public static final double FEEDER_ACCELERATION = 5;
+    // public static final double FEEDER_JERK = 50;
+
     // Shooter Motor IDs
     public static final int LEFT_SHOOTER_MOTOR_ID = 24;
     public static final int MIDDLE_SHOOTER_MOTOR_ID = 25;
     public static final int RIGHT_SHOOTER_MOTOR_ID = 26;
     
-    // Hood Motor IDs
-    // TODO Change Hood ID
-    public static final int HOOD_MOTOR_ID = 999;
-    public static final int HOOD_THROUGHBORE_DIO = 0;
+    // // Hood Motor IDs
+    // public static final int HOOD_MOTOR_ID = 17;
+    // public static final int HOOD_THROUGHBORE_DIO = 0;
 
-    public static final double HOOD_P_VALUE = 0.4;
-    public static final double HOOD_I_VALUE = 0.0;
-    public static final double HOOD_D_VALUE = 0.2;
-    public static final double HOOD_SPEED = 0.25;
-    public static final double HOOD_THROUGHBORE_OFFSET_ROT = 0.0;
-    public static final double HOOD_MIN_ROT = 0.05;
-    public static final double HOOD_MAX_ROT = 0.95;
-    public static final double HOOD_LIMIT_TOLERANCE_ROT = 0.01;
+    // public static final double HOOD_P_VALUE = 0.4;
+    // public static final double HOOD_I_VALUE = 0.0;
+    // public static final double HOOD_D_VALUE = 0.2;
+    // public static final double HOOD_SPEED = .1;
 
-    // Hood Motion Magic Values
+    // // Hood Motion Magic Values
     
-    public static final double HOOD_CRUISE_VELOCITY = 40;
-    public static final double HOOD_ACCELERATION = 80;
-    public static final double HOOD_JERK = 800;
+    // public static final double HOOD_CRUISE_VELOCITY = 40;
+    
+    // public static final double HOOD_ACCELERATION = 80;
+    // public static final double HOOD_JERK = 800;
 
-    //TODO
-    public static double HOOD_SPEED_REGRESSION_SLOPE = 1.0;
-    public static double HOOD_SPEED_REGRESSION_Y_INTERCEPT = 1.0;
+    // //TODO
+    // public static double HOOD_SPEED_REGRESSION_SLOPE = 1.0;
+    // public static double HOOD_SPEED_REGRESSION_Y_INTERCEPT = 1.0;
 
     // Shooter speeds
 
-    // Notice: Will be dynamically modified in the Shooter's updateSpeed function
-    public static double SHOOTER_SPEED = 0.1;
+      // Notice: Will be dynamically modified in the Shooter's updateSpeed function
+   
+    public static final double SHOOTER_MULTIPLIER = 0.5;
+    public static double SHOOTER_TARGET_RPS_1 = 70.0 * SHOOTER_MULTIPLIER; // Notice: Will be dynamically modified in the Shooter's updateSpeed function
+    public static double SHOOTER_TARGET_RPS_2 = 90.0 * SHOOTER_MULTIPLIER;
+    public static double SHOOTER_TARGET_RPS_3 = 110.0 * SHOOTER_MULTIPLIER;
+    
+    public static final double SHOOTER_ACCELERATION = 160.0 * SHOOTER_MULTIPLIER;
+    public static final double SHOOTER_JERK = 1600.0 * SHOOTER_MULTIPLIER;
+
+    // Notice 1: Will be dynamically modified in the Shooter's updateSpeed function
+    // Notice 2: This apparently does not control anything
+    public static double SHOOTER_SPEED = 0.83;
     
     //TODO
     public static double SHOOTER_SPEED_REGRESSION_SLOPE = 1.0;
     public static double SHOOTER_SPEED_REGRESSION_Y_INTERCEPT = 1.0;
-
-    // TODO Edit HOOD_POSITION
-    public static double HOOD_POSITION = 1;
 
     //If the distance between the robot and tag is less than threshold, the distance is "short"
     public static final double SHORT_DISTANCE_THRESHOLD = 5.0;
@@ -151,18 +162,18 @@ public class RobotMap {
 
     // Shooter PID Values
     // TODO
-    public static final double SHOOTER_P_VALUE = 0.5;
-    public static final double SHOOTER_I_VALUE = 0.15;
-    public static final double SHOOTER_D_VALUE = 0.2;
-    public static final double SHOOTER_S_VALUE = 0.25;
-    public static final double SHOOTER_V_VALUE = 0.12;
-    public static final double SHOOTER_A_VALUE = 0.01;
+    public static final double SHOOTER_P_VALUE = 0.5; //Good enough
+    public static final double SHOOTER_I_VALUE = 0.0;  //Formerly 0.15
+    public static final double SHOOTER_D_VALUE = 0.0; //Formerly 0.2
+    public static final double SHOOTER_S_VALUE = 0.2; //Recommended range: 0.2--0.3 (formerly 0.25)
+    public static final double SHOOTER_V_VALUE = 0.05; //TODO: Important! Must be measured (formerly 0.12).
+    public static final double SHOOTER_A_VALUE = 0.01; //Recommended range: Small (<0.05)
 
     // Indexer ID
-    public static final int INDEXER_MOTOR_ID = 30;
+    public static final int INDEXER_MOTOR_ID = 18;
 
     // Indexer speeds
-    public static final double INDEXER_MOTOR_SPEED = 0.5;
+    public static final double INDEXER_MOTOR_SPEED =.4;
 
     // CANdle Constants
     public static final int CANDLE_LED_START_INDEX = 0;

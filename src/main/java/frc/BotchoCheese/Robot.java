@@ -5,10 +5,13 @@
 package frc.BotchoCheese;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.wpilibj.DataLogManager;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -55,6 +58,11 @@ public class Robot extends TimedRobot {
     SmartDashboard.putNumber("Mod2 Offset", Units.rotationsToDegrees(RobotContainer.drivetrain.getModule(2).getEncoder().getAbsolutePosition().getValueAsDouble()));
     SmartDashboard.putNumber("Mod3 Offset", Units.rotationsToDegrees(RobotContainer.drivetrain.getModule(3).getEncoder().getAbsolutePosition().getValueAsDouble()));
 
+    SmartDashboard.putNumber("Mod0 Drive Speed", RobotContainer.drivetrain.getModule(0).getEncoder().getVelocity().getValueAsDouble());
+    SmartDashboard.putNumber("Mod1 Drive Speed", RobotContainer.drivetrain.getModule(1).getEncoder().getVelocity().getValueAsDouble());
+    SmartDashboard.putNumber("Mod2 Drive Speed", RobotContainer.drivetrain.getModule(2).getEncoder().getVelocity().getValueAsDouble());
+    SmartDashboard.putNumber("Mod3 Drive Speed", RobotContainer.drivetrain.getModule(3).getEncoder().getVelocity().getValueAsDouble());
+
     // SmartDashboard.putNumber("Mod0 Offset", Units.rotationsToDegrees(RobotContainer.drivetrain.getModule(0).getEncoder().getAbsolutePosition().getValueAsDouble()));
     // SmartDashboard.putNumber("Mod1 Offset", Units.rotationsToDegrees(RobotContainer.drivetrain.getModule(1).getEncoder().getAbsolutePosition().getValueAsDouble()));
     // SmartDashboard.putNumber("Mod2 new Offset", Units.rotationsToDegrees(RobotContainer.drivetrain.getModule(2).getEncoder().getAbsolutePosition().getValueAsDouble()));
@@ -70,13 +78,14 @@ public class Robot extends TimedRobot {
   
   //AdvantageScope simulation
   Pose2d poseA = RobotContainer.drivetrain.getState().Pose;
-  System.out.println("Current pose: " + poseA);
+  //System.out.println("Current pose: " + poseA);
   publisher.set(poseA);
   
 }
 
   @Override
-  public void disabledInit() {}
+  public void disabledInit() {
+  }
 
   @Override
   public void disabledPeriodic() {
@@ -88,12 +97,20 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousInit() {
+    try {  
+      RobotContainer.gyro.setYaw(DriverStation.getAlliance().get() == Alliance.Blue ? Math.PI: 0); // this is esentually directly from the external IMU since we barely trust vision angle
+      RobotContainer.drivetrain.resetRotation(new Rotation2d(DriverStation.getAlliance().get() == Alliance.Blue ? Math.PI: 0));
+    } 
+    catch (Exception e) {
+      System.out.print(e);
+    }
 
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
     if (m_autonomousCommand != null) {
       CommandScheduler.getInstance().schedule(m_autonomousCommand);
     }
+
   }
 
   @Override

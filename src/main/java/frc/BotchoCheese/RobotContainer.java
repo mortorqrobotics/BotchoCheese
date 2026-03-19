@@ -8,20 +8,32 @@ import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 
+import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.hardware.Pigeon2;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.BotchoCheese.Commands.RotateToTag;
 import frc.BotchoCheese.Subsystems.Shooter;
 import frc.BotchoCheese.Subsystems.Climber;
@@ -32,12 +44,19 @@ import frc.BotchoCheese.Subsystems.CommandSwerveDrivetrain;
 import frc.BotchoCheese.Constants.TunerConstants;
 import frc.BotchoCheese.Constants.RobotMap;
 import frc.BotchoCheese.Subsystems.Feeder;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 
 
 public class RobotContainer {
-    public static double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
+    private static final String DEFAULT_AUTO_NAME = "Auto 1 (Default)";
+    private static final String AUTO_CHOOSER_KEY = "Auto Mode";
+    private static final String PATHPLANNER_AUTO_FOLDER = "pathplanner/autos";
+
+    public static double MaxSpeed = 1.0 * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
     
     public static boolean pivotIsUp = true;
+    public static boolean hoodIsDown = true;
     
     public static double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
 
@@ -46,15 +65,12 @@ public class RobotContainer {
             .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
             .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
     private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
-    private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
     private final SwerveRequest.RobotCentric forwardStraight = new SwerveRequest.RobotCentric()
             .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
-
     private final Telemetry logger = new Telemetry(MaxSpeed);
 
     private final static CommandXboxController JOYSTICK1_CONTROLLER = new CommandXboxController(0);
     private final static CommandXboxController JOYSTICK2_CONTROLLER = new CommandXboxController(1);
-    
     public final static CommandSwerveDrivetrain drivetrain = createDrivetrain();
     public static Pigeon2 gyro = new Pigeon2(RobotMap.PIGEON_ID);
 
@@ -80,10 +96,49 @@ public class RobotContainer {
         NamedCommands.registerCommand("IntakeOn", intake.startIntake());
         // NamedCommands.registerCommand("IntakeOff", intake.stopIntake());
 
-        autoChooser = AutoBuilder.buildAutoChooser("New Auto");
-        SmartDashboard.putData("Auto Mode", autoChooser);
+        autoChooser = new SendableChooser<>();
+        configureAutoChooser();
+        SmartDashboard.putData(AUTO_CHOOSER_KEY, autoChooser);
 
         configureBindings();
+    }
+
+    private void configureAutoChooser() {
+        List<String> autoNames = getAutoNamesFromDeploy();
+
+        if (autoNames.isEmpty()) {
+            autoChooser.setDefaultOption("Do Nothing", Commands.none());
+            DriverStation.reportWarning("No PathPlanner autos found in deploy/pathplanner/autos", false);
+            return;
+        }
+
+        String defaultAuto = autoNames.contains(DEFAULT_AUTO_NAME) ? DEFAULT_AUTO_NAME : autoNames.get(0);
+        autoChooser.setDefaultOption(defaultAuto, AutoBuilder.buildAuto(defaultAuto));
+
+        for (String autoName : autoNames) {
+            if (!autoName.equals(defaultAuto)) {
+                autoChooser.addOption(autoName, AutoBuilder.buildAuto(autoName));
+            }
+        }
+
+    }
+
+    private List<String> getAutoNamesFromDeploy() {
+        Path autoFolder = Filesystem.getDeployDirectory().toPath().resolve(PATHPLANNER_AUTO_FOLDER);
+        if (!Files.isDirectory(autoFolder)) {
+            return List.of();
+        }
+
+        try (var files = Files.list(autoFolder)) {
+            return files
+                .filter(path -> path.toString().endsWith(".auto"))
+                .map(path -> path.getFileName().toString().replaceFirst("\\.auto$", ""))
+                .sorted(Comparator.naturalOrder())
+                .collect(Collectors.toList());
+        } catch (IOException e) {
+            DriverStation.reportError("Failed to read PathPlanner autos: " + e.getMessage(), e.getStackTrace());
+            return List.of();
+        }
     }
 
     private void configureBindings() {
@@ -91,15 +146,43 @@ public class RobotContainer {
         // Note that X is defined as forward according to WPILib convention,
         // and Y is defined as to the left according to WPILib convention.
         drivetrain.setDefaultCommand(
-            // Drivetrain will execute this command periodically
-            //TODO: May be cause of sensitivity
             drivetrain.applyRequest(() ->
-                drive.withVelocityX(-JOYSTICK1_CONTROLLER.getLeftY() * MaxSpeed * getRobotSpeed()) // Drive forward with negative Y (forward)
-                    .withVelocityY(-JOYSTICK1_CONTROLLER.getLeftX() * MaxSpeed * getRobotSpeed()) // Drive left with negative X (left)
-                    .withRotationalRate(-JOYSTICK1_CONTROLLER.getRightX() * MaxAngularRate * getRobotYawSpeed()) // Drive counterclockwise with negative X (left)
+                drive.withVelocityX(-applyDriveDeadband(JOYSTICK1_CONTROLLER.getLeftY()) * MaxSpeed)
+                    .withVelocityY(-applyDriveDeadband(JOYSTICK1_CONTROLLER.getLeftX()) * MaxSpeed)
+                    .withRotationalRate(-applyDriveDeadband(JOYSTICK1_CONTROLLER.getRightX()) * MaxAngularRate)
             )
-        );
+        ); 
+        /*drivetrain.setDefaultCommand(
+            // Drivetrain will execute this command periodically
+            drivetrain.applyRequest(() -> {
+                double velocityX = -applyDriveDeadband(JOYSTICK1_CONTROLLER.getLeftY()) * MaxSpeed;
+                double velocityY = -applyDriveDeadband(JOYSTICK1_CONTROLLER.getLeftX()) * MaxSpeed;
+                double rotationalRate = -applyDriveDeadband(JOYSTICK1_CONTROLLER.getRightX()) * MaxAngularRate;
 
+                SmartDashboard.putBoolean("Driver Controller Connected", JOYSTICK1_CONTROLLER.getHID().isConnected());
+                SmartDashboard.putNumber("Driver Left Y", JOYSTICK1_CONTROLLER.getLeftY());
+                SmartDashboard.putNumber("Driver Left X", JOYSTICK1_CONTROLLER.getLeftX());
+                SmartDashboard.putNumber("Driver Right X", JOYSTICK1_CONTROLLER.getRightX());
+                SmartDashboard.putBoolean(
+                    "Driver Controller Active",
+                    Math.abs(velocityX) > 0.0 || Math.abs(velocityY) > 0.0 || Math.abs(rotationalRate) > 0.0
+                );
+
+                return drive.withVelocityX(velocityX)
+                    .withVelocityY(velocityY)
+                    .withRotationalRate(rotationalRate);
+            })
+        );*/
+
+        // new Trigger(this::isDriverControllerActive)
+        //     .onTrue(Commands.runOnce(() -> DriverStation.reportWarning("Driver joystick movement detected", false)));
+        // JOYSTICK1_CONTROLLER.leftBumper().onTrue(Commands.runOnce(SignalLogger::start));
+        // JOYSTICK1_CONTROLLER.leftBumper().onTrue(Commands.runOnce(SignalLogger::stop));
+
+        // JOYSTICK1_CONTROLLER.y().whileTrue(drivetrain.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+        // JOYSTICK1_CONTROLLER.a().whileTrue(drivetrain.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+        // JOYSTICK1_CONTROLLER.b().whileTrue(drivetrain.sysIdDynamic(SysIdRoutine.Direction.kForward));
+        // JOYSTICK1_CONTROLLER.x().whileTrue(drivetrain.sysIdDynamic(SysIdRoutine.Direction.kReverse));
         // Controller 1
         JOYSTICK1_CONTROLLER.x().whileTrue(drivetrain.applyRequest(() -> brake));
         // JOYSTICK1_CONTROLLER.b().whileTrue(drivetrain.applyRequest(() ->
@@ -119,10 +202,18 @@ public class RobotContainer {
             forwardStraight.withVelocityX(0).withVelocityY(0.5))
         );
         
-        JOYSTICK1_CONTROLLER.y().onTrue(Commands.sequence(climber.automaticClimberUp()));
-        JOYSTICK1_CONTROLLER.a().onTrue(Commands.sequence(climber.automaticClimberDown()));
-        
-        JOYSTICK1_CONTROLLER.rightBumper().onTrue(new StrafeToTag(drivetrain, 0.5));
+        JOYSTICK1_CONTROLLER.a().toggleOnTrue(createFullIntakeToShooterCommand());
+
+        JOYSTICK1_CONTROLLER.leftBumper().whileTrue(climber.manualClimberUp());
+        JOYSTICK1_CONTROLLER.rightBumper().whileTrue(climber.manualClimberDown());
+        // JOYSTICK1_CONTROLLER.leftBumper().whileTrue(climber.manualClimber(true)); // true = up, false = down
+        // JOYSTICK1_CONTROLLER.rightBumper().whileTrue(climber.manualClimber(false)); // true = up, false = down
+
+        // JOYSTICK1_CONTROLLER.leftTrigger().whileTrue(shooter.hoodUp());
+        // JOYSTICK1_CONTROLLER.rightTrigger().whileTrue(shooter.hoodDown());
+
+        // reset the field-centric heading on menu button press
+        JOYSTICK1_CONTROLLER.start().onTrue(new InstantCommand(()->drivetrain.seedFieldCentric()));
 
         JOYSTICK1_CONTROLLER.rightTrigger().onTrue(new RotateToTag(drivetrain, 0));
 
@@ -130,19 +221,51 @@ public class RobotContainer {
         JOYSTICK1_CONTROLLER.start().onTrue(new InstantCommand(()->drivetrain.seedFieldCentric()));
 
         //Controller 2
-        JOYSTICK2_CONTROLLER.rightTrigger().whileTrue(feeder.runFeeder());
+        // Indexer + Feeder + Shooter
+        JOYSTICK2_CONTROLLER.rightTrigger().whileTrue(Commands.waitSeconds(1).andThen(feeder.runFeeder()));
+        JOYSTICK2_CONTROLLER.rightTrigger().whileTrue(Commands.waitSeconds(1).andThen(indexer.indexerOn()));
+        JOYSTICK2_CONTROLLER.rightTrigger().whileTrue(shooter.shoot());
 
-        JOYSTICK2_CONTROLLER.leftTrigger().whileTrue(shooter.shoot());
+        // Feeder Reverse
+        JOYSTICK2_CONTROLLER.a().whileTrue(feeder.reverseFeeder());
 
-        JOYSTICK2_CONTROLLER.povUp().whileTrue(shooter.hoodUp());
+        // Hood Up-PPAD Up/Down-DPAD Down
+        // JOYSTICK2_CONTROLLER.povUp().whileTrue(shooter.hoodUp());
+        // JOYSTICK2_CONTROLLER.povDown().whileTrue(shooter.hoodDown());
 
-        JOYSTICK2_CONTROLLER.povDown().whileTrue(shooter.hoodDown());
+        // Intake + Indexer
+        JOYSTICK2_CONTROLLER.leftTrigger().whileTrue(intake.startIntake());
+        JOYSTICK2_CONTROLLER.leftTrigger().whileTrue(indexer.indexerOn());
 
-        JOYSTICK2_CONTROLLER.leftBumper().whileTrue(intake.startIntake());
+        // Shooter
+        JOYSTICK2_CONTROLLER.leftBumper().whileTrue(shooter.shoot());
 
+        // Feeder
+        JOYSTICK2_CONTROLLER.b().whileTrue(feeder.runFeeder());
+
+        // Intake
+        //JOYSTICK2_CONTROLLER.x().whileTrue(intake.startIntake());
+        JOYSTICK2_CONTROLLER.x().onTrue(new InstantCommand(()->shooter.cycleSpeed()));
+
+        // // Hood Auto
+        // JOYSTICK2_CONTROLLER.a().onTrue(
+        //     Commands.either(
+        //         shooter.hoodDown().andThen(Commands.runOnce(() -> hoodIsDown = true)),
+        //         shooter.hoodUp().andThen(Commands.runOnce(() -> hoodIsDown = false)),
+        //         () -> hoodIsDown
+        //     )
+        // );
+
+        // Indexer
         JOYSTICK2_CONTROLLER.y().whileTrue(indexer.indexerOn());
 
+        // Intake Pivot Up-DPAD Left/Down-DPAD Right
+        JOYSTICK2_CONTROLLER.povUp().whileTrue(intake.pivotDown().andThen(Commands.runOnce(() -> pivotIsUp = false)));
+        JOYSTICK2_CONTROLLER.povDown().whileTrue(intake.pivotUp().andThen(Commands.runOnce(() -> pivotIsUp = true)));
+
+        // Intake Auto Pivot
         JOYSTICK2_CONTROLLER.rightBumper().onTrue(
+
             Commands.either(
                 intake.setPivotDown().andThen(Commands.runOnce(() -> pivotIsUp = false)),
                 intake.setPivotUp().andThen(Commands.runOnce(() -> pivotIsUp = true)),
@@ -152,24 +275,30 @@ public class RobotContainer {
 
         drivetrain.registerTelemetry(logger::telemeterize);
     }
-    
-    
-    public static double getRobotSpeed() {
-        
-        return JOYSTICK1_CONTROLLER.getLeftTriggerAxis() >= 0.25 ? 0.1 : 1.0;
-    // return 0.7;
+    private static double applyDriveDeadband(double value) {
+        return MathUtil.applyDeadband(value, 0.1);
     }
 
-    public static double getRobotYawSpeed() {
-        
-        return JOYSTICK1_CONTROLLER.getLeftTriggerAxis() >= 0.25 ? 0.1 : 0.7*(1.0/0.9);
-    // return 0.7;
+   
+
+    private Command createFullIntakeToShooterCommand() {
+        return Commands.parallel(
+           // intake.routineIntakeOn(),
+            indexer.indexerOn(),
+            feeder.runFeeder(),
+            shooter.shoot()
+        );
     }
 
     public Command getAutonomousCommand() {
         /* Run the path selected from the auto chooser */
-        System.out.println(autoChooser.getSelected().getName());
-        return autoChooser.getSelected();
+        Command selected = autoChooser.getSelected();
+        if (selected == null) {
+            DriverStation.reportWarning("No autonomous selected; running no-op command.", false);
+            return Commands.none();
+        }
+        System.out.println(selected.getName());
+        return selected;
     }
 
     public static CommandSwerveDrivetrain createDrivetrain() {

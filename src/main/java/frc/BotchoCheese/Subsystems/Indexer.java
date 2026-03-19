@@ -1,9 +1,14 @@
 package frc.BotchoCheese.Subsystems;
 
 import com.ctre.phoenix6.hardware.TalonFX;
+
+import com.ctre.phoenix6.hardware.TalonFXS;
+import com.ctre.phoenix6.signals.MotorArrangementValue;
+
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.configs.TalonFXSConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -13,7 +18,7 @@ import frc.BotchoCheese.Constants.RobotMap; // Assuming your IDs are here
 
 public class Indexer extends SubsystemBase {
     // Motor controllers
-    private final TalonFX indexer;
+    private final TalonFXS indexer;
     //No sensor specified due to immense quantity of balls
 
     // Control requests (Phoenix 6 uses request objects instead of passing doubles directly)
@@ -24,10 +29,13 @@ public class Indexer extends SubsystemBase {
     
     public Indexer() {
         
-        indexer = new TalonFX(RobotMap.INDEXER_MOTOR_ID);
+        indexer = new TalonFXS(RobotMap.INDEXER_MOTOR_ID);
 
         // Apply basic configuration
-        TalonFXConfiguration config = new TalonFXConfiguration();
+
+        TalonFXSConfiguration config = new TalonFXSConfiguration();
+        config.Commutation.MotorArrangement = MotorArrangementValue.Minion_JST;
+
         
         // Verify
         CurrentLimitsConfigs currentLimits = new CurrentLimitsConfigs();
@@ -35,6 +43,7 @@ public class Indexer extends SubsystemBase {
         currentLimits.StatorCurrentLimitEnable = true;
         currentLimits.SupplyCurrentLimit = 30.0; 
         currentLimits.SupplyCurrentLimitEnable = true;
+        config.CurrentLimits = currentLimits;
         
         /* Set motors to Brake mode so the climber doesn't slide down */
         config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
