@@ -9,36 +9,6 @@
           "data": {
             "pathName": "Auto 4 Path 2 (MB, B)"
           }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "IntakeOn"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Auto 4 Path 3 (MB, B)"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "IntakeOff"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Auto 2 Path 4 (MB, B)"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Shoot"
-          }
         }
       ]
     }

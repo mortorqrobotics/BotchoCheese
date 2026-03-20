@@ -9,12 +9,6 @@
           "data": {
             "pathName": "Auto 3 Path (Bottom)"
           }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Climb"
-          }
         }
       ]
     }

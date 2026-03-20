@@ -22,12 +22,12 @@ public class Shooter extends SubsystemBase {
     private final TalonFX rightShooter;
 
     // Control requests (Phoenix 6 uses request objects instead of passing doubles directly)
-    private final MotionMagicVelocityVoltage shooterVelocityRequest = new MotionMagicVelocityVoltage(0);
+    private final DutyCycleOut shooter_output = new DutyCycleOut(0);
 
     private boolean shooterTurning = false;
 
     private static int buttonPresses = 0;
-    private double shooterSpeed = 90.0;
+    private double shooterSpeed = 0.5;
     
     public Shooter() {
         leftShooter = new TalonFX(RobotMap.LEFT_SHOOTER_MOTOR_ID);
@@ -35,7 +35,7 @@ public class Shooter extends SubsystemBase {
         rightShooter = new TalonFX(RobotMap.RIGHT_SHOOTER_MOTOR_ID);
 
         buttonPresses = 0;
-        shooterSpeed = 90.0;
+        shooterSpeed = 0.5;
 
         // Apply basic configuration
         TalonFXConfiguration config = new TalonFXConfiguration();
@@ -52,9 +52,9 @@ public class Shooter extends SubsystemBase {
         config.Slot0 = shooterSlot0;
         //https://v6.docs.ctr-electronics.com/en/stable/docs/api-reference/device-specific/talonfx/basic-pid-control.html
 
-        MotionMagicConfigs shooterMotionMagicConfigs = config.MotionMagic;
-        shooterMotionMagicConfigs.MotionMagicAcceleration = RobotMap.SHOOTER_ACCELERATION;
-        shooterMotionMagicConfigs.MotionMagicJerk = RobotMap.SHOOTER_JERK;
+        // MotionMagicConfigs shooterMotionMagicConfigs = config.MotionMagic;
+        // shooterMotionMagicConfigs.MotionMagicAcceleration = RobotMap.SHOOTER_ACCELERATION;
+        // shooterMotionMagicConfigs.MotionMagicJerk = RobotMap.SHOOTER_JERK;
         
         // Verify
         CurrentLimitsConfigs currentLimits = new CurrentLimitsConfigs();
@@ -130,9 +130,9 @@ public class Shooter extends SubsystemBase {
         return this.startEnd(
             // When command starts/runs:
             () -> {
-                leftShooter.setControl(shooterVelocityRequest.withVelocity(shooterSpeed));
-                middleShooter.setControl(shooterVelocityRequest.withVelocity(shooterSpeed));
-                rightShooter.setControl(shooterVelocityRequest.withVelocity(shooterSpeed));
+                leftShooter.setControl(shooter_output.withOutput(shooterSpeed));
+                middleShooter.setControl(shooter_output.withOutput(shooterSpeed));
+                rightShooter.setControl(shooter_output.withOutput(shooterSpeed));
             },
             // When command ends:
             () -> {
@@ -161,34 +161,34 @@ public class Shooter extends SubsystemBase {
         //Short
        if(distance <= RobotMap.SHORT_DISTANCE_THRESHOLD) {
             //RobotMap.SHOOTER_SPEED = 0.25; 
-            shooterSpeed = RobotMap.SHOOTER_TARGET_RPS_1;
+            shooterSpeed = RobotMap.SHOOTER_SPEED_1;
        }
        //Medium
        else if(distance > RobotMap.SHORT_DISTANCE_THRESHOLD && distance <= RobotMap.MEDIUM_DISTANCE_THRESHOLD) {
             //RobotMap.SHOOTER_SPEED = 0.5; 
-            shooterSpeed = RobotMap.SHOOTER_TARGET_RPS_2;
+            shooterSpeed = RobotMap.SHOOTER_SPEED_2;
        }
        //Long/Regular
        else {
             //RobotMap.SHOOTER_SPEED = 0.75;
-            shooterSpeed = RobotMap.SHOOTER_TARGET_RPS_3;
+            shooterSpeed = RobotMap.SHOOTER_SPEED_3;
        }
     }
 
     public void cycleSpeed() {
         if(buttonPresses == 0) {
             //Set to speed 1
-            shooterSpeed = RobotMap.SHOOTER_TARGET_RPS_1;
+            shooterSpeed = RobotMap.SHOOTER_SPEED_1;
             buttonPresses = 1;
         }
         else if(buttonPresses == 1) {
             //Set to speed 2
-            shooterSpeed = RobotMap.SHOOTER_TARGET_RPS_2;
+            shooterSpeed = RobotMap.SHOOTER_SPEED_2;
             buttonPresses = 2;
         }
         else if(buttonPresses == 2) {
             //Set to speed 3
-            shooterSpeed = RobotMap.SHOOTER_TARGET_RPS_3;
+            shooterSpeed = RobotMap.SHOOTER_SPEED_3;
             buttonPresses = 0;
         }
     }
@@ -223,5 +223,6 @@ public class Shooter extends SubsystemBase {
         
         SmartDashboard.putNumber("Shooter Battery Draw", leftShooter.getSupplyCurrent().getValueAsDouble());
         SmartDashboard.putNumber("Shooter Motor Draw", leftShooter.getStatorCurrent().getValueAsDouble());
+        SmartDashboard.putNumber("Shooter Mode", buttonPresses);
     } 
 }

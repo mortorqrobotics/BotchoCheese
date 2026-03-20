@@ -5,9 +5,22 @@
     "data": {
       "commands": [
         {
-          "type": "path",
+          "type": "parallel",
           "data": {
-            "pathName": "Auto 8 Path 1 (B)"
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "Auto 8 Path 1 (B)"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "PivotDown"
+                }
+              }
+            ]
           }
         },
         {

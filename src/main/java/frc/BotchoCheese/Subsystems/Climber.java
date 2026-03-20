@@ -17,9 +17,6 @@ public class Climber extends SubsystemBase {
     private final TalonFX lClimber;
     private final TalonFX rClimber;
 
-    // Limit switches
-    private final CANcoder encoder;
-
     // Control requests (Phoenix 6 uses request objects instead of passing doubles directly)
     private final DutyCycleOut m_output = new DutyCycleOut(0);
 
@@ -28,7 +25,6 @@ public class Climber extends SubsystemBase {
     public Climber() {
         lClimber = new TalonFX(RobotMap.LEFT_CLIMBER_MOTOR_ID);
         rClimber = new TalonFX(RobotMap.RIGHT_CLIMBER_MOTOR_ID);
-        encoder = new CANcoder(RobotMap.ENCODER_ID);
 
         // Apply basic configuration
         TalonFXConfiguration config = new TalonFXConfiguration();
@@ -55,19 +51,19 @@ public class Climber extends SubsystemBase {
     //     return position >= RobotMap.CLIMBER_EXTENSION_LIMIT || position <= 0.0;
     // }
     public boolean atUpperLimit() {
-        return encoder.getAbsolutePosition().getValueAsDouble() >= RobotMap.CLIMBER_EXTENSION_LIMIT;
+        return lClimber.getPosition().getValueAsDouble() >= RobotMap.CLIMBER_EXTENSION_LIMIT;
     }
 
     public boolean atLowerLimit() {
-        return encoder.getAbsolutePosition().getValueAsDouble() <= 0.0;
+        return lClimber.getPosition().getValueAsDouble() <= 0.0;
     }
 
     // Commands to move the climber.
     public Command manualClimberUp() {
         return this.run(() -> {
             if(!atUpperLimit()) {
-                lClimber.setControl(m_output.withOutput(RobotMap.TEST_MOTOR_LEFT_UP_SPEED));
-                rClimber.setControl(m_output.withOutput(RobotMap.TEST_MOTOR_RIGHT_UP_SPEED));
+                lClimber.setControl(m_output.withOutput(RobotMap.CLIMBER_UP_SPEED));
+                rClimber.setControl(m_output.withOutput(RobotMap.CLIMBER_UP_SPEED));
                 goingUp = true;
             }
         }).finallyDo(() -> stopMotors());
@@ -76,8 +72,8 @@ public class Climber extends SubsystemBase {
     public Command manualClimberDown() {
         return this.run(() -> {
             if(!atLowerLimit()) {
-                lClimber.setControl(m_output.withOutput(RobotMap.TEST_MOTOR_LEFT_UP_SPEED));
-                rClimber.setControl(m_output.withOutput(RobotMap.TEST_MOTOR_RIGHT_DOWN_SPEED));
+                lClimber.setControl(m_output.withOutput(RobotMap.CLIMBER_UP_SPEED));
+                rClimber.setControl(m_output.withOutput(RobotMap.CLIMBER_DOWN_SPEED));
                 goingUp = false;
             }
         }).finallyDo(() -> stopMotors());
@@ -106,16 +102,16 @@ public class Climber extends SubsystemBase {
 
     public Command automaticClimberUp(){
         return this.run(() -> {
-            lClimber.setControl(m_output.withOutput(RobotMap.TEST_MOTOR_LEFT_UP_SPEED));
-            rClimber.setControl(m_output.withOutput(RobotMap.TEST_MOTOR_RIGHT_UP_SPEED));
+            lClimber.setControl(m_output.withOutput(RobotMap.CLIMBER_UP_SPEED));
+            rClimber.setControl(m_output.withOutput(RobotMap.CLIMBER_UP_SPEED));
             goingUp = false;
         }).until(this::atUpperLimit).finallyDo(() -> stopMotors());
     }
 
     public Command automaticClimberDown(){
         return this.run(() -> {
-            lClimber.setControl(m_output.withOutput(RobotMap.TEST_MOTOR_LEFT_DOWN_SPEED));
-            rClimber.setControl(m_output.withOutput(RobotMap.TEST_MOTOR_RIGHT_DOWN_SPEED));
+            lClimber.setControl(m_output.withOutput(RobotMap.CLIMBER_DOWN_SPEED));
+            rClimber.setControl(m_output.withOutput(RobotMap.CLIMBER_DOWN_SPEED));
             goingUp = false;
         }).until(this::atLowerLimit).finallyDo(() -> stopMotors());
     }
