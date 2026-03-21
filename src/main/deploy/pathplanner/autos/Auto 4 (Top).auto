@@ -9,42 +9,6 @@
           "data": {
             "pathName": "Auto 4 Path 2 (MT, T)"
           }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "IntakeOn"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Auto 4 Path 3 (MT, T)"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "IntakeOff"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Auto 4 Path 4 (MT, T)"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Auto 4 Path 5 (MT, T)"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Shoot"
-          }
         }
       ]
     }

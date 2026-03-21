@@ -18,6 +18,7 @@ import com.pathplanner.lib.auto.NamedCommands;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.security.Timestamp;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -36,7 +37,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.BotchoCheese.Commands.RotateToTag;
 import frc.BotchoCheese.Subsystems.Shooter;
-import frc.BotchoCheese.Subsystems.Climber;
+//import frc.BotchoCheese.Subsystems.Climber;
 import frc.BotchoCheese.Subsystems.Intake;
 import frc.BotchoCheese.Subsystems.Indexer;
 import frc.BotchoCheese.Commands.StrafeToTag;
@@ -80,7 +81,7 @@ public class RobotContainer {
     // Initializing the Feeder subsystem
     public final Feeder feeder = new Feeder();
 
-    public final Climber climber = new Climber();
+   // public final Climber climber = new Climber();
 
     public final Intake intake = new Intake();
 
@@ -91,9 +92,11 @@ public class RobotContainer {
 
     public RobotContainer() {
         
-        NamedCommands.registerCommand("Shoot", shooter.shoot());
-        NamedCommands.registerCommand("Climb", climber.automaticClimberUp());
-        NamedCommands.registerCommand("IntakeOn", intake.startIntake());
+        NamedCommands.registerCommand("Shoot", Commands.parallel(shooter.shoot(), feeder.runFeeder(), indexer.indexerOn()).withTimeout(6));
+        //NamedCommands.registerCommand("Climb", climber.automaticClimberUp());
+        // NamedCommands.registerCommand("IntakeOn", intake.startIntake());
+        NamedCommands.registerCommand("PivotDown", intake.pivotDown().withTimeout(5));
+        // NamedCommands.registerCommand("IntakeOn", intake.startIntake());
         // NamedCommands.registerCommand("IntakeOff", intake.stopIntake());
 
         autoChooser = new SendableChooser<>();
@@ -204,8 +207,8 @@ public class RobotContainer {
         
         JOYSTICK1_CONTROLLER.a().toggleOnTrue(createFullIntakeToShooterCommand());
 
-        JOYSTICK1_CONTROLLER.leftBumper().whileTrue(climber.manualClimberUp());
-        JOYSTICK1_CONTROLLER.rightBumper().whileTrue(climber.manualClimberDown());
+        //JOYSTICK1_CONTROLLER.leftBumper().whileTrue(climber.manualClimberUp());
+       // JOYSTICK1_CONTROLLER.rightBumper().whileTrue(climber.manualClimberDown());
         // JOYSTICK1_CONTROLLER.leftBumper().whileTrue(climber.manualClimber(true)); // true = up, false = down
         // JOYSTICK1_CONTROLLER.rightBumper().whileTrue(climber.manualClimber(false)); // true = up, false = down
 
@@ -228,6 +231,7 @@ public class RobotContainer {
 
         // Feeder Reverse
         JOYSTICK2_CONTROLLER.a().whileTrue(feeder.reverseFeeder());
+        JOYSTICK2_CONTROLLER.a().whileTrue(indexer.reverseIndexer());
 
         // Hood Up-PPAD Up/Down-DPAD Down
         // JOYSTICK2_CONTROLLER.povUp().whileTrue(shooter.hoodUp());
@@ -236,6 +240,7 @@ public class RobotContainer {
         // Intake + Indexer
         JOYSTICK2_CONTROLLER.leftTrigger().whileTrue(intake.startIntake());
         JOYSTICK2_CONTROLLER.leftTrigger().whileTrue(indexer.indexerOn());
+        JOYSTICK2_CONTROLLER.leftTrigger().whileTrue(feeder.reverseFeeder());
 
         // Shooter
         JOYSTICK2_CONTROLLER.leftBumper().whileTrue(shooter.shoot());

@@ -5,22 +5,9 @@
     "data": {
       "commands": [
         {
-          "type": "parallel",
+          "type": "path",
           "data": {
-            "commands": [
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "Auto 8 Path 1 (B)"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "PivotDown"
-                }
-              }
-            ]
+            "pathName": "Red Auto 8 Path 1 (T)"
           }
         },
         {
@@ -32,7 +19,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Auto 8 Path 2 (M, B)"
+            "pathName": "Red Auto 8 Path 2 (M, B)"
           }
         },
         {
@@ -44,7 +31,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Auto 8 Path 3 (M, B)"
+            "pathName": "Red Auto 8 Path 3 (M, T)"
           }
         },
         {

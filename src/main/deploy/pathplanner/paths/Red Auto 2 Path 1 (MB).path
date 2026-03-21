@@ -1,0 +1,54 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 13.191872037914694,
+        "y": 4.07798578199052
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 13.824610980550458,
+        "y": 3.3228893664228596
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 14.97578199052133,
+        "y": 2.0361611374407573
+      },
+      "prevControl": {
+        "x": 14.75060024309787,
+        "y": 2.3027567903352306
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": null
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 1.5,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": -37.44460155431782
+  },
+  "reversed": false,
+  "folder": "Auto 2; Shoot and Intake",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 180.0
+  },
+  "useDefaultConstraints": false
+}

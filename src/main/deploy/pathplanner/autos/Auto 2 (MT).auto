@@ -21,30 +21,6 @@
           "data": {
             "pathName": "Auto 2 Path 2 (MT, T)"
           }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "IntakeOn"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Auto 2 Path 3 (MT, T)"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "IntakeOff"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Auto 2 Path 4 (MT, T)"
-          }
         }
       ]
     }

@@ -5,22 +5,9 @@
     "data": {
       "commands": [
         {
-          "type": "parallel",
+          "type": "path",
           "data": {
-            "commands": [
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "Auto 8 Path 1 (B)"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "PivotDown"
-                }
-              }
-            ]
+            "pathName": "Red Auto 2 Path 1 (MT)"
           }
         },
         {
@@ -32,31 +19,37 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Auto 8 Path 2 (M, B)"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 5.0
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Auto 8 Path 3 (M, B)"
+            "pathName": "Bump Red Auto 2 Path 2 (MT, T)"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "Shoot"
+            "name": "IntakeOn"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Red Auto 2 Path 3 (MT, T)"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "IntakeOff"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Bump Red Auto 2 Path 4 (MT, T)"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": "Autos 8",
+  "folder": "Autos 2",
   "choreoAuto": false
 }
