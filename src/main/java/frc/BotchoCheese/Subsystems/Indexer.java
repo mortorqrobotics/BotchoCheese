@@ -60,7 +60,7 @@ public class Indexer extends SubsystemBase {
 
     public Command reverseIndexer() {
         return this.run(() -> {
-            indexer.setControl(m_output.withOutput(-RobotMap.INDEXER_MOTOR_SPEED));
+            indexer.setControl(m_output.withOutput(-RobotMap.INDEXER_MOTOR_SPEED*0.5));
             isOn = true;
         }).finallyDo(() -> stopMotors());
     }

@@ -8,20 +8,18 @@ import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 
-import com.ctre.phoenix6.SignalLogger;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import com.ctre.phoenix6.hardware.Pigeon2;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
-
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.security.Timestamp;
-import java.util.Comparator;
-import java.util.List;
-import java.util.stream.Collectors;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.VecBuilder;
@@ -34,19 +32,15 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.BotchoCheese.Commands.RotateToTag;
-import frc.BotchoCheese.Subsystems.Shooter;
+import frc.BotchoCheese.Constants.RobotMap;
+import frc.BotchoCheese.Constants.TunerConstants;
+import frc.BotchoCheese.Subsystems.CommandSwerveDrivetrain;
+import frc.BotchoCheese.Subsystems.Feeder;
+import frc.BotchoCheese.Subsystems.Indexer;
 //import frc.BotchoCheese.Subsystems.Climber;
 import frc.BotchoCheese.Subsystems.Intake;
-import frc.BotchoCheese.Subsystems.Indexer;
-import frc.BotchoCheese.Commands.StrafeToTag;
-import frc.BotchoCheese.Subsystems.CommandSwerveDrivetrain;
-import frc.BotchoCheese.Constants.TunerConstants;
-import frc.BotchoCheese.Constants.RobotMap;
-import frc.BotchoCheese.Subsystems.Feeder;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
+import frc.BotchoCheese.Subsystems.Shooter;
 
 
 public class RobotContainer {
@@ -228,9 +222,8 @@ public class RobotContainer {
 
         //Controller 2
         // Indexer + Feeder + Shooter
-        JOYSTICK2_CONTROLLER.rightTrigger().whileTrue(Commands.waitSeconds(1).andThen(feeder.runFeeder()));
-        JOYSTICK2_CONTROLLER.rightTrigger().whileTrue(Commands.waitSeconds(1).andThen(indexer.indexerOn()));
-        JOYSTICK2_CONTROLLER.rightTrigger().whileTrue(shooter.shoot());
+        JOYSTICK2_CONTROLLER.rightTrigger().whileTrue(feeder.runFeeder());
+        JOYSTICK2_CONTROLLER.rightTrigger().whileTrue(indexer.indexerOn());
 
 
         // Feeder Reverse
@@ -259,7 +252,7 @@ public class RobotContainer {
 
         // Intake
         //JOYSTICK2_CONTROLLER.x().whileTrue(intake.startIntake());
-        JOYSTICK2_CONTROLLER.x().onTrue(new InstantCommand(()->shooter.cycleSpeed()));
+        //JOYSTICK2_CONTROLLER.x().onTrue(new InstantCommand(()->shooter.cycleSpeed()));
 
         // // Hood Auto
         // JOYSTICK2_CONTROLLER.a().onTrue(
@@ -278,15 +271,9 @@ public class RobotContainer {
         JOYSTICK2_CONTROLLER.povDown().whileTrue(intake.pivotUp().andThen(Commands.runOnce(() -> pivotIsUp = true)));
 
         // Intake Auto Pivot
-        JOYSTICK2_CONTROLLER.rightBumper().onTrue(
-
-            Commands.either(
-                intake.setPivotDown().andThen(Commands.runOnce(() -> pivotIsUp = false)),
-                intake.setPivotUp().andThen(Commands.runOnce(() -> pivotIsUp = true)),
-                () -> pivotIsUp
-            )
-        );
-
+        JOYSTICK2_CONTROLLER.rightBumper().whileTrue(intake.startIntake());
+        JOYSTICK2_CONTROLLER.rightBumper().whileTrue(indexer.reverseIndexer());
+        JOYSTICK2_CONTROLLER.rightBumper().whileTrue(feeder.reverseFeeder());
         drivetrain.registerTelemetry(logger::telemeterize);
     }
     private static double applyDriveDeadband(double value) {
