@@ -39,21 +39,21 @@ public class RobotMap {
 
     // Climber
     // Climber motor IDs
-    public static final int LEFT_CLIMBER_MOTOR_ID = 27;
-    public static final int RIGHT_CLIMBER_MOTOR_ID = 28;
+    // public static final int LEFT_CLIMBER_MOTOR_ID = 27;
+    // public static final int RIGHT_CLIMBER_MOTOR_ID = 28;
 
-    // Climber PID Values
-    // TODO
-    public static final double CLIMBER_P_VALUE = 0.3;
-    public static final double CLIMBER_I_VALUE = 0.25;
-    public static final double CLIMBER_D_VALUE = 0.4;
+    // // Climber PID Values
+    // // TODO
+    // public static final double CLIMBER_P_VALUE = 0.3;
+    // public static final double CLIMBER_I_VALUE = 0.25;
+    // public static final double CLIMBER_D_VALUE = 0.4;
 
-    // Climber speeds
-    public static final double CLIMBER_UP_SPEED = -0.6;
-    public static final double CLIMBER_DOWN_SPEED = 0.6;
+    // // Climber speeds
+    // public static final double CLIMBER_UP_SPEED = -0.6;
+    // public static final double CLIMBER_DOWN_SPEED = 0.6;
 
-    // TODO: Comfirm the new Climber Extension Limit
-    public static final double CLIMBER_EXTENSION_LIMIT = 200; 
+    // // TODO: Comfirm the new Climber Extension Limit
+    // public static final double CLIMBER_EXTENSION_LIMIT = 200; 
     
     // Intake motor IDs
     public static final int INTAKE_MOTOR_ID = 22;
@@ -65,7 +65,7 @@ public class RobotMap {
     // TODO Edit values
     public static final double PIVOT_UP_POSITION = 0;
     public static final double PIVOT_DOWN_POSITION = 17.2;
-    
+
     public static final double PIVOT_CURRENT_STALL_THRESHOLD = 4.0;
 
     // Intake PID Values

@@ -37,7 +37,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.BotchoCheese.Commands.RotateToTag;
 import frc.BotchoCheese.Subsystems.Shooter;
-import frc.BotchoCheese.Subsystems.Climber;
+//import frc.BotchoCheese.Subsystems.Climber;
 import frc.BotchoCheese.Subsystems.Intake;
 import frc.BotchoCheese.Subsystems.Indexer;
 import frc.BotchoCheese.Commands.StrafeToTag;
@@ -81,7 +81,7 @@ public class RobotContainer {
     // Initializing the Feeder subsystem
     public final Feeder feeder = new Feeder();
 
-    public final Climber climber = new Climber();
+   // public final Climber climber = new Climber();
 
     public final Intake intake = new Intake();
 
@@ -207,8 +207,8 @@ public class RobotContainer {
         
         JOYSTICK1_CONTROLLER.a().toggleOnTrue(createFullIntakeToShooterCommand());
 
-        JOYSTICK1_CONTROLLER.leftBumper().whileTrue(climber.manualClimberUp());
-        JOYSTICK1_CONTROLLER.rightBumper().whileTrue(climber.manualClimberDown());
+        //JOYSTICK1_CONTROLLER.leftBumper().whileTrue(climber.manualClimberUp());
+       // JOYSTICK1_CONTROLLER.rightBumper().whileTrue(climber.manualClimberDown());
         // JOYSTICK1_CONTROLLER.leftBumper().whileTrue(climber.manualClimber(true)); // true = up, false = down
         // JOYSTICK1_CONTROLLER.rightBumper().whileTrue(climber.manualClimber(false)); // true = up, false = down
 
