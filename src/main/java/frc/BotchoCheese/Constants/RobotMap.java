@@ -85,9 +85,9 @@ public class RobotMap {
 
     // Intake Motion Magic Values
 
-    public static final double PIVOT_CRUISE_VELOCITY = 5; // Target cruise velocity of 20 rps
-    public static final double PIVOT_ACCELERATION = 5; // Target acceleration of 20 rps^2 (1 seconds)
-    public static final double PIVOT_JERK = 50; // Target jerk
+    public static final double PIVOT_CRUISE_VELOCITY = 10; // Target cruise velocity of 20 rps
+    public static final double PIVOT_ACCELERATION = 10; // Target acceleration of 20 rps^2 (1 seconds)
+    public static final double PIVOT_JERK = 100; // Target jerk
 
     // Intake speeds
     // Verify if values are correct and go in the right directions

@@ -92,12 +92,15 @@ public class RobotContainer {
 
     public RobotContainer() {
         
-        NamedCommands.registerCommand("Shoot", Commands.parallel(shooter.shoot(), feeder.runFeeder(), indexer.indexerOn()).withTimeout(6));
-        //NamedCommands.registerCommand("Climb", climber.automaticClimberUp());
-        // NamedCommands.registerCommand("IntakeOn", intake.startIntake());
+        NamedCommands.registerCommand("Shoot", 
+            Commands.sequence(
+                Commands.parallel(feeder.reverseFeeder(), indexer.reverseIndexer().withTimeout(1))).andThen(Commands.parallel(shooter.shoot(), feeder.runFeeder(), indexer.indexerOn().withTimeout(6))                
+            )
+        );
         NamedCommands.registerCommand("PivotDown", intake.pivotDown().withTimeout(5));
-        // NamedCommands.registerCommand("IntakeOn", intake.startIntake());
-        // NamedCommands.registerCommand("IntakeOff", intake.stopIntake());
+        NamedCommands.registerCommand("PivotUp", intake.pivotUp().withTimeout(3));
+        NamedCommands.registerCommand("IntakeOn", intake.startIntake());
+        NamedCommands.registerCommand("IntakeOff", new InstantCommand(()->intake.stopIntake()));
 
         autoChooser = new SendableChooser<>();
         configureAutoChooser();
@@ -229,6 +232,7 @@ public class RobotContainer {
         JOYSTICK2_CONTROLLER.rightTrigger().whileTrue(Commands.waitSeconds(1).andThen(indexer.indexerOn()));
         JOYSTICK2_CONTROLLER.rightTrigger().whileTrue(shooter.shoot());
 
+
         // Feeder Reverse
         JOYSTICK2_CONTROLLER.a().whileTrue(feeder.reverseFeeder());
         JOYSTICK2_CONTROLLER.a().whileTrue(indexer.reverseIndexer());
@@ -241,6 +245,11 @@ public class RobotContainer {
         JOYSTICK2_CONTROLLER.leftTrigger().whileTrue(intake.startIntake());
         JOYSTICK2_CONTROLLER.leftTrigger().whileTrue(indexer.indexerOn());
         JOYSTICK2_CONTROLLER.leftTrigger().whileTrue(feeder.reverseFeeder());
+
+        //Outtake
+        JOYSTICK2_CONTROLLER.povLeft().whileTrue(feeder.reverseFeeder());
+        JOYSTICK2_CONTROLLER.povLeft().whileTrue(indexer.reverseIndexer());
+        JOYSTICK2_CONTROLLER.povLeft().whileTrue(intake.intakeOut());
 
         // Shooter
         JOYSTICK2_CONTROLLER.leftBumper().whileTrue(shooter.shoot());
