@@ -27,7 +27,7 @@ public class Shooter extends SubsystemBase {
     private boolean shooterTurning = false;
 
     private static int buttonPresses = 0;
-    private double shooterSpeed = 0.87;
+    private double shooterSpeed = 0.77;
     
     public Shooter() {
         leftShooter = new TalonFX(RobotMap.LEFT_SHOOTER_MOTOR_ID);
@@ -35,7 +35,7 @@ public class Shooter extends SubsystemBase {
         rightShooter = new TalonFX(RobotMap.RIGHT_SHOOTER_MOTOR_ID);
 
         buttonPresses = 0;
-        shooterSpeed = 0.87;
+        shooterSpeed = 0.77;
 
         // Apply basic configuration
         TalonFXConfiguration config = new TalonFXConfiguration();
@@ -140,6 +140,23 @@ public class Shooter extends SubsystemBase {
             }
         );
     }
+
+    public Command reverseShoot() {
+        // We use startEnd so it automatically stops motors when the command finishes (button release)
+        return this.startEnd(
+            // When command starts/runs:
+            () -> {
+                leftShooter.setControl(shooter_output.withOutput(-shooterSpeed));
+                middleShooter.setControl(shooter_output.withOutput(-shooterSpeed));
+                rightShooter.setControl(shooter_output.withOutput(-shooterSpeed));
+            },
+            // When command ends:
+            () -> {
+                stopMotors();
+            }
+        );
+    }
+
 
     public void stopMotors() {
         leftShooter.stopMotor();

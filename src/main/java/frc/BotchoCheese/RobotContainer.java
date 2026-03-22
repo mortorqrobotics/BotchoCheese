@@ -88,11 +88,11 @@ public class RobotContainer {
         
         NamedCommands.registerCommand("Shoot", 
             Commands.sequence(
-                Commands.parallel(feeder.reverseFeeder(), indexer.reverseIndexer().withTimeout(1))).andThen(Commands.parallel(shooter.shoot(), feeder.runFeeder(), indexer.indexerOn().withTimeout(6))                
+                Commands.parallel(feeder.reverseFeeder().withTimeout(0.5), indexer.reverseIndexer().withTimeout(0.25), shooter.shoot().withTimeout(0.5), intake.startIntake().withTimeout(0.5))).andThen(Commands.parallel(shooter.shoot().withTimeout(2), feeder.runFeeder().withTimeout(2), indexer.indexerOn().withTimeout(2), intake.startIntake().withTimeout(2))                
             )
         );
-        NamedCommands.registerCommand("PivotDown", intake.pivotDown().withTimeout(5));
-        NamedCommands.registerCommand("PivotUp", intake.pivotUp().withTimeout(3));
+        NamedCommands.registerCommand("PivotDown", intake.pivotDown().withTimeout(1.5).andThen(intake.startIntake().withTimeout(1.5)));
+        // NamedCommands.registerCommand("PivotUp", intake.pivotDown().withTimeout(3));
         NamedCommands.registerCommand("IntakeOn", intake.startIntake());
         NamedCommands.registerCommand("IntakeOff", new InstantCommand(()->intake.stopIntake()));
 
@@ -248,11 +248,11 @@ public class RobotContainer {
         JOYSTICK2_CONTROLLER.leftBumper().whileTrue(shooter.shoot());
 
         // Feeder
-        JOYSTICK2_CONTROLLER.b().whileTrue(feeder.runFeeder());
+        JOYSTICK2_CONTROLLER.b().whileTrue(shooter.reverseShoot());
 
         // Intake
         //JOYSTICK2_CONTROLLER.x().whileTrue(intake.startIntake());
-        //JOYSTICK2_CONTROLLER.x().onTrue(new InstantCommand(()->shooter.cycleSpeed()));
+        JOYSTICK2_CONTROLLER.x().onTrue(new InstantCommand(()->shooter.cycleSpeed()));
 
         // // Hood Auto
         // JOYSTICK2_CONTROLLER.a().onTrue(
@@ -267,14 +267,13 @@ public class RobotContainer {
         JOYSTICK2_CONTROLLER.y().whileTrue(indexer.indexerOn());
 
         // Intake Pivot Up-DPAD Left/Down-DPAD Right
-        JOYSTICK2_CONTROLLER.povUp().whileTrue(intake.pivotDown().andThen(Commands.runOnce(() -> pivotIsUp = false)));
-        JOYSTICK2_CONTROLLER.povDown().whileTrue(intake.pivotUp().andThen(Commands.runOnce(() -> pivotIsUp = true)));
+        JOYSTICK2_CONTROLLER.povUp().whileTrue(intake.pivotUp().andThen(Commands.runOnce(() -> pivotIsUp = false)));
+        JOYSTICK2_CONTROLLER.povDown().whileTrue(intake.pivotDown().andThen(Commands.runOnce(() -> pivotIsUp = true)));
 
         // Intake Auto Pivot
         JOYSTICK2_CONTROLLER.rightBumper().whileTrue(intake.startIntake());
         JOYSTICK2_CONTROLLER.rightBumper().whileTrue(indexer.reverseIndexer());
         JOYSTICK2_CONTROLLER.rightBumper().whileTrue(feeder.reverseFeeder());
-        drivetrain.registerTelemetry(logger::telemeterize);
     }
     private static double applyDriveDeadband(double value) {
         return MathUtil.applyDeadband(value, 0.1);

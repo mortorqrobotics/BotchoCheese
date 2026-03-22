@@ -90,7 +90,7 @@ public class Feeder extends SubsystemBase {
      */
     public Command reverseFeeder() {
         return this.run(() -> {
-            feederLMotor.setControl(m_output.withOutput(-RobotMap.FEEDER_SPEED*0.35));
+            feederLMotor.setControl(m_output.withOutput(-RobotMap.FEEDER_SPEED*0.1));
         }).finallyDo((interrupted) -> stopMotor());
     }
 

@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 15.828333333333333,
-        "y": 7.41334595959596
+        "x": 16.25,
+        "y": 7.38
       },
       "prevControl": null,
       "nextControl": {
-        "x": 15.438964646464644,
-        "y": 6.840744949494949
+        "x": 16.25,
+        "y": 7.38
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 15.03814393939394,
-        "y": 6.062007575757576
+        "x": 14.144,
+        "y": 4.001
       },
       "prevControl": {
-        "x": 15.69090909090909,
-        "y": 6.691868686868687
+        "x": 14.144,
+        "y": 4.001
       },
       "nextControl": null,
       "isLocked": false,
@@ -42,13 +42,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 38.04704253182616
+    "rotation": 0
   },
   "reversed": false,
   "folder": "Auto 8 Shoot Outpost Shoot (SOS)",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": -90.0
   },
   "useDefaultConstraints": true
 }
