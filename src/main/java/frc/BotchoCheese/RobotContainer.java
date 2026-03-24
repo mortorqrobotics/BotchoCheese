@@ -31,6 +31,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.BotchoCheese.Commands.RotateToTag;
 import frc.BotchoCheese.Constants.RobotMap;
@@ -202,7 +203,7 @@ public class RobotContainer {
             forwardStraight.withVelocityX(0).withVelocityY(0.5))
         );
         
-        JOYSTICK1_CONTROLLER.a().toggleOnTrue(createFullIntakeToShooterCommand());
+       // JOYSTICK1_CONTROLLER.a().toggleOnTrue(createFullIntakeToShooterCommand());
 
         //JOYSTICK1_CONTROLLER.leftBumper().whileTrue(climber.manualClimberUp());
        // JOYSTICK1_CONTROLLER.rightBumper().whileTrue(climber.manualClimberDown());
@@ -215,15 +216,16 @@ public class RobotContainer {
         // reset the field-centric heading on menu button press
         JOYSTICK1_CONTROLLER.start().onTrue(new InstantCommand(()->drivetrain.seedFieldCentric()));
 
-        JOYSTICK1_CONTROLLER.rightTrigger().onTrue(new RotateToTag(drivetrain, 0));
+        //JOYSTICK1_CONTROLLER.rightTrigger().onTrue(new RotateToTag(drivetrain, 0));
 
         // reset the field-centric heading on menu button press
-        JOYSTICK1_CONTROLLER.start().onTrue(new InstantCommand(()->drivetrain.seedFieldCentric()));
+        //JOYSTICK1_CONTROLLER.start().onTrue(new InstantCommand(()->drivetrain.seedFieldCentric()));
 
         //Controller 2
         // Indexer + Feeder + Shooter
         JOYSTICK2_CONTROLLER.rightTrigger().whileTrue(feeder.runFeeder());
         JOYSTICK2_CONTROLLER.rightTrigger().whileTrue(indexer.indexerOn());
+        JOYSTICK2_CONTROLLER.rightTrigger().whileTrue(intake.startIntake());
 
 
         // Feeder Reverse
@@ -264,13 +266,30 @@ public class RobotContainer {
         // );
 
         // Indexer
-        JOYSTICK2_CONTROLLER.y().whileTrue(indexer.indexerOn());
+        // JOYSTICK2_CONTROLLER.y().whileTrue(indexer.indexerOn());
+        JOYSTICK2_CONTROLLER.y().whileTrue(Commands.parallel(shooter.shoot(), intake.startIntake()));
+        JOYSTICK2_CONTROLLER.y().whileTrue(
+            Commands.parallel(
+                feeder.reverseFeeder().withTimeout(1), 
+                indexer.reverseIndexer().withTimeout(1)
+            ).andThen(
+                Commands.parallel(
+                    feeder.runFeeder().withTimeout(0.5), 
+                    indexer.reverseIndexer().withTimeout(0.5)
+                )
+            )
+            .andThen(
+                Commands.parallel(
+                    feeder.runFeeder(), 
+                    indexer.indexerOn()
+                )
+            )
+        );
 
         // Intake Pivot Up-DPAD Left/Down-DPAD Right
         JOYSTICK2_CONTROLLER.povUp().whileTrue(intake.pivotUp().andThen(Commands.runOnce(() -> pivotIsUp = false)));
         JOYSTICK2_CONTROLLER.povDown().whileTrue(intake.pivotDown().andThen(Commands.runOnce(() -> pivotIsUp = true)));
 
-        // Intake Auto Pivot
         JOYSTICK2_CONTROLLER.rightBumper().whileTrue(intake.startIntake());
         JOYSTICK2_CONTROLLER.rightBumper().whileTrue(indexer.reverseIndexer());
         JOYSTICK2_CONTROLLER.rightBumper().whileTrue(feeder.reverseFeeder());

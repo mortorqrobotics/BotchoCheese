@@ -27,7 +27,7 @@ public class Shooter extends SubsystemBase {
     private boolean shooterTurning = false;
 
     private static int buttonPresses = 0;
-    private double shooterSpeed = 0.77;
+    private double shooterSpeed = 0.82;
     
     public Shooter() {
         leftShooter = new TalonFX(RobotMap.LEFT_SHOOTER_MOTOR_ID);
@@ -35,7 +35,7 @@ public class Shooter extends SubsystemBase {
         rightShooter = new TalonFX(RobotMap.RIGHT_SHOOTER_MOTOR_ID);
 
         buttonPresses = 0;
-        shooterSpeed = 0.77;
+        shooterSpeed = 0.82;
 
         // Apply basic configuration
         TalonFXConfiguration config = new TalonFXConfiguration();
