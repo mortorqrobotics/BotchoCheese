@@ -8,20 +8,20 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 13.264322396576317,
-        "y": 2.42413694721826
+        "x": 13.00519462684863,
+        "y": 0.3881484040427099
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 13.245604265402847,
-        "y": 2.7605420827389446
+        "x": 15.018767772511849,
+        "y": 2.079146919431279
       },
       "prevControl": {
-        "x": 13.264322396576317,
-        "y": 0.9750071326676175
+        "x": 15.210278883291593,
+        "y": 1.9184500170096441
       },
       "nextControl": null,
       "isLocked": false,
@@ -42,7 +42,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -44.42420542992699
+    "rotation": -34.01770440463506
   },
   "reversed": false,
   "folder": "Auto 2; Shoot and Intake",

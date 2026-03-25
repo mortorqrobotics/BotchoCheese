@@ -7,13 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Red Auto 2 Path 1 (Bottom)"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "PivotDown"
+            "pathName": "Red Auto 8 Path 1 (M)"
           }
         },
         {
@@ -25,13 +19,31 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Red Auto 2 Path 2 (MB, B)"
+            "pathName": "Red Auto 8 Path 2 (M, B)"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 5.0
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Red Auto 8 Path 3 (M, T)"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Shoot"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": "Autos 2",
+  "folder": "Autos 8",
   "choreoAuto": false
 }

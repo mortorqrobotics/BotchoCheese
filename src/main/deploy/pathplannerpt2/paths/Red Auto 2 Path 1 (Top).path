@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 13.245604265402847,
-        "y": 0.617630331753553
+        "x": 13.310082938388627,
+        "y": 7.366398104265403
       },
       "prevControl": null,
       "nextControl": {
-        "x": 13.264322396576317,
-        "y": 2.42413694721826
+        "x": 13.196991811373378,
+        "y": 7.1434398189508155
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 13.245604265402847,
-        "y": 2.7605420827389446
+        "x": 14.986528436018958,
+        "y": 6.055331753554502
       },
       "prevControl": {
-        "x": 13.264322396576317,
-        "y": 0.9750071326676175
+        "x": 15.208435104320426,
+        "y": 5.940190837441496
       },
       "nextControl": null,
       "isLocked": false,
@@ -42,13 +42,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -44.42420542992699
+    "rotation": 31.77428237566569
   },
   "reversed": false,
   "folder": "Auto 2; Shoot and Intake",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 178.579734453601
+    "rotation": 180.0
   },
   "useDefaultConstraints": true
 }

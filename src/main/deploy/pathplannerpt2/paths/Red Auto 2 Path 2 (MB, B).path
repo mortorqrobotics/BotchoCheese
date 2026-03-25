@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 2.383,
-        "y": 4.03
+        "x": 15.05100710900474,
+        "y": 2.079146919431279
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.4736162624821687,
-        "y": 2.594025677603425
+        "x": 14.454090909090908,
+        "y": 1.9850883838383842
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 4.368807228915662,
-        "y": 0.6386019971469341
+        "x": 13.35469696969697,
+        "y": 0.6566540404040415
       },
       "prevControl": {
-        "x": 2.970060240963856,
-        "y": 0.614626506024097
+        "x": 14.753561780266885,
+        "y": 0.6723129748507194
       },
       "nextControl": {
-        "x": 5.8782737043553475,
-        "y": 0.6644752968886682
+        "x": 10.285555555555556,
+        "y": 0.6222979797979812
       },
       "isLocked": false,
       "linkedName": null
@@ -50,8 +50,8 @@
       "rotationDegrees": 90.0
     },
     {
-      "waypointRelativePos": 1.7322709163346521,
-      "rotationDegrees": 59.99999999999999
+      "waypointRelativePos": 1.3228070175438618,
+      "rotationDegrees": 90.0
     }
   ],
   "constraintZones": [],
@@ -67,13 +67,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 90.0
+    "rotation": 91.14601547542843
   },
   "reversed": false,
   "folder": "Auto 2; Shoot and Intake",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 180.0
+    "rotation": -36.15632599972626
   },
   "useDefaultConstraints": false
 }
