@@ -132,98 +132,96 @@ import frc.BotchoCheese.Utils.LimelightHelpers;
 public class StrafeToTag extends Command {
     private final CommandSwerveDrivetrain drivetrainSubsystem;
     
-    // We use RobotCentric so X is always "Robot Forward" and Y is always "Robot Left"
-    private final SwerveRequest.RobotCentric driveRequest = new SwerveRequest.RobotCentric();
+    // We use FieldCentric so the position controller can drive to field X/Y setpoints.
+    private final SwerveRequest.FieldCentric driveRequest = new SwerveRequest.FieldCentric();
 
-    // PID for moving forward/backward (X axis) based on Limelight 'ty'
-    private final PIDController forwardController;
-    // PID for strafing left/right (Y axis) based on Limelight 'tx'
-    private final PIDController strafeController;
+    private final PIDController xController;
+    private final PIDController yController;
 
-    private final double targetTy;
+    private final double offset;
+    private double xSetpoint;
+    private double ySetpoint;
     private boolean lostTarget = false;
 
     /**
      * Align robot with the target using the Limelight camera
      *
-     * @param drivetrainSubsystem drivetrain to command
-     * @param desiredTyOffset The target 'ty' (pitch) angle in degrees. Controls how far away the robot stops.
+      * @param drivetrainSubsystem drivetrain to command
+     * @param offset desired offset from the AprilTag in meters
      */
-    public StrafeToTag(CommandSwerveDrivetrain drivetrainSubsystem, double desiredTyOffset) {
+    public StrafeToTag(CommandSwerveDrivetrain drivetrainSubsystem, double offset) {
         this.drivetrainSubsystem = drivetrainSubsystem;
-        this.targetTy = desiredTyOffset; // Replaces your old odometry offset
+        this.offset = offset;
 
-        // Standard vision PID starting points. 
-        // 0.05 means for every 1 degree of error, the robot moves at 0.05 m/s.
-        forwardController = new PIDController(0.05, 0, 0);
-        strafeController = new PIDController(0.05, 0, 0);
+        xController = new PIDController(1, 0, 0);
+        yController = new PIDController(1, 0, 0);
 
-        // Tolerance is now in Limelight degrees, not field meters
-        forwardController.setTolerance(1.0);
-        strafeController.setTolerance(1.0);
+        xController.setTolerance(0.05);
+        yController.setTolerance(0.05);
 
         addRequirements(drivetrainSubsystem);
     }
 
     @Override
     public void initialize() {
-        forwardController.reset();
-        strafeController.reset();
-        
-        // We want 'tx' to be exactly 0 (centered horizontally on the screen)
-        strafeController.setSetpoint(0.0);
-        // We want 'ty' to match our target distance
-        forwardController.setSetpoint(targetTy);
-        
-        System.out.println("StrafeToTag Initialized in RobotCentric Vision Mode");
+        lostTarget = false;
+
+        if (!LimelightHelpers.getTV(RobotMap.LIMELIGHT_NAME)) {
+            lostTarget = true;
+            xSetpoint = drivetrainSubsystem.getState().Pose.getX();
+            ySetpoint = drivetrainSubsystem.getState().Pose.getY();
+        } else {
+            int fid = (int) LimelightHelpers.getFiducialID(RobotMap.LIMELIGHT_NAME);
+            var optionalTagPose = RobotMap.WELDED_FIELD2026.getTagPose(fid);
+
+            if (optionalTagPose.isEmpty()) {
+                lostTarget = true;
+                xSetpoint = drivetrainSubsystem.getState().Pose.getX();
+                ySetpoint = drivetrainSubsystem.getState().Pose.getY();
+            } else {
+                var tagPose = optionalTagPose.get();
+                double angle = drivetrainSubsystem.getState().Pose.getRotation().getRadians();
+
+                xSetpoint = tagPose.getX() - offset * Math.cos(angle);
+                ySetpoint = tagPose.getY() - offset * Math.sin(angle);
+            }
+        }
+
+        xController.reset();
+        yController.reset();
+        xController.setSetpoint(xSetpoint);
+        yController.setSetpoint(ySetpoint);
+
+        System.out.println("StrafeToTag initialized");
     }
 
     @Override
     public void execute() {
-        // SAFETY CHECK: If the Limelight loses the target, stop moving immediately.
-        if (!LimelightHelpers.getTV(RobotMap.LIMELIGHT_NAME)) {
-            lostTarget = true;
+        if (lostTarget) {
             drivetrainSubsystem.setControl(driveRequest.withVelocityX(0).withVelocityY(0).withRotationalRate(0));
             return;
         }
-        lostTarget = false;
 
-        // Get live vision data
-        double tx = LimelightHelpers.getTX(RobotMap.LIMELIGHT_NAME);
-        double ty = LimelightHelpers.getTY(RobotMap.LIMELIGHT_NAME);
+        var robotPose = drivetrainSubsystem.getState().Pose;
+        double xSpeed = xController.calculate(robotPose.getX());
+        double ySpeed = yController.calculate(robotPose.getY());
 
-        // --- THE MATH ---
-        // Limelight ty is positive when target is HIGH (farther). 
-        // We need to drive FORWARD (Positive X velocity) to get closer.
-        //NOTE: Ty should go with xSpeed and tx should go with ySpeed
-        double xSpeed = forwardController.calculate(ty);
-        
-        // Limelight tx is positive when target is RIGHT. 
-        // We need to strafe RIGHT (Negative Y velocity) to center it. 
-        // Notice the negative sign!
-        double ySpeed = -strafeController.calculate(tx); 
-
-        // Cap the maximum speeds so the robot doesn't fly out of control during tuning (Max 1.5 m/s)
-        // TODO Change the speed caps
         xSpeed = Math.max(-0.25, Math.min(0.25, xSpeed)); 
         ySpeed = Math.max(-0.25, Math.min(0.25, ySpeed));
 
-        // Send the command to the Swerve drivetrain
         drivetrainSubsystem.setControl(
             driveRequest
                 .withVelocityX(xSpeed)
                 .withVelocityY(ySpeed)
-                .withRotationalRate(0.0) // Keeps the robot locked facing straight forward
+                .withRotationalRate(0.0)
         );
     }
 
     @Override
     public boolean isFinished() {
-        // Command finishes when the Limelight crosshair is resting on the setpoints
-        return lostTarget || (forwardController.atSetpoint() && strafeController.atSetpoint());
+        return lostTarget || (xController.atSetpoint() && yController.atSetpoint());
     }
 
-    // TODO Figure out how to make it stop
     @Override
     public void end(boolean interrupted) {
         // Stop the robot when the command ends or the driver lets go of the button

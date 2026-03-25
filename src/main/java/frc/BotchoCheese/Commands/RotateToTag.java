@@ -53,7 +53,7 @@ public class RotateToTag extends Command {
         }
 
         var tagPose = tagPoseOpt.get();
-        angleSetpoint = tagPose.getRotation().toRotation2d().getRadians() + angleOffset;
+        angleSetpoint = tagPose.getRotation().toRotation2d().getRadians() + Math.PI + angleOffset;
         System.out.println("Angle Setpoint (Degrees): " + tagPose.getRotation().toRotation2d());
         System.out.println("Angle Setpoint " + angleSetpoint);
         angleController.reset();

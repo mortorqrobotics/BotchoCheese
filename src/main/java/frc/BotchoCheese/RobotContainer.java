@@ -33,6 +33,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.BotchoCheese.Commands.StrafeToTag;
 import frc.BotchoCheese.Commands.RotateToTag;
 import frc.BotchoCheese.Constants.RobotMap;
 import frc.BotchoCheese.Constants.TunerConstants;
@@ -216,6 +217,7 @@ public class RobotContainer {
         // reset the field-centric heading on menu button press
         JOYSTICK1_CONTROLLER.start().onTrue(new InstantCommand(()->drivetrain.seedFieldCentric()));
 
+        JOYSTICK1_CONTROLLER.leftTrigger().whileTrue(new StrafeToTag(drivetrain, 0));
         JOYSTICK1_CONTROLLER.rightTrigger().whileTrue(new RotateToTag(drivetrain, 0));
 
         // reset the field-centric heading on menu button press
