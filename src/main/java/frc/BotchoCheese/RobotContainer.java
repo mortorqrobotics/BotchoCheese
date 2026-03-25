@@ -216,7 +216,7 @@ public class RobotContainer {
         // reset the field-centric heading on menu button press
         JOYSTICK1_CONTROLLER.start().onTrue(new InstantCommand(()->drivetrain.seedFieldCentric()));
 
-        //JOYSTICK1_CONTROLLER.rightTrigger().onTrue(new RotateToTag(drivetrain, 0));
+        JOYSTICK1_CONTROLLER.rightTrigger().whileTrue(new RotateToTag(drivetrain, 0));
 
         // reset the field-centric heading on menu button press
         //JOYSTICK1_CONTROLLER.start().onTrue(new InstantCommand(()->drivetrain.seedFieldCentric()));

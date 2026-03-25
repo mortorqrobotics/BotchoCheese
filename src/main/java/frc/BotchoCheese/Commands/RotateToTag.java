@@ -26,7 +26,7 @@ public class RotateToTag extends Command {
     public RotateToTag(CommandSwerveDrivetrain drivetrainSubsystem, double angleOffset) {
         this.drivetrainSubsystem = drivetrainSubsystem;
         this.angleOffset = angleOffset;
-        angleController = new PIDController(10, 0, 0);
+        angleController = new PIDController(2, 0, 0);
         // TODO tune PID and tolerance
         angleController.setTolerance(0.025);
         angleController.enableContinuousInput(-Math.PI, Math.PI);
@@ -53,16 +53,29 @@ public class RotateToTag extends Command {
         }
 
         var tagPose = tagPoseOpt.get();
-        angleSetpoint = tagPose.getRotation().toRotation2d().getRadians() + Math.PI + angleOffset;
+        angleSetpoint = tagPose.getRotation().toRotation2d().getRadians() + angleOffset;
+        System.out.println("Angle Setpoint (Degrees): " + tagPose.getRotation().toRotation2d());
+        System.out.println("Angle Setpoint " + angleSetpoint);
         angleController.reset();
         angleController.setSetpoint(angleSetpoint);
-
     }
 
     @Override
     public void execute() {
-        double rotation = angleController.calculate(drivetrainSubsystem.getState().Pose.getRotation().getRadians(), angleSetpoint);
-        // System.out.println("Rotation: " + rotation);
+        validTarget = LimelightHelpers.getTV(RobotMap.LIMELIGHT_NAME);
+        if (!validTarget) {
+            drivetrainSubsystem.setControl(
+                driveRequest.withVelocityX(0).withVelocityY(0).withRotationalRate(0)
+            );
+            return;
+        }
+
+        double currentAngle = drivetrainSubsystem.getState().Pose.getRotation().getRadians();
+        double rotation = angleController.calculate(currentAngle, angleSetpoint);
+        System.out.println("Target Rotation (Before Max) " + rotation);
+
+        rotation = Math.max(-1.0, Math.min(1.0, rotation));
+
         drivetrainSubsystem.setControl(
             driveRequest.withVelocityX(0).withVelocityY(0).withRotationalRate(rotation)
         );
@@ -70,11 +83,12 @@ public class RotateToTag extends Command {
 
     @Override
     public boolean isFinished() {
-        return angleController.atSetpoint();
+        boolean finished = angleController.atSetpoint();
+        return finished;
     }
 
     @Override
-    public void end(boolean interrupted) {
+    public void end(boolean finished) {
         drivetrainSubsystem.setControl(new SwerveRequest.Idle());
     }
 
