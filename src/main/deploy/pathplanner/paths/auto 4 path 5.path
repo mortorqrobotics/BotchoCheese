@@ -3,25 +3,41 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 0.4032952924393719,
-        "y": 0.6386019971469341
+        "x": 13.096119828815977,
+        "y": 7.379643366619116
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.1851069900142646,
-        "y": 2.7864194008559195
+        "x": 12.436248216833096,
+        "y": 7.41845934379458
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 3.276,
-        "y": 2.799
+        "x": 12.009272467902996,
+        "y": 7.379643366619116
       },
       "prevControl": {
-        "x": 1.3736947218259623,
-        "y": 1.5572467902995721
+        "x": 12.683613747471547,
+        "y": 7.33357035994052
+      },
+      "nextControl": {
+        "x": 9.926148359486447,
+        "y": 7.521968616262482
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 8.25706134094151,
+        "y": 6.6809557774607695
+      },
+      "prevControl": {
+        "x": 9.83557774607703,
+        "y": 7.496091298145506
       },
       "nextControl": null,
       "isLocked": false,
@@ -42,13 +58,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -137.93774547911875
+    "rotation": -90.0
   },
   "reversed": false,
-  "folder": "Auto 8 Shoot Outpost Shoot (SOS)",
+  "folder": "Auto 4; Intake and Shoot",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 180.0
+    "rotation": 0.0
   },
   "useDefaultConstraints": true
 }

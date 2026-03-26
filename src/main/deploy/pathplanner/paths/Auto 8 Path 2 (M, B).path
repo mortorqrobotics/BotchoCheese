@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.845,
-        "y": 2.125
+        "x": 2.525,
+        "y": 4.002
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.560385542168675,
-        "y": 1.1828674698795192
+        "x": 2.240385542168675,
+        "y": 3.059867469879519
       },
       "isLocked": false,
       "linkedName": null
@@ -48,7 +48,7 @@
   "folder": "Auto 8 Shoot Outpost Shoot (SOS)",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -150.0
+    "rotation": 180.0
   },
   "useDefaultConstraints": true
 }
