@@ -17,6 +17,12 @@
           }
         },
         {
+          "type": "named",
+          "data": {
+            "name": "PivotDown"
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "Auto 1 Path 2 (Top)"
@@ -25,7 +31,7 @@
         {
           "type": "named",
           "data": {
-            "name": "Climb"
+            "name": "PivotUp"
           }
         }
       ]

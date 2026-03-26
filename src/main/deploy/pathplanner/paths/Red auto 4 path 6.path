@@ -3,25 +3,41 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.237,
-        "y": 5.439
+        "x": 13.160813124108415,
+        "y": 0.7679885877318122
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.52151212553495,
-        "y": 7.340827389443652
+        "x": 11.595235378031385,
+        "y": 0.6515406562054203
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 3.5862054208273886,
-        "y": 7.431398002853067
+        "x": 11.465848787446506,
+        "y": 0.6386019971469341
       },
       "prevControl": {
-        "x": 3.2627389443651924,
-        "y": 5.684679029957205
+        "x": 12.837346647646218,
+        "y": 0.6903566333808839
+      },
+      "nextControl": {
+        "x": 10.020002511749531,
+        "y": 0.584041760328182
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 8.244122681883024,
+        "y": 1.2337803138373749
+      },
+      "prevControl": {
+        "x": 9.977902995720399,
+        "y": 0.6256633380884444
       },
       "nextControl": null,
       "isLocked": false,
@@ -42,13 +58,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 180.0
+    "rotation": 89.06080905426442
   },
   "reversed": false,
-  "folder": "Auto 1; Shoot and Climb",
+  "folder": "Auto 4; Intake and Shoot",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 147.0
+    "rotation": 0.0
   },
   "useDefaultConstraints": true
 }

@@ -8,48 +8,27 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.613631377313133,
-        "y": 1.9204767122657287
+        "x": 3.2368616262482157,
+        "y": 2.462952924393724
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 2.729650602409638,
-        "y": 1.7620361445783135
+        "x": 3.2368616262482157,
+        "y": 2.6570328102710414
       },
       "prevControl": {
-        "x": 2.904493975903614,
-        "y": 1.4560602409638557
-      },
-      "nextControl": {
-        "x": 2.551807992142113,
-        "y": 2.073260712546482
-      },
-      "isLocked": false,
-      "linkedName": null
-    },
-    {
-      "anchor": {
-        "x": 2.435,
-        "y": 2.915805991440799
-      },
-      "prevControl": {
-        "x": 2.7624337349397594,
-        "y": 2.6253253012048186
+        "x": 3.534450784593438,
+        "y": 0.6903566333808842
       },
       "nextControl": null,
       "isLocked": false,
       "linkedName": null
     }
   ],
-  "rotationTargets": [
-    {
-      "waypointRelativePos": 1.0,
-      "rotationDegrees": 43.129621454080976
-    }
-  ],
+  "rotationTargets": [],
   "constraintZones": [],
   "pointTowardsZones": [],
   "eventMarkers": [],
@@ -63,7 +42,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -147.0
+    "rotation": -140.90614111377045
   },
   "reversed": false,
   "folder": "Auto 1; Shoot and Climb",
