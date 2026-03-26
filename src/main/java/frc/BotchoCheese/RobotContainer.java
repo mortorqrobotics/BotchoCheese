@@ -272,12 +272,12 @@ public class RobotContainer {
         JOYSTICK2_CONTROLLER.y().whileTrue(Commands.parallel(shooter.shoot(), intake.startIntake()));
         JOYSTICK2_CONTROLLER.y().whileTrue(
             Commands.parallel(
-                feeder.reverseFeeder().withTimeout(1), 
-                indexer.reverseIndexer().withTimeout(1)
+                feeder.reverseFeeder().withTimeout(0.75), 
+                indexer.reverseIndexer().withTimeout(0.75)
             ).andThen(
                 Commands.parallel(
-                    feeder.runFeeder().withTimeout(0.5), 
-                    indexer.reverseIndexer().withTimeout(0.5)
+                    feeder.runFeeder().withTimeout(0.25), 
+                    indexer.reverseIndexer().withTimeout(0.25)
                 )
             )
             .andThen(
