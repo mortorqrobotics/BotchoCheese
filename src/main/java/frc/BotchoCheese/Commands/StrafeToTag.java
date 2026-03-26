@@ -7,6 +7,10 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.BotchoCheese.Constants.RobotMap;
 import frc.BotchoCheese.Subsystems.CommandSwerveDrivetrain;
 import frc.BotchoCheese.Utils.LimelightHelpers;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Translation2d;
+import frc.BotchoCheese.Utils.LimelightHelpers.RawFiducial;
 
 public class StrafeToTag extends Command {
     private final CommandSwerveDrivetrain drivetrainSubsystem;
@@ -17,7 +21,7 @@ public class StrafeToTag extends Command {
     private final PIDController xController;
     private final PIDController yController;
 
-    private final double offset;
+    private static final double offset = 0.0;
     private double xSetpoint;
     private double ySetpoint;
     private boolean lostTarget = false;
@@ -26,11 +30,9 @@ public class StrafeToTag extends Command {
      * Align robot with the target using the Limelight camera
      *
       * @param drivetrainSubsystem drivetrain to command
-     * @param offset desired offset from the AprilTag in meters
      */
-    public StrafeToTag(CommandSwerveDrivetrain drivetrainSubsystem, double offset) {
+    public StrafeToTag(CommandSwerveDrivetrain drivetrainSubsystem) {
         this.drivetrainSubsystem = drivetrainSubsystem;
-        this.offset = offset;
 
         xController = new PIDController(1, 0, 0);
         yController = new PIDController(1, 0, 0);
@@ -40,29 +42,46 @@ public class StrafeToTag extends Command {
 
         addRequirements(drivetrainSubsystem);
     }
-
     @Override
     public void initialize() {
         lostTarget = false;
 
-        if (!LimelightHelpers.getTV(RobotMap.LIMELIGHT_NAME)) {
+        RawFiducial[] rawFiducials = LimelightHelpers.getRawFiducials(RobotMap.LIMELIGHT_NAME);
+        Pose2d robotPose = drivetrainSubsystem.getState().Pose;
+
+        if (rawFiducials.length == 0 || !LimelightHelpers.getTV(RobotMap.LIMELIGHT_NAME)) {
             lostTarget = true;
-            xSetpoint = drivetrainSubsystem.getState().Pose.getX();
-            ySetpoint = drivetrainSubsystem.getState().Pose.getY();
+            xSetpoint = robotPose.getX();
+            ySetpoint = robotPose.getY();
         } else {
-            int fid = (int) LimelightHelpers.getFiducialID(RobotMap.LIMELIGHT_NAME);
-            var optionalTagPose = RobotMap.WELDED_FIELD2026.getTagPose(fid);
+            int trackedId = (int) LimelightHelpers.getFiducialID(RobotMap.LIMELIGHT_NAME);
 
-            if (optionalTagPose.isEmpty()) {
+            boolean trackedIdSeen = false;
+            for (RawFiducial fiducial : rawFiducials) {
+                if (fiducial.id == trackedId) {
+                    trackedIdSeen = true;
+                    break;
+                }
+            }
+
+            if (!trackedIdSeen) {
                 lostTarget = true;
-                xSetpoint = drivetrainSubsystem.getState().Pose.getX();
-                ySetpoint = drivetrainSubsystem.getState().Pose.getY();
+                xSetpoint = robotPose.getX();
+                ySetpoint = robotPose.getY();
             } else {
-                var tagPose = optionalTagPose.get();
-                double angle = drivetrainSubsystem.getState().Pose.getRotation().getRadians();
+                Pose3d targetPoseRobotSpace = LimelightHelpers.getTargetPose3d_RobotSpace(RobotMap.LIMELIGHT_NAME);
 
-                xSetpoint = tagPose.getX() - offset * Math.cos(angle);
-                ySetpoint = tagPose.getY() - offset * Math.sin(angle);
+                double forwardToTagMeters = targetPoseRobotSpace.getX();
+                double leftToTagMeters = targetPoseRobotSpace.getY();
+
+                double forwardDeltaMeters = forwardToTagMeters - offset;
+                double leftDeltaMeters = leftToTagMeters;
+
+                Translation2d fieldDelta = new Translation2d(forwardDeltaMeters, leftDeltaMeters)
+                    .rotateBy(robotPose.getRotation());
+
+                xSetpoint = robotPose.getX() + fieldDelta.getX();
+                ySetpoint = robotPose.getY() + fieldDelta.getY();
             }
         }
 
@@ -73,6 +92,7 @@ public class StrafeToTag extends Command {
 
         System.out.println("StrafeToTag initialized");
     }
+
 
     @Override
     public void execute() {
