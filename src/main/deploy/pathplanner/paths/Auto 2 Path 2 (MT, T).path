@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.78,
-        "y": 6.1
+        "x": 3.172,
+        "y": 5.426
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.5395903614457829,
-        "y": 5.870518072289157
+        "x": 2.931590361445783,
+        "y": 5.196518072289157
       },
       "isLocked": false,
       "linkedName": null
@@ -67,7 +67,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -90.0
+    "rotation": 90.0
   },
   "reversed": false,
   "folder": "Auto 2; Shoot and Intake",

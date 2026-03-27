@@ -9,6 +9,18 @@
           "data": {
             "pathName": "Auto 3 Path (Bottom)"
           }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "PivotDown"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Shoot"
+          }
         }
       ]
     }

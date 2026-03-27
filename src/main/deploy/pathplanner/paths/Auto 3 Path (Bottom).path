@@ -8,20 +8,20 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.587590361445783,
-        "y": 0.5053493975903616
+        "x": 3.055720399429386,
+        "y": 1.6995720399429397
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 1.58,
-        "y": 3.76
+        "x": 3.120413694721825,
+        "y": 2.6182168330955777
       },
       "prevControl": {
-        "x": 2.8280000000000003,
-        "y": 4.155204819277109
+        "x": 3.2627389443651924,
+        "y": 1.2984736091298146
       },
       "nextControl": null,
       "isLocked": false,
@@ -42,7 +42,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 180.0
+    "rotation": -133.09084756700364
   },
   "reversed": false,
   "folder": "Auto 3; Climb",

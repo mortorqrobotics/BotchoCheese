@@ -7,19 +7,25 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Auto 4 Path 1 (MT)"
+            "pathName": "red Auto 3 Path (Bottom)"
           }
         },
         {
-          "type": "path",
+          "type": "named",
           "data": {
-            "pathName": "Auto 4 Path 2 (MT, T)"
+            "name": "PivotDown"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Shoot"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": "Autos 4",
+  "folder": "Autos 3",
   "choreoAuto": false
 }

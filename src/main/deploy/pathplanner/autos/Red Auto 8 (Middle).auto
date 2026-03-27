@@ -26,13 +26,19 @@
         {
           "type": "named",
           "data": {
+            "name": "PivotDown"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
             "name": "Shoot"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Red Auto 8 Path 2 (M, B)"
+            "pathName": "Red Auto 8 Path 2 (middle)"
           }
         },
         {
@@ -44,7 +50,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Red Auto 8 Path 3 (M, T)"
+            "pathName": "Red Auto 8 Path 3 (top)"
           }
         },
         {
