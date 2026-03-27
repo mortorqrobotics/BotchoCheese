@@ -102,7 +102,8 @@ public class RobotMap {
     public static final double FEEDER_P_VALUE = 0.12;
     public static final double FEEDER_I_VALUE = 0.0;
     public static final double FEEDER_D_VALUE = 0.001;
-    public static final double FEEDER_SPEED = -0.83; 
+    public static final double FEEDER_SPEED = -1
+  ; 
 
     // Motion Magic is currently disabled for the feeder.
     // public static final double FEEDER_CRUISE_VELOCITY = 14;

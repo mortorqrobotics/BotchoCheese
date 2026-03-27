@@ -141,23 +141,13 @@ public class Intake extends SubsystemBase {
 
     public Command pivotUp() {
         return this.run(() -> {
-            if (isPivotStalling()) {
-                handlePivotHardStop(RobotMap.PIVOT_UP_POSITION, true);
-                return;
-            }
-
-            pivotLeader.setControl(pivot_output.withOutput(RobotMap.GLOBAL_SPEED*2));
+                        pivotLeader.setControl(pivot_output.withOutput(-RobotMap.GLOBAL_SPEED*2));
         }).finallyDo(() -> stopPivot());
     }
 
     public Command pivotDown() {
         return this.run(() -> {
-            if (isPivotStalling()) {
-                handlePivotHardStop(RobotMap.PIVOT_DOWN_POSITION, false);
-                return;
-            }
-
-            pivotLeader.setControl(pivot_output.withOutput(-RobotMap.GLOBAL_SPEED*2));
+            pivotLeader.setControl(pivot_output.withOutput(RobotMap.GLOBAL_SPEED*2));
         }).finallyDo(() -> stopPivot());
     }
 

@@ -5,9 +5,22 @@
     "data": {
       "commands": [
         {
-          "type": "path",
+          "type": "parallel",
           "data": {
-            "pathName": "Red Auto 2 Path 1 (Top)"
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "Red Auto 2 Path 1 (Top)"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "PivotDown"
+                }
+              }
+            ]
           }
         },
         {

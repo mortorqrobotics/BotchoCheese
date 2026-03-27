@@ -8,20 +8,18 @@ import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 
-import com.ctre.phoenix6.SignalLogger;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import com.ctre.phoenix6.hardware.Pigeon2;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
-
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.security.Timestamp;
-import java.util.Comparator;
-import java.util.List;
-import java.util.stream.Collectors;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.VecBuilder;
@@ -33,20 +31,17 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.BotchoCheese.Commands.RotateToTag;
-import frc.BotchoCheese.Subsystems.Shooter;
+import frc.BotchoCheese.Constants.RobotMap;
+import frc.BotchoCheese.Constants.TunerConstants;
+import frc.BotchoCheese.Subsystems.CommandSwerveDrivetrain;
+import frc.BotchoCheese.Subsystems.Feeder;
+import frc.BotchoCheese.Subsystems.Indexer;
 //import frc.BotchoCheese.Subsystems.Climber;
 import frc.BotchoCheese.Subsystems.Intake;
-import frc.BotchoCheese.Subsystems.Indexer;
-import frc.BotchoCheese.Commands.StrafeToTag;
-import frc.BotchoCheese.Subsystems.CommandSwerveDrivetrain;
-import frc.BotchoCheese.Constants.TunerConstants;
-import frc.BotchoCheese.Constants.RobotMap;
-import frc.BotchoCheese.Subsystems.Feeder;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
+import frc.BotchoCheese.Subsystems.Shooter;
 
 
 public class RobotContainer {
@@ -94,11 +89,11 @@ public class RobotContainer {
         
         NamedCommands.registerCommand("Shoot", 
             Commands.sequence(
-                Commands.parallel(feeder.reverseFeeder(), indexer.reverseIndexer().withTimeout(1))).andThen(Commands.parallel(shooter.shoot(), feeder.runFeeder(), indexer.indexerOn().withTimeout(6))                
+                Commands.parallel(feeder.reverseFeeder().withTimeout(0.5), indexer.reverseIndexer().withTimeout(0.25), shooter.shoot().withTimeout(0.5), intake.startIntake().withTimeout(0.5))).andThen(Commands.parallel(shooter.shoot().withTimeout(2), feeder.runFeeder().withTimeout(2), indexer.indexerOn().withTimeout(2), intake.startIntake().withTimeout(2))                
             )
         );
-        NamedCommands.registerCommand("PivotDown", intake.pivotDown().withTimeout(5));
-        NamedCommands.registerCommand("PivotUp", intake.pivotUp().withTimeout(3));
+        NamedCommands.registerCommand("PivotDown", intake.pivotDown().withTimeout(1.5).andThen(intake.startIntake().withTimeout(1.5)));
+        // NamedCommands.registerCommand("PivotUp", intake.pivotDown().withTimeout(3));
         NamedCommands.registerCommand("IntakeOn", intake.startIntake());
         NamedCommands.registerCommand("IntakeOff", new InstantCommand(()->intake.stopIntake()));
 
@@ -208,7 +203,7 @@ public class RobotContainer {
             forwardStraight.withVelocityX(0).withVelocityY(0.5))
         );
         
-        JOYSTICK1_CONTROLLER.a().toggleOnTrue(createFullIntakeToShooterCommand());
+       // JOYSTICK1_CONTROLLER.a().toggleOnTrue(createFullIntakeToShooterCommand());
 
         //JOYSTICK1_CONTROLLER.leftBumper().whileTrue(climber.manualClimberUp());
        // JOYSTICK1_CONTROLLER.rightBumper().whileTrue(climber.manualClimberDown());
@@ -221,16 +216,16 @@ public class RobotContainer {
         // reset the field-centric heading on menu button press
         JOYSTICK1_CONTROLLER.start().onTrue(new InstantCommand(()->drivetrain.seedFieldCentric()));
 
-        JOYSTICK1_CONTROLLER.rightTrigger().onTrue(new RotateToTag(drivetrain, 0));
+        //JOYSTICK1_CONTROLLER.rightTrigger().onTrue(new RotateToTag(drivetrain, 0));
 
         // reset the field-centric heading on menu button press
-        JOYSTICK1_CONTROLLER.start().onTrue(new InstantCommand(()->drivetrain.seedFieldCentric()));
+        //JOYSTICK1_CONTROLLER.start().onTrue(new InstantCommand(()->drivetrain.seedFieldCentric()));
 
         //Controller 2
         // Indexer + Feeder + Shooter
-        JOYSTICK2_CONTROLLER.rightTrigger().whileTrue(Commands.waitSeconds(1).andThen(feeder.runFeeder()));
-        JOYSTICK2_CONTROLLER.rightTrigger().whileTrue(Commands.waitSeconds(1).andThen(indexer.indexerOn()));
-        JOYSTICK2_CONTROLLER.rightTrigger().whileTrue(shooter.shoot());
+        JOYSTICK2_CONTROLLER.rightTrigger().whileTrue(feeder.runFeeder());
+        JOYSTICK2_CONTROLLER.rightTrigger().whileTrue(indexer.indexerOn());
+        JOYSTICK2_CONTROLLER.rightTrigger().whileTrue(intake.startIntake());
 
 
         // Feeder Reverse
@@ -255,7 +250,7 @@ public class RobotContainer {
         JOYSTICK2_CONTROLLER.leftBumper().whileTrue(shooter.shoot());
 
         // Feeder
-        JOYSTICK2_CONTROLLER.b().whileTrue(feeder.runFeeder());
+        JOYSTICK2_CONTROLLER.b().whileTrue(shooter.reverseShoot());
 
         // Intake
         //JOYSTICK2_CONTROLLER.x().whileTrue(intake.startIntake());
@@ -271,23 +266,33 @@ public class RobotContainer {
         // );
 
         // Indexer
-        JOYSTICK2_CONTROLLER.y().whileTrue(indexer.indexerOn());
-
-        // Intake Pivot Up-DPAD Left/Down-DPAD Right
-        JOYSTICK2_CONTROLLER.povUp().whileTrue(intake.pivotDown().andThen(Commands.runOnce(() -> pivotIsUp = false)));
-        JOYSTICK2_CONTROLLER.povDown().whileTrue(intake.pivotUp().andThen(Commands.runOnce(() -> pivotIsUp = true)));
-
-        // Intake Auto Pivot
-        JOYSTICK2_CONTROLLER.rightBumper().onTrue(
-
-            Commands.either(
-                intake.setPivotDown().andThen(Commands.runOnce(() -> pivotIsUp = false)),
-                intake.setPivotUp().andThen(Commands.runOnce(() -> pivotIsUp = true)),
-                () -> pivotIsUp
+        // JOYSTICK2_CONTROLLER.y().whileTrue(indexer.indexerOn());
+        JOYSTICK2_CONTROLLER.y().whileTrue(Commands.parallel(shooter.shoot(), intake.startIntake()));
+        JOYSTICK2_CONTROLLER.y().whileTrue(
+            Commands.parallel(
+                feeder.reverseFeeder().withTimeout(1), 
+                indexer.reverseIndexer().withTimeout(1)
+            ).andThen(
+                Commands.parallel(
+                    feeder.runFeeder().withTimeout(0.5), 
+                    indexer.reverseIndexer().withTimeout(0.5)
+                )
+            )
+            .andThen(
+                Commands.parallel(
+                    feeder.runFeeder(), 
+                    indexer.indexerOn()
+                )
             )
         );
 
-        drivetrain.registerTelemetry(logger::telemeterize);
+        // Intake Pivot Up-DPAD Left/Down-DPAD Right
+        JOYSTICK2_CONTROLLER.povUp().whileTrue(intake.pivotUp().andThen(Commands.runOnce(() -> pivotIsUp = false)));
+        JOYSTICK2_CONTROLLER.povDown().whileTrue(intake.pivotDown().andThen(Commands.runOnce(() -> pivotIsUp = true)));
+
+        JOYSTICK2_CONTROLLER.rightBumper().whileTrue(intake.startIntake());
+        JOYSTICK2_CONTROLLER.rightBumper().whileTrue(indexer.reverseIndexer());
+        JOYSTICK2_CONTROLLER.rightBumper().whileTrue(feeder.reverseFeeder());
     }
     private static double applyDriveDeadband(double value) {
         return MathUtil.applyDeadband(value, 0.1);

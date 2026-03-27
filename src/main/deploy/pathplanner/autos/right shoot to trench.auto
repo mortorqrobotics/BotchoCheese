@@ -11,7 +11,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "Red Auto 8 Path 1 (M)"
+                  "pathName": "Red Auto 2 Path 1 (Top)"
                 }
               },
               {
@@ -26,37 +26,13 @@
         {
           "type": "named",
           "data": {
-            "name": "PivotDown"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
             "name": "Shoot"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Red Auto 8 Path 2 (middle)"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 5.0
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Red Auto 8 Path 3 (top)"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Shoot"
+            "pathName": "shoot to trench.path"
           }
         }
       ]
