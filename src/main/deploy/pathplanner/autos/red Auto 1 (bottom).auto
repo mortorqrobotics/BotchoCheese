@@ -7,7 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Auto 8 Path 1 (B)"
+            "pathName": "red Auto 1 Path 1 (Bottom)"
           }
         },
         {
@@ -25,7 +25,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Auto 1 Path 2 (Bottom)"
+            "pathName": "red Auto 1 Path 2 (Bottom)"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "PivotUp"
           }
         }
       ]

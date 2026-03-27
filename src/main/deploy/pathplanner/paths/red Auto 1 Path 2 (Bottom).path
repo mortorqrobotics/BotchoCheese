@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.276,
-        "y": 2.799
+        "x": 13.264,
+        "y": 2.702
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.2886162624821687,
-        "y": 0.9491298145506417
+        "x": 13.176542168674699,
+        "y": 0.8550361445783143
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 3.276,
-        "y": 0.7809272467902997
+        "x": 13.132831325301204,
+        "y": 0.6146265060240967
       },
       "prevControl": {
-        "x": 3.301554921540655,
-        "y": 2.669971469329529
+        "x": 13.274891566265062,
+        "y": 2.352132530120481
       },
       "nextControl": null,
       "isLocked": false,
@@ -42,7 +42,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -1.591140271194672
+    "rotation": 180.0
   },
   "reversed": false,
   "folder": "Auto 1; Shoot and Climb",

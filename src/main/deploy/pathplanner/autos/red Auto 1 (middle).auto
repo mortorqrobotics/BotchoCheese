@@ -7,7 +7,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Auto 1 Path 1"
+            "pathName": "red Auto 1 Path 1"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "PivotDown"
           }
         },
         {
@@ -19,19 +25,19 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Auto 1 Path 2"
+            "pathName": "red Auto 1 Path 2"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "Climb"
+            "name": "PivotDown"
           }
         }
       ]
     }
   },
-  "resetOdom": true,
+  "resetOdom": false,
   "folder": "Autos 1",
   "choreoAuto": false
 }
