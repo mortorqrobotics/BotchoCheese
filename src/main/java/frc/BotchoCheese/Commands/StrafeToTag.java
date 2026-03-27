@@ -105,8 +105,8 @@ public class StrafeToTag extends Command {
         double xSpeed = xController.calculate(robotPose.getX());
         double ySpeed = yController.calculate(robotPose.getY());
 
-        xSpeed = Math.max(-0.25, Math.min(0.25, xSpeed)); 
-        ySpeed = Math.max(-0.25, Math.min(0.25, ySpeed));
+        xSpeed = Math.max(-0.5, Math.min(0.5, xSpeed)); 
+        ySpeed = Math.max(-0.5, Math.min(0.5, ySpeed));
 
         drivetrainSubsystem.setControl(
             driveRequest

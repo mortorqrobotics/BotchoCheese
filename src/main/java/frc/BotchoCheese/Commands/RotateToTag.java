@@ -74,7 +74,7 @@ public class RotateToTag extends Command {
         double rotation = angleController.calculate(currentAngle, angleSetpoint);
         System.out.println("Target Rotation (Before Max) " + rotation);
 
-        rotation = Math.max(-1.0, Math.min(1.0, rotation));
+        rotation = Math.max(-3.0, Math.min(3.0, rotation));
 
         drivetrainSubsystem.setControl(
             driveRequest.withVelocityX(0).withVelocityY(0).withRotationalRate(rotation)
