@@ -62,11 +62,12 @@ public class RobotMap {
     // public static final int CAN_RANGE_ID = 23;
 
     // Pivot motor values
-    // TODO Edit values
+    // TODO Edit values (for Voltage Spike Threshold)
     public static final double PIVOT_UP_POSITION = 0;
     public static final double PIVOT_DOWN_POSITION = 17.2;
 
     public static final double PIVOT_CURRENT_STALL_THRESHOLD = 4.0;
+    public static final double PIVOT_VOLTAGE_SPIKE_THRESHOLD = 12.0;
 
     // Intake PID Values
     // TODO
@@ -76,7 +77,7 @@ public class RobotMap {
 
     // Pivot PID Values
     // TODO
-    public static final double PIVOT_S_VALUE = 0.25;
+    public static final double PIVOT_S_VALUE = 6;
     public static final double PIVOT_V_VALUE = 0.12;
     public static final double PIVOT_A_VALUE = 0.01;
     public static final double PIVOT_P_VALUE = 0.4;
@@ -85,15 +86,18 @@ public class RobotMap {
 
     // Intake Motion Magic Values
 
-    public static final double PIVOT_CRUISE_VELOCITY = 10; // Target cruise velocity of 20 rps
-    public static final double PIVOT_ACCELERATION = 10; // Target acceleration of 20 rps^2 (1 seconds)
+    public static final double PIVOT_CRUISE_VELOCITY = 100; // Target cruise velocity of 10 rps
+    public static final double PIVOT_ACCELERATION = 50; // Target acceleration of 10 rps^2 (1 seconds)
     public static final double PIVOT_JERK = 100; // Target jerk
+
+    //TODO
+    public static final double PIVOT_TARGET_ROTATIONS = 9.0;
+    public static final double PIVOT_FEEDFORWARD = 0.0;
 
     // Intake speeds
     // Verify if values are correct and go in the right directions
     public static final double INTAKE_SPEED = -0.83;
-    // TODO: Comfirm the threshold.
-    public static final double CAN_RANGE_DISTANCE_THRESHOLD = 0.5;
+    // public static final double CAN_RANGE_DISTANCE_THRESHOLD = 0.5;
     
     // Feeder Motor ID and Speed
     // TODO PID
@@ -131,7 +135,6 @@ public class RobotMap {
     // public static final double HOOD_ACCELERATION = 80;
     // public static final double HOOD_JERK = 800;
 
-    // //TODO
     // public static double HOOD_SPEED_REGRESSION_SLOPE = 1.0;
     // public static double HOOD_SPEED_REGRESSION_Y_INTERCEPT = 1.0;
 

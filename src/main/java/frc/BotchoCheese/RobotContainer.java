@@ -33,6 +33,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.BotchoCheese.Commands.StrafeToTag;
 import frc.BotchoCheese.Commands.RotateToTag;
 import frc.BotchoCheese.Constants.RobotMap;
 import frc.BotchoCheese.Constants.TunerConstants;
@@ -216,7 +217,8 @@ public class RobotContainer {
         // reset the field-centric heading on menu button press
         JOYSTICK1_CONTROLLER.start().onTrue(new InstantCommand(()->drivetrain.seedFieldCentric()));
 
-        //JOYSTICK1_CONTROLLER.rightTrigger().onTrue(new RotateToTag(drivetrain, 0));
+        JOYSTICK1_CONTROLLER.leftTrigger().whileTrue(new StrafeToTag(drivetrain));
+        JOYSTICK1_CONTROLLER.rightTrigger().whileTrue(new RotateToTag(drivetrain, 0));
 
         // reset the field-centric heading on menu button press
         //JOYSTICK1_CONTROLLER.start().onTrue(new InstantCommand(()->drivetrain.seedFieldCentric()));
@@ -270,12 +272,12 @@ public class RobotContainer {
         JOYSTICK2_CONTROLLER.y().whileTrue(Commands.parallel(shooter.shoot(), intake.startIntake()));
         JOYSTICK2_CONTROLLER.y().whileTrue(
             Commands.parallel(
-                feeder.reverseFeeder().withTimeout(1), 
-                indexer.reverseIndexer().withTimeout(1)
+                feeder.reverseFeeder().withTimeout(0.75), 
+                indexer.reverseIndexer().withTimeout(0.75)
             ).andThen(
                 Commands.parallel(
-                    feeder.runFeeder().withTimeout(0.5), 
-                    indexer.reverseIndexer().withTimeout(0.5)
+                    feeder.runFeeder().withTimeout(0.25), 
+                    indexer.reverseIndexer().withTimeout(0.25)
                 )
             )
             .andThen(
@@ -287,8 +289,8 @@ public class RobotContainer {
         );
 
         // Intake Pivot Up-DPAD Left/Down-DPAD Right
-        JOYSTICK2_CONTROLLER.povUp().whileTrue(intake.pivotUp().andThen(Commands.runOnce(() -> pivotIsUp = false)));
-        JOYSTICK2_CONTROLLER.povDown().whileTrue(intake.pivotDown().andThen(Commands.runOnce(() -> pivotIsUp = true)));
+        JOYSTICK2_CONTROLLER.povUp().onTrue(intake.pivotUp().andThen(Commands.runOnce(() -> pivotIsUp = false)));
+        JOYSTICK2_CONTROLLER.povDown().onTrue(intake.pivotDown().andThen(Commands.runOnce(() -> pivotIsUp = true)));
 
         JOYSTICK2_CONTROLLER.rightBumper().whileTrue(intake.startIntake());
         JOYSTICK2_CONTROLLER.rightBumper().whileTrue(indexer.reverseIndexer());
