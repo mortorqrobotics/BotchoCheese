@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.BotchoCheese.Utils.LimelightHelpers;
 import frc.BotchoCheese.Constants.RobotMap; // Assuming your IDs are here
+import frc.BotchoCheese.Subsystems.Intake;
 
 public class Shooter extends SubsystemBase {
     // Motor controllers
@@ -28,6 +29,9 @@ public class Shooter extends SubsystemBase {
 
     private static int buttonPresses = 0;
     private double shooterSpeed = 0.82;
+
+    // TODO Make sure this doesn't cause issues with RobotContainer
+    public final Intake intake = new Intake();
     
     public Shooter() {
         leftShooter = new TalonFX(RobotMap.LEFT_SHOOTER_MOTOR_ID);
@@ -133,6 +137,7 @@ public class Shooter extends SubsystemBase {
                 leftShooter.setControl(shooter_output.withOutput(shooterSpeed));
                 middleShooter.setControl(shooter_output.withOutput(shooterSpeed));
                 rightShooter.setControl(shooter_output.withOutput(shooterSpeed));
+                shooterTurning = true;
             },
             // When command ends:
             () -> {
@@ -157,12 +162,12 @@ public class Shooter extends SubsystemBase {
         );
     }
 
-
     public void stopMotors() {
         leftShooter.stopMotor();
         middleShooter.stopMotor();
         rightShooter.stopMotor();
         shooterTurning = false;
+        intake.updateShooterStatus(false);
     }
 
     /**

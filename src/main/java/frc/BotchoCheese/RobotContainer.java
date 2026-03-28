@@ -289,8 +289,8 @@ public class RobotContainer {
         );
 
         // Intake Pivot Up-DPAD Left/Down-DPAD Right
-        JOYSTICK2_CONTROLLER.povUp().whileTrue(intake.pivotUp().andThen(Commands.runOnce(() -> pivotIsUp = false)));
-        JOYSTICK2_CONTROLLER.povDown().whileTrue(intake.pivotDown().andThen(Commands.runOnce(() -> pivotIsUp = true)));
+        JOYSTICK2_CONTROLLER.povUp().onTrue(intake.pivotUp().andThen(Commands.runOnce(() -> pivotIsUp = false)));
+        JOYSTICK2_CONTROLLER.povDown().onTrue(intake.pivotDown().andThen(Commands.runOnce(() -> pivotIsUp = true)));
 
         JOYSTICK2_CONTROLLER.rightBumper().whileTrue(intake.startIntake());
         JOYSTICK2_CONTROLLER.rightBumper().whileTrue(indexer.reverseIndexer());

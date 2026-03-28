@@ -62,11 +62,12 @@ public class RobotMap {
     // public static final int CAN_RANGE_ID = 23;
 
     // Pivot motor values
-    // TODO Edit values
+    // TODO Edit values (for Voltage Spike Threshold)
     public static final double PIVOT_UP_POSITION = 0;
     public static final double PIVOT_DOWN_POSITION = 17.2;
 
     public static final double PIVOT_CURRENT_STALL_THRESHOLD = 4.0;
+    public static final double PIVOT_VOLTAGE_SPIKE_THRESHOLD = 12.0;
 
     // Intake PID Values
     // TODO
