@@ -14,6 +14,7 @@ import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.MotorArrangementValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -25,6 +26,7 @@ public class Intake extends SubsystemBase {
     private final TalonFX pivotFollower;
     private final TalonFXS intakeMotor;
     // private final CoreCANrange CANrange;
+    private final DigitalInput m_bottomLimitSwitch;
 
     // Control requests
     private final DutyCycleOut intakeOutput = new DutyCycleOut(0);
@@ -40,10 +42,12 @@ public class Intake extends SubsystemBase {
         pivotLeader = new TalonFX(RobotMap.LEFT_PIVOT_MOTOR_ID);
         pivotFollower = new TalonFX(RobotMap.RIGHT_PIVOT_MOTOR_ID);
         intakeMotor = new TalonFXS(RobotMap.INTAKE_MOTOR_ID);
+
+        m_bottomLimitSwitch = new DigitalInput(9);
         // CANrange = new CoreCANrange(RobotMap.CAN_RANGE_ID);
 
         // --- PIVOT CONFIGURATION (Kraken X44s) ---
-        TalonFXConfiguration pivotConfig = new TalonFXConfiguration();
+        var pivotConfig = new TalonFXConfiguration();
         
         // PID configuration for moving the pivot to set positions
         Slot0Configs pivotSlot0 = new Slot0Configs();
@@ -55,7 +59,7 @@ public class Intake extends SubsystemBase {
         pivotSlot0.kD = RobotMap.PIVOT_D_VALUE;
         pivotConfig.Slot0 = pivotSlot0;
 
-        MotionMagicConfigs motionMagicConfigs = pivotConfig.MotionMagic;
+        var motionMagicConfigs = pivotConfig.MotionMagic;
         motionMagicConfigs.MotionMagicCruiseVelocity = RobotMap.PIVOT_CRUISE_VELOCITY; // Target cruise velocity of 20 rps
         motionMagicConfigs.MotionMagicAcceleration = RobotMap.PIVOT_ACCELERATION; // Target acceleration of 160 rps^2 (0.5 seconds)
         motionMagicConfigs.MotionMagicJerk = RobotMap.PIVOT_JERK; // Target jerk of 1600 rps^3 (0.1 seconds)
@@ -113,41 +117,67 @@ public class Intake extends SubsystemBase {
         });
     }
 
-    public Command setPivotUp() {
-        System.out.println("setPivotUp executed=====================");
-        return this.run(() -> {
-            if (isPivotStalling()) {
-                handlePivotHardStop(RobotMap.PIVOT_UP_POSITION, true);
-                return;
-            }
+    // public Command setPivotUp() {
+    //     System.out.println("setPivotUp executed=====================");
+    //     return this.run(() -> {
+    //         if (isPivotStalling()) {
+    //             handlePivotHardStop(RobotMap.PIVOT_UP_POSITION, true);
+    //             return;
+    //         }
 
-            pivotLeader.setControl(pivotPositionRequest.withPosition(RobotMap.PIVOT_UP_POSITION));
-            pivotUp = true;
-        });
-    }
+    //         pivotLeader.setControl(pivotPositionRequest.withPosition(RobotMap.PIVOT_UP_POSITION));
+    //         pivotUp = true;
+    //     });
+    // }
 
-    public Command setPivotDown() {
-        System.out.println("setPivotDown executed=====================");
-        return this.run(() -> {
-            if (isPivotStalling()) {
-                handlePivotHardStop(RobotMap.PIVOT_DOWN_POSITION, false);
-                return;
-            }
+    // public Command setPivotDown() {
+    //     System.out.println("setPivotDown executed=====================");
+    //     return this.run(() -> {
+    //         if (isPivotStalling()) {
+    //             handlePivotHardStop(RobotMap.PIVOT_DOWN_POSITION, false);
+    //             return;
+    //         }
 
-            pivotLeader.setControl(pivotPositionRequest.withPosition(RobotMap.PIVOT_DOWN_POSITION));
-            pivotUp = false;
-        });
-    }
+    //         pivotLeader.setControl(pivotPositionRequest.withPosition(RobotMap.PIVOT_DOWN_POSITION));
+    //         pivotUp = false;
+    //     });
+    // }
 
     public Command pivotUp() {
+        System.out.println("pivotUp executed=====================");
+        final MotionMagicVoltage m_request = new MotionMagicVoltage(0);
         return this.run(() -> {
-                        pivotLeader.setControl(pivot_output.withOutput(-RobotMap.GLOBAL_SPEED*2));
+            //pivotLeader.setControl(pivot_output.withOutput(-RobotMap.GLOBAL_SPEED*2));
+            // set target position to ??? rotations
+            pivotLeader.setControl(m_request.withPosition(-RobotMap.PIVOT_TARGET_ROTATIONS).withFeedForward(RobotMap.PIVOT_FEEDFORWARD));
         }).finallyDo(() -> stopPivot());
+        
+       
     }
 
     public Command pivotDown() {
+        System.out.println("pivotDown executed=====================");
+        final MotionMagicVoltage m_request = new MotionMagicVoltage(0);
+        //Get to target rotations
+        while(!m_bottomLimitSwitch.get()) {
+            return this.run(() -> {
+                //pivotLeader.setControl(pivot_output.withOutput(RobotMap.PIVOT_TARGET_ROTATIONS));
+                pivotLeader.setControl(m_request.withPosition(RobotMap.PIVOT_TARGET_ROTATIONS).withFeedForward(RobotMap.PIVOT_FEEDFORWARD));
+            }).finallyDo(() -> stopPivot());
+        }
+
+        System.out.println("Stopping motors==========================");
+        //Stop motors
         return this.run(() -> {
-            pivotLeader.setControl(pivot_output.withOutput(RobotMap.GLOBAL_SPEED*2));
+           zeroPivotMotors();
+        });
+    }
+
+    public Command zeroPivotMotors() {
+        System.out.println("ZeroPivotMotors executed=====================");
+        return this.run(() -> {
+            pivotLeader.set(RobotMap.PIVOT_TARGET_ROTATIONS);
+            pivotFollower.set(RobotMap.PIVOT_TARGET_ROTATIONS);
         }).finallyDo(() -> stopPivot());
     }
 
@@ -173,7 +203,7 @@ public class Intake extends SubsystemBase {
 
     // Checks whether the intake is full or not.
     // 
-    // TODO Refine the command later
+
     // public Command isIndexFull() {
     //     return this.run(() -> {
     //         while(!pivotUp) {
@@ -199,7 +229,6 @@ public class Intake extends SubsystemBase {
     public void stopPivot() {
         System.out.println("stopPivot executed=====================");
         pivotLeader.stopMotor();
-        
     }
 
     // private boolean isPivotVoltageSpiking() {

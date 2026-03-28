@@ -54,7 +54,6 @@ public class CANdleLight extends SubsystemBase {
         candle.setControl(rainbow);
     }
 
-    // TODO May not need
     public void setDisabledColor() {
         setSolidColor(255, 80, 0); //orange
     }

@@ -218,13 +218,13 @@ public class Shooter extends SubsystemBase {
     //     double distance = rawFiducials[0].distToRobot;
 
     //    if(distance <= RobotMap.SHORT_DISTANCE_THRESHOLD) {
-    //         RobotMap.HOOD_POSITION = 0.25; // TODO
+    //         RobotMap.HOOD_POSITION = 0.25;
     //    }
     //    else if(distance > RobotMap.SHORT_DISTANCE_THRESHOLD && distance <= RobotMap.MEDIUM_DISTANCE_THRESHOLD) {
-    //         RobotMap.HOOD_POSITION = 0.5; // TODO
+    //         RobotMap.HOOD_POSITION = 0.5;
     //    }
     //    else {
-    //         RobotMap.HOOD_POSITION = 0.75; // TODO
+    //         RobotMap.HOOD_POSITION = 0.75;
     //    }
     // }
 
