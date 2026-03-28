@@ -229,7 +229,6 @@ public class RobotContainer {
         JOYSTICK2_CONTROLLER.rightTrigger().whileTrue(indexer.indexerOn());
         JOYSTICK2_CONTROLLER.rightTrigger().whileTrue(intake.startIntake());
 
-
         // Feeder Reverse
         JOYSTICK2_CONTROLLER.a().whileTrue(feeder.reverseFeeder());
         JOYSTICK2_CONTROLLER.a().whileTrue(indexer.reverseIndexer());

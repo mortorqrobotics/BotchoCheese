@@ -18,9 +18,9 @@ import frc.BotchoCheese.Subsystems.Intake;
 
 public class Shooter extends SubsystemBase {
     // Motor controllers
-    private final TalonFX leftShooter;
-    private final TalonFX middleShooter;
-    private final TalonFX rightShooter;
+    private final TalonFX backLeftShooter;
+    private final TalonFX backRightShooter;
+    private final TalonFX frontShooter;
 
     // Control requests (Phoenix 6 uses request objects instead of passing doubles directly)
     private final DutyCycleOut shooter_output = new DutyCycleOut(0);
@@ -34,9 +34,9 @@ public class Shooter extends SubsystemBase {
     public final Intake intake = new Intake();
     
     public Shooter() {
-        leftShooter = new TalonFX(RobotMap.LEFT_SHOOTER_MOTOR_ID);
-        middleShooter = new TalonFX(RobotMap.MIDDLE_SHOOTER_MOTOR_ID);
-        rightShooter = new TalonFX(RobotMap.RIGHT_SHOOTER_MOTOR_ID);
+        backLeftShooter = new TalonFX(RobotMap.BACK_LEFT_SHOOTER_MOTOR_ID);
+        backRightShooter = new TalonFX(RobotMap.BACK_RIGHT_SHOOTER_MOTOR_ID);
+        frontShooter = new TalonFX(RobotMap.FRONT_SHOOTER_MOTOR_ID);
 
         buttonPresses = 0;
         shooterSpeed = 0.82;
@@ -72,9 +72,9 @@ public class Shooter extends SubsystemBase {
         /* Set motors to Brake mode so the climber doesn't slide down */
         config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
-        leftShooter.getConfigurator().apply(config);
-        middleShooter.getConfigurator().apply(config);
-        rightShooter.getConfigurator().apply(config);
+        backLeftShooter.getConfigurator().apply(config);
+        backRightShooter.getConfigurator().apply(config);
+        frontShooter.getConfigurator().apply(config);
     }
 
     // Moves the Shooter counter Clockwise.
@@ -134,9 +134,9 @@ public class Shooter extends SubsystemBase {
         return this.startEnd(
             // When command starts/runs:
             () -> {
-                leftShooter.setControl(shooter_output.withOutput(shooterSpeed));
-                middleShooter.setControl(shooter_output.withOutput(shooterSpeed));
-                rightShooter.setControl(shooter_output.withOutput(shooterSpeed));
+                backLeftShooter.setControl(shooter_output.withOutput(RobotMap.SHOOTER_SPEED));
+                backRightShooter.setControl(shooter_output.withOutput(RobotMap.SHOOTER_SPEED));
+                frontShooter.setControl(shooter_output.withOutput(RobotMap.SHOOTER_SPEED));
                 shooterTurning = true;
             },
             // When command ends:
@@ -151,9 +151,9 @@ public class Shooter extends SubsystemBase {
         return this.startEnd(
             // When command starts/runs:
             () -> {
-                leftShooter.setControl(shooter_output.withOutput(-shooterSpeed));
-                middleShooter.setControl(shooter_output.withOutput(-shooterSpeed));
-                rightShooter.setControl(shooter_output.withOutput(-shooterSpeed));
+                backLeftShooter.setControl(shooter_output.withOutput(-RobotMap.SHOOTER_SPEED));
+                backRightShooter.setControl(shooter_output.withOutput(-RobotMap.SHOOTER_SPEED));
+                frontShooter.setControl(shooter_output.withOutput(-RobotMap.SHOOTER_SPEED));
             },
             // When command ends:
             () -> {
@@ -163,9 +163,9 @@ public class Shooter extends SubsystemBase {
     }
 
     public void stopMotors() {
-        leftShooter.stopMotor();
-        middleShooter.stopMotor();
-        rightShooter.stopMotor();
+        backLeftShooter.stopMotor();
+        backRightShooter.stopMotor();
+        frontShooter.stopMotor();
         shooterTurning = false;
         intake.updateShooterStatus(false);
     }
@@ -243,8 +243,8 @@ public class Shooter extends SubsystemBase {
         SmartDashboard.putNumber("kD", RobotMap.SHOOTER_D_VALUE);
         SmartDashboard.putBoolean("Shooter Turning?", shooterTurning);
         
-        SmartDashboard.putNumber("Shooter Battery Draw", leftShooter.getSupplyCurrent().getValueAsDouble());
-        SmartDashboard.putNumber("Shooter Motor Draw", leftShooter.getStatorCurrent().getValueAsDouble());
+        SmartDashboard.putNumber("Shooter Battery Draw", backLeftShooter.getSupplyCurrent().getValueAsDouble());
+        SmartDashboard.putNumber("Shooter Motor Draw", backLeftShooter.getStatorCurrent().getValueAsDouble());
         SmartDashboard.putNumber("Shooter Mode", buttonPresses);
     } 
 }
