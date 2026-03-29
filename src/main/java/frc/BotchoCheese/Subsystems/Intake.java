@@ -1,13 +1,11 @@
 package frc.BotchoCheese.Subsystems;
 
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
-import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.configs.TalonFXSConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.Follower;
-import com.ctre.phoenix6.controls.MotionMagicVelocityVoltage;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.hardware.TalonFXS;
@@ -30,11 +28,9 @@ public class Intake extends SubsystemBase {
     // Control requests
     private final DutyCycleOut intakeOutput = new DutyCycleOut(0);
     private final MotionMagicVoltage pivotPositionRequest = new MotionMagicVoltage(0);
-    private final DutyCycleOut pivot_output = new DutyCycleOut(0);
 
     // Telemetry state variables
     private boolean goingIn = false;
-    private boolean pivotUp = true;
     private boolean shooterTurning = false;
     
     public Intake() {
@@ -59,9 +55,9 @@ public class Intake extends SubsystemBase {
         pivotConfig.Slot0 = pivotSlot0;
 
         var motionMagicConfigs = pivotConfig.MotionMagic;
-        motionMagicConfigs.MotionMagicCruiseVelocity = RobotMap.PIVOT_CRUISE_VELOCITY; // Target cruise velocity of 20 rps
-        motionMagicConfigs.MotionMagicAcceleration = RobotMap.PIVOT_ACCELERATION; // Target acceleration of 160 rps^2 (0.5 seconds)
-        motionMagicConfigs.MotionMagicJerk = RobotMap.PIVOT_JERK; // Target jerk of 1600 rps^3 (0.1 seconds)
+        motionMagicConfigs.MotionMagicCruiseVelocity = RobotMap.PIVOT_CRUISE_VELOCITY; 
+        motionMagicConfigs.MotionMagicAcceleration = RobotMap.PIVOT_ACCELERATION; 
+        motionMagicConfigs.MotionMagicJerk = RobotMap.PIVOT_JERK; 
 
         // Current limits to protect the X44s and the pivot mechanism
         CurrentLimitsConfigs pivotLimits = new CurrentLimitsConfigs();
@@ -97,11 +93,8 @@ public class Intake extends SubsystemBase {
         // but keeping it Brake if your game piece requires firm holding.
         intakeConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
         intakeConfig.Commutation.MotorArrangement = MotorArrangementValue.Minion_JST;
-        //TODO pivot minion config 
 
         intakeMotor.getConfigurator().apply(intakeConfig);
-
-        System.out.println("Intake constructed======================");
     }
 
     // --- PIVOT METHODS ---
@@ -109,35 +102,38 @@ public class Intake extends SubsystemBase {
     /**
      * Moves the pivot to a target position (in rotations).
      */
-    public Command setPivotPosition(double targetRotations) {
-        System.out.println("setPivotPosition executed=====================");
-        return this.run(() -> {
-            pivotLeader.setControl(pivotPositionRequest.withPosition(targetRotations));
-        });
-    }
-    public void updateShooterStatus(boolean shooterTurning) {
-        this.shooterTurning = shooterTurning;
-    }
 
-    public Command oscillatePivot() {
-        final MotionMagicVoltage m_request = new MotionMagicVoltage(0);
-        final double minPos = 4.0;
-        final double maxPos = 6.0;
-        final double positionTolerance = 0.1;
-        final double[] currentTarget = {maxPos};
+    // public Command setPivotPosition(double targetRotations) {
+    //     return this.run(() -> {
+    //         pivotLeader.setControl(pivotPositionRequest.withPosition(targetRotations));
+    //     });
+    // }
+    // public void updateShooterStatus(boolean shooterTurning) {
+    //     this.shooterTurning = shooterTurning;
+    // }
 
-        return this.run(() -> {
-            double currentPos = pivotLeader.getPosition().getValueAsDouble();
-            if (Math.abs(currentPos - currentTarget[0]) <= positionTolerance) {
-                currentTarget[0] = (currentTarget[0] == maxPos) ? minPos : maxPos;
-            }
-
-            pivotLeader.setControl(
-                m_request.withPosition(currentTarget[0])
-                    .withFeedForward(RobotMap.PIVOT_FEEDFORWARD)
-            );
-        }).finallyDo(() -> stopPivot());
-    }
+    // public Command oscillatePivot() {
+    //    final MotionMagicVoltage m_request = new MotionMagicVoltage(0);
+    //    double minPos = 3;
+    //    double maxPos = 8;
+    //    double currentTarget = minPos;
+    //    while(shooterTurning) {
+    //         if(currentTarget == minPos) {
+    //             currentTarget = maxPos;
+    //         }
+    //         else {
+    //             currentTarget = minPos;
+    //         }
+    //         return this.run(() -> {
+    //             // set target position to ??? rotations
+    //             pivotLeader.setControl(m_request.withPosition(RobotMap.PIVOT_TARGET_ROTATIONS).withFeedForward(RobotMap.PIVOT_FEEDFORWARD));
+    //             // pivotLeader.setControl(m_request);
+    //         });
+    //     }
+    //     return this.run(() -> {
+    //         // nothing (turning motor off)
+    //     }).finallyDo(() -> stopPivot());
+    // }
 
     // public Command setPivotUp() {
     //     System.out.println("setPivotUp executed=====================");
@@ -166,7 +162,6 @@ public class Intake extends SubsystemBase {
     // }
 
     public Command pivotUp() {
-        System.out.println("pivotUp executed=====================");
         final MotionMagicVoltage m_request = new MotionMagicVoltage(0);
         while(!isPivotVoltageSpiking()) {
             return this.run(() -> {
@@ -230,21 +225,6 @@ public class Intake extends SubsystemBase {
     // Checks whether the intake is full or not.
     // 
 
-    // public Command isIndexFull() {
-    //     return this.run(() -> {
-    //         while(!pivotUp) {
-    //             while(goingIn) {
-    //                 if(CANrange.getDistance().getValueAsDouble() < RobotMap.CAN_RANGE_DISTANCE_THRESHOLD) {
-    //                     stopIntake();
-    //                 }
-    //                 else {
-    //                     startIntake();
-    //                 }
-    //             }
-    //         }
-    //     });
-    // }
-    
     public void stopIntake() {
         System.out.println("stopIntake executed=====================");
         intakeMotor.stopMotor();
