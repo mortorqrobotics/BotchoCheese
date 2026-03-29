@@ -120,25 +120,22 @@ public class Intake extends SubsystemBase {
     }
 
     public Command oscillatePivot() {
-       final MotionMagicVoltage m_request = new MotionMagicVoltage(0);
-       double minPos = 3;
-       double maxPos = 8;
-       double currentTarget = minPos;
-       while(shooterTurning) {
-            if(currentTarget == minPos) {
-                currentTarget = maxPos;
-            }
-            else {
-                currentTarget = minPos;
-            }
-            return this.run(() -> {
-                // set target position to ??? rotations
-                pivotLeader.setControl(m_request.withPosition(RobotMap.PIVOT_TARGET_ROTATIONS).withFeedForward(RobotMap.PIVOT_FEEDFORWARD));
-                // pivotLeader.setControl(m_request);
-            });
-        }
+        final MotionMagicVoltage m_request = new MotionMagicVoltage(0);
+        final double minPos = 4.0;
+        final double maxPos = 6.0;
+        final double positionTolerance = 0.1;
+        final double[] currentTarget = {maxPos};
+
         return this.run(() -> {
-            // nothing (turning motor off)
+            double currentPos = pivotLeader.getPosition().getValueAsDouble();
+            if (Math.abs(currentPos - currentTarget[0]) <= positionTolerance) {
+                currentTarget[0] = (currentTarget[0] == maxPos) ? minPos : maxPos;
+            }
+
+            pivotLeader.setControl(
+                m_request.withPosition(currentTarget[0])
+                    .withFeedForward(RobotMap.PIVOT_FEEDFORWARD)
+            );
         }).finallyDo(() -> stopPivot());
     }
 
