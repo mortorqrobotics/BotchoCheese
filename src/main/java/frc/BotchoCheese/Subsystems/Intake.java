@@ -15,7 +15,6 @@ import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.MotorArrangementValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
-import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -27,7 +26,6 @@ public class Intake extends SubsystemBase {
     private final TalonFX pivotFollower;
     private final TalonFXS intakeMotor;
     // private final CoreCANrange CANrange;
-    private final DigitalInput m_bottomLimitSwitch;
 
     // Control requests
     private final DutyCycleOut intakeOutput = new DutyCycleOut(0);
@@ -45,7 +43,6 @@ public class Intake extends SubsystemBase {
         pivotFollower = new TalonFX(RobotMap.RIGHT_PIVOT_MOTOR_ID);
         intakeMotor = new TalonFXS(RobotMap.INTAKE_MOTOR_ID);
 
-        m_bottomLimitSwitch = new DigitalInput(9);
         // CANrange = new CoreCANrange(RobotMap.CAN_RANGE_ID);
 
         // --- PIVOT CONFIGURATION (Kraken X44s) ---
@@ -189,19 +186,13 @@ public class Intake extends SubsystemBase {
     public Command pivotDown() {
         System.out.println("pivotDown executed=====================");
         final MotionMagicVoltage m_request = new MotionMagicVoltage(0);
-        //Get to target rotations
-        while(!m_bottomLimitSwitch.get()) {
-            return this.run(() -> {
-                //pivotLeader.setControl(pivot_output.withOutput(RobotMap.PIVOT_TARGET_ROTATIONS));
-                pivotLeader.setControl(m_request.withPosition(RobotMap.PIVOT_TARGET_ROTATIONS).withFeedForward(RobotMap.PIVOT_FEEDFORWARD));
-            }).finallyDo(() -> stopPivot());
-        }
 
-        System.out.println("Stopping motors==========================");
-        //Stop motors
         return this.run(() -> {
-           setPivotAtTarget();
-        });
+            pivotLeader.setControl(
+                m_request.withPosition(RobotMap.PIVOT_TARGET_ROTATIONS)
+                    .withFeedForward(RobotMap.PIVOT_FEEDFORWARD)
+            );
+        }).finallyDo(() -> stopPivot());
     }
 
     public Command setPivotAtTarget() {
