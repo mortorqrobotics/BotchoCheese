@@ -130,9 +130,9 @@ public class Shooter extends SubsystemBase {
         return this.startEnd(
             // When command starts/runs:
             () -> {
-                backLeftShooter.setControl(shooter_output.withOutput(RobotMap.SHOOTER_SPEED));
-                backRightShooter.setControl(shooter_output.withOutput(RobotMap.SHOOTER_SPEED));
-                frontShooter.setControl(shooter_output.withOutput(RobotMap.SHOOTER_SPEED));
+                backLeftShooter.setControl(shooter_output.withOutput(-RobotMap.SHOOTER_SPEED));
+                backRightShooter.setControl(shooter_output.withOutput(-RobotMap.SHOOTER_SPEED));
+                frontShooter.setControl(shooter_output.withOutput(-RobotMap.SHOOTER_SPEED));
                 shooterTurning = true;
             },
             // When command ends:
@@ -147,9 +147,9 @@ public class Shooter extends SubsystemBase {
         return this.startEnd(
             // When command starts/runs:
             () -> {
-                backLeftShooter.setControl(shooter_output.withOutput(-RobotMap.SHOOTER_SPEED));
-                backRightShooter.setControl(shooter_output.withOutput(-RobotMap.SHOOTER_SPEED));
-                frontShooter.setControl(shooter_output.withOutput(-RobotMap.SHOOTER_SPEED));
+                backLeftShooter.setControl(shooter_output.withOutput(RobotMap.SHOOTER_SPEED));
+                backRightShooter.setControl(shooter_output.withOutput(RobotMap.SHOOTER_SPEED));
+                frontShooter.setControl(shooter_output.withOutput(RobotMap.SHOOTER_SPEED));
             },
             // When command ends:
             () -> {

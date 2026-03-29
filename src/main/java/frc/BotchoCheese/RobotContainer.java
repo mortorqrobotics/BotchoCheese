@@ -251,7 +251,7 @@ public class RobotContainer {
         JOYSTICK2_CONTROLLER.leftBumper().whileTrue(shooter.shoot());
 
         // Feeder
-        JOYSTICK2_CONTROLLER.b().whileTrue(shooter.reverseShoot());
+        JOYSTICK2_CONTROLLER.b().whileTrue(feeder.runFeeder());
 
         // Intake
         //JOYSTICK2_CONTROLLER.x().whileTrue(intake.startIntake());
