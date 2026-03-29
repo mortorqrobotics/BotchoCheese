@@ -7,41 +7,35 @@ import com.ctre.phoenix6.configs.TalonFXSConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
+import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.hardware.TalonFXS;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.MotorArrangementValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.BotchoCheese.Constants.RobotMap;
 
 public class Intake extends SubsystemBase {
     // Hardware: 2x Kraken X44s for Pivot, 1x Minion for Intake
+
     private final TalonFX pivotLeader;
     private final TalonFX pivotFollower;
     private final TalonFXS intakeMotor;
-    // private final CoreCANrange CANrange;
 
     // Control requests
-    private final DutyCycleOut intakeOutput = new DutyCycleOut(0);
-    private final MotionMagicVoltage pivotPositionRequest = new MotionMagicVoltage(0);
+    private final DutyCycleOut intakeDuty = new DutyCycleOut(0);
+    private final DutyCycleOut pivotDuty = new DutyCycleOut(0);
 
-    // Telemetry state variables
-    private boolean goingIn = false;
-    private boolean shooterTurning = false;
     
     public Intake() {
-        // Initialize motors (You will need to add these new IDs to your RobotMap)
         pivotLeader = new TalonFX(RobotMap.LEFT_PIVOT_MOTOR_ID);
         pivotFollower = new TalonFX(RobotMap.RIGHT_PIVOT_MOTOR_ID);
         intakeMotor = new TalonFXS(RobotMap.INTAKE_MOTOR_ID);
 
-        // CANrange = new CoreCANrange(RobotMap.CAN_RANGE_ID);
-
-        // --- PIVOT CONFIGURATION (Kraken X44s) ---
         var pivotConfig = new TalonFXConfiguration();
         
         // PID configuration for moving the pivot to set positions
@@ -54,10 +48,10 @@ public class Intake extends SubsystemBase {
         pivotSlot0.kD = RobotMap.PIVOT_D_VALUE;
         pivotConfig.Slot0 = pivotSlot0;
 
-        var motionMagicConfigs = pivotConfig.MotionMagic;
-        motionMagicConfigs.MotionMagicCruiseVelocity = RobotMap.PIVOT_CRUISE_VELOCITY; 
-        motionMagicConfigs.MotionMagicAcceleration = RobotMap.PIVOT_ACCELERATION; 
-        motionMagicConfigs.MotionMagicJerk = RobotMap.PIVOT_JERK; 
+        // var motionMagicConfigs = pivotConfig.MotionMagic;
+        // motionMagicConfigs.MotionMagicCruiseVelocity = RobotMap.PIVOT_CRUISE_VELOCITY; 
+        // motionMagicConfigs.MotionMagicAcceleration = RobotMap.PIVOT_ACCELERATION; 
+        // motionMagicConfigs.MotionMagicJerk = RobotMap.PIVOT_JERK; 
 
         // Current limits to protect the X44s and the pivot mechanism
         CurrentLimitsConfigs pivotLimits = new CurrentLimitsConfigs();
@@ -67,16 +61,11 @@ public class Intake extends SubsystemBase {
         pivotLimits.SupplyCurrentLimitEnable = true;
         pivotConfig.CurrentLimits = pivotLimits;
 
-        // Pivot MUST be in brake mode to hold its position against gravity
         pivotConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-        // Commutation/MotorArrangement is not available on TalonFXConfiguration in this CTRE Phoenix version,
-        // so we do not set pivotConfig.Commutation here.
 
         pivotLeader.getConfigurator().apply(pivotConfig);
         pivotFollower.getConfigurator().apply(pivotConfig);
 
-        // Set the second X44 to strictly follow the leader. 
-        // Note: Change 'false' to 'true' if the follower motor needs to be inverted relative to the leader!
         pivotFollower.setControl(new Follower(pivotLeader.getDeviceID(), MotorAlignmentValue.Opposed));
 
         // --- INTAKE CONFIGURATION (Minion) ---
@@ -88,184 +77,49 @@ public class Intake extends SubsystemBase {
         intakeLimits.SupplyCurrentLimit = 30.0;
         intakeLimits.SupplyCurrentLimitEnable = true;
         intakeConfig.CurrentLimits = intakeLimits;
-        
-        // Typically intakes run in Coast mode so objects don't get stuck, 
-        // but keeping it Brake if your game piece requires firm holding.
+    
         intakeConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
         intakeConfig.Commutation.MotorArrangement = MotorArrangementValue.Minion_JST;
 
         intakeMotor.getConfigurator().apply(intakeConfig);
     }
 
-    // --- PIVOT METHODS ---
 
-    /**
-     * Moves the pivot to a target position (in rotations).
-     */
+public Command pivotUp() {
+    final double upPercent = 0.30; // tune
+    return this.startEnd(
+        () -> pivotLeader.setControl(pivotDuty.withOutput(upPercent)),
+        () -> pivotLeader.setControl(pivotDuty.withOutput(0.0))
+    );
+}
 
-    // public Command setPivotPosition(double targetRotations) {
-    //     return this.run(() -> {
-    //         pivotLeader.setControl(pivotPositionRequest.withPosition(targetRotations));
-    //     });
-    // }
-    // public void updateShooterStatus(boolean shooterTurning) {
-    //     this.shooterTurning = shooterTurning;
-    // }
+public Command pivotDown() {
+    final double downPercent = -0.30; // tune
+    return this.startEnd(
+        () -> pivotLeader.setControl(pivotDuty.withOutput(downPercent)),
+        () -> pivotLeader.setControl(pivotDuty.withOutput(0.0))
+    );
+}
 
-    // public Command oscillatePivot() {
-    //    final MotionMagicVoltage m_request = new MotionMagicVoltage(0);
-    //    double minPos = 3;
-    //    double maxPos = 8;
-    //    double currentTarget = minPos;
-    //    while(shooterTurning) {
-    //         if(currentTarget == minPos) {
-    //             currentTarget = maxPos;
-    //         }
-    //         else {
-    //             currentTarget = minPos;
-    //         }
-    //         return this.run(() -> {
-    //             // set target position to ??? rotations
-    //             pivotLeader.setControl(m_request.withPosition(RobotMap.PIVOT_TARGET_ROTATIONS).withFeedForward(RobotMap.PIVOT_FEEDFORWARD));
-    //             // pivotLeader.setControl(m_request);
-    //         });
-    //     }
-    //     return this.run(() -> {
-    //         // nothing (turning motor off)
-    //     }).finallyDo(() -> stopPivot());
-    // }
 
-    // public Command setPivotUp() {
-    //     System.out.println("setPivotUp executed=====================");
-    //     return this.run(() -> {
-    //         if (isPivotStalling()) {
-    //             handlePivotHardStop(RobotMap.PIVOT_UP_POSITION, true);
-    //             return;
-    //         }
+public Command startIntake() {
+    final double inPercent = Math.abs(RobotMap.INTAKE_SPEED); // intake in
+    return this.startEnd(
+        () -> intakeMotor.setControl(intakeDuty.withOutput(inPercent)),
+        () -> intakeMotor.setControl(intakeDuty.withOutput(0.0))
+    );
+}
 
-    //         pivotLeader.setControl(pivotPositionRequest.withPosition(RobotMap.PIVOT_UP_POSITION));
-    //         pivotUp = true;
-    //     });
-    // }
 
-    // public Command setPivotDown() {
-    //     System.out.println("setPivotDown executed=====================");
-    //     return this.run(() -> {
-    //         if (isPivotStalling()) {
-    //             handlePivotHardStop(RobotMap.PIVOT_DOWN_POSITION, false);
-    //             return;
-    //         }
+public Command reverseIntake() {
+    final double outPercent = -Math.abs(RobotMap.INTAKE_SPEED); // intake out
+    return this.startEnd(
+        () -> intakeMotor.setControl(intakeDuty.withOutput(outPercent)),
+        () -> intakeMotor.setControl(intakeDuty.withOutput(0.0))
+    );
+}
 
-    //         pivotLeader.setControl(pivotPositionRequest.withPosition(RobotMap.PIVOT_DOWN_POSITION));
-    //         pivotUp = false;
-    //     });
-    // }
 
-    public Command pivotUp() {
-        final MotionMagicVoltage m_request = new MotionMagicVoltage(0);
-        while(!isPivotVoltageSpiking()) {
-            return this.run(() -> {
-                //pivotLeader.setControl(pivot_output.withOutput(-RobotMap.GLOBAL_SPEED*2));
-                // set target position to ??? rotations
-                pivotLeader.setControl(m_request.withPosition(-RobotMap.PIVOT_TARGET_ROTATIONS).withFeedForward(RobotMap.PIVOT_FEEDFORWARD));
-            }).finallyDo(() -> stopPivot());
-        }
-        return this.run(() -> {
-           setPivotToZero();
-        });
-    }
 
-    public Command pivotDown() {
-        System.out.println("pivotDown executed=====================");
-        final MotionMagicVoltage m_request = new MotionMagicVoltage(0);
 
-        return this.run(() -> {
-            pivotLeader.setControl(
-                m_request.withPosition(RobotMap.PIVOT_TARGET_ROTATIONS)
-                    .withFeedForward(RobotMap.PIVOT_FEEDFORWARD)
-            );
-        }).finallyDo(() -> stopPivot());
-    }
-
-    public Command setPivotAtTarget() {
-        System.out.println("ZeroPivotMotors executed=====================");
-        return this.run(() -> {
-            pivotLeader.set(RobotMap.PIVOT_TARGET_ROTATIONS);
-            pivotFollower.set(RobotMap.PIVOT_TARGET_ROTATIONS);
-        }).finallyDo(() -> stopPivot());
-    }
-    public Command setPivotToZero() {
-        System.out.println("ZeroPivotMotors executed=====================");
-        return this.run(() -> {
-            pivotLeader.set(0);
-            pivotFollower.set(0);
-        }).finallyDo(() -> stopPivot());
-    }
-
-    // --- INTAKE METHODS ---
-
-    // Pulls the game objects into the Intake using the single Minion.
-    public Command startIntake() {
-        System.out.println("startIntake executed=====================");
-        return this.run(() -> {
-            intakeMotor.setControl(intakeOutput.withOutput(RobotMap.INTAKE_SPEED));
-            goingIn = true;
-        }).finallyDo(() -> stopIntake());
-    }
-
-    // Ejects the game objects from the Intake.
-    public Command intakeOut() {
-        System.out.println("IntakeOut executed=====================");
-        return this.run(() -> {
-            intakeMotor.setControl(intakeOutput.withOutput(-RobotMap.INTAKE_SPEED));
-            goingIn = false;
-        }).finallyDo(() -> stopIntake());
-    }
-
-    // Checks whether the intake is full or not.
-    // 
-
-    public void stopIntake() {
-        System.out.println("stopIntake executed=====================");
-        intakeMotor.stopMotor();
-        goingIn = false;
-    }
-
-    // Completely stop everything (Useful for an emergency stop or disable command)
-    public void stopPivot() {
-        System.out.println("stopPivot executed=====================");
-        pivotLeader.stopMotor();
-    }
-
-    private boolean isPivotVoltageSpiking() {
-        return Math.abs(pivotLeader.getMotorVoltage().getValueAsDouble()) >= RobotMap.PIVOT_VOLTAGE_SPIKE_THRESHOLD
-            || Math.abs(pivotFollower.getMotorVoltage().getValueAsDouble()) >= RobotMap.PIVOT_VOLTAGE_SPIKE_THRESHOLD;
-    }
-    private boolean isPivotStalling() {
-        return Math.abs(pivotLeader.getStatorCurrent().getValueAsDouble()) >= RobotMap.PIVOT_CURRENT_STALL_THRESHOLD
-            || Math.abs(pivotFollower.getStatorCurrent().getValueAsDouble()) >= RobotMap.PIVOT_CURRENT_STALL_THRESHOLD;
-    }
-
-    private void handlePivotHardStop(double expectedPosition, boolean isPivotUp) {
-        stopPivot();
-        pivotLeader.setPosition(expectedPosition);
-        pivotFollower.setPosition(expectedPosition);
-        pivotUp = isPivotUp;
-    }
-
-    @Override
-    public void periodic() {
-        SmartDashboard.putBoolean("Intake Going In?", goingIn);
-
-        // Intake Telemetry
-        SmartDashboard.putNumber("Intake Battery Draw", intakeMotor.getSupplyCurrent().getValueAsDouble());
-        SmartDashboard.putNumber("Intake Motor Draw", intakeMotor.getStatorCurrent().getValueAsDouble());
-        
-        // Pivot Telemetry
-        SmartDashboard.putNumber("Pivot Position (Rot)", pivotLeader.getPosition().getValueAsDouble());
-        SmartDashboard.putNumber("Pivot Leader Voltage", pivotLeader.getMotorVoltage().getValueAsDouble());
-        SmartDashboard.putNumber("Pivot Follower Voltage", pivotFollower.getMotorVoltage().getValueAsDouble());
-        SmartDashboard.putNumber("Pivot Leader Draw", pivotLeader.getStatorCurrent().getValueAsDouble());
-        SmartDashboard.putNumber("Pivot Follower Draw", pivotFollower.getStatorCurrent().getValueAsDouble());
-    } 
 }

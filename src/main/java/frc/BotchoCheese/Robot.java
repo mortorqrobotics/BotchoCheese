@@ -83,9 +83,12 @@ public class Robot extends TimedRobot {
   
 }
 
-  @Override
-  public void disabledInit() {
-  }
+
+@Override
+public void disabledInit() {
+
+}
+
 
   @Override
   public void disabledPeriodic() {
@@ -97,6 +100,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousInit() {
+
     try {  
       RobotContainer.gyro.setYaw(DriverStation.getAlliance().get() == Alliance.Blue ? Math.PI: 0); // this is esentually directly from the external IMU since we barely trust vision angle
       RobotContainer.drivetrain.resetRotation(new Rotation2d(DriverStation.getAlliance().get() == Alliance.Blue ? Math.PI: 0));
@@ -125,6 +129,7 @@ public class Robot extends TimedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
+
     
   }
 

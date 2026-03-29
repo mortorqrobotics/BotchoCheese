@@ -61,12 +61,7 @@ public class RobotMap {
     public static final int RIGHT_PIVOT_MOTOR_ID = 21;
     // public static final int CAN_RANGE_ID = 23;
 
-    // Pivot motor values
-    // TODO Edit values (for Voltage Spike Threshold)
-    public static final double PIVOT_UP_POSITION = 0;
-    public static final double PIVOT_DOWN_POSITION = 17.2;
-
-    public static final double PIVOT_CURRENT_STALL_THRESHOLD = 4.0;
+  
     public static final double PIVOT_VOLTAGE_SPIKE_THRESHOLD = 12.0;
 
     // Intake PID Values
@@ -75,73 +70,37 @@ public class RobotMap {
     public static final double INTAKE_I_VALUE = 0.3;
     public static final double INTAKE_D_VALUE = 0.1;
 
-    // Pivot PID Values
-    // TODO
-    public static final double PIVOT_S_VALUE = 6;
+
+    public static final double PIVOT_S_VALUE = 9;
     public static final double PIVOT_V_VALUE = 0.12;
     public static final double PIVOT_A_VALUE = 0.01;
-    public static final double PIVOT_P_VALUE = 0.4;
+    public static final double PIVOT_P_VALUE = 1;
     public static final double PIVOT_I_VALUE = 0.3;
     public static final double PIVOT_D_VALUE = 0.1;
 
-    // Intake Motion Magic Values
+    public static final double PIVOT_CRUISE_VELOCITY = 200; // Target cruise velocity of 10 rps
+    public static final double PIVOT_ACCELERATION = 20; // Target acceleration of 10 rps^2 (1 seconds)
+    public static final double PIVOT_JERK = 20; // Target jerk
 
-    public static final double PIVOT_CRUISE_VELOCITY = 100; // Target cruise velocity of 10 rps
-    public static final double PIVOT_ACCELERATION = 50; // Target acceleration of 10 rps^2 (1 seconds)
-    public static final double PIVOT_JERK = 100; // Target jerk
-
-    //TODO
-    public static final double PIVOT_TARGET_ROTATIONS = 9.0;
-    public static final double PIVOT_FEEDFORWARD = 0.0;
+    public static final double PIVOT_TARGET_ROTATIONS = 8.0;
+    public static final double PIVOT_FEEDFORWARD = 9;
 
     // Intake speeds
     // Verify if values are correct and go in the right directions
-    public static final double INTAKE_SPEED = -0.83;
-    // public static final double CAN_RANGE_DISTANCE_THRESHOLD = 0.5;
+    public static final double INTAKE_SPEED = 0.83;
     
-    // Feeder Motor ID and Speed
-    // TODO PID
+
     public static final int FEEDER_MOTOR_ID = 23;
     public static final double FEEDER_P_VALUE = 0.12;
     public static final double FEEDER_I_VALUE = 0.0;
     public static final double FEEDER_D_VALUE = 0.001;
-    public static final double FEEDER_SPEED = -1
+    public static final double FEEDER_SPEED = 1
   ; 
 
-    // Motion Magic is currently disabled for the feeder.
-    // public static final double FEEDER_CRUISE_VELOCITY = 14;
-    // public static final double FEEDER_ACCELERATION = 5;
-    // public static final double FEEDER_JERK = 50;
-
-    // Shooter Motor IDs
-    // TODO PUT IN THE RIGHT MOTOR IDS!
     public static final int BACK_LEFT_SHOOTER_MOTOR_ID = 24;
     public static final int BACK_RIGHT_SHOOTER_MOTOR_ID = 25;
     public static final int FRONT_SHOOTER_MOTOR_ID = 26;
-    
-    // // Hood Motor IDs
-    // public static final int HOOD_MOTOR_ID = 17;
-    // public static final int HOOD_THROUGHBORE_DIO = 0;
 
-    // public static final double HOOD_P_VALUE = 0.4;
-    // public static final double HOOD_I_VALUE = 0.0;
-    // public static final double HOOD_D_VALUE = 0.2;
-    // public static final double HOOD_SPEED = .1;
-
-    // // Hood Motion Magic Values
-    
-    // public static final double HOOD_CRUISE_VELOCITY = 40;
-    
-    // public static final double HOOD_ACCELERATION = 80;
-    // public static final double HOOD_JERK = 800;
-
-    // public static double HOOD_SPEED_REGRESSION_SLOPE = 1.0;
-    // public static double HOOD_SPEED_REGRESSION_Y_INTERCEPT = 1.0;
-
-    // Shooter speeds
-
-      // Notice: Will be dynamically modified in the Shooter's updateSpeed function
-   
     public static final double SHOOTER_MULTIPLIER = 0.5;
     public static double SHOOTER_SPEED_1 = 0.67; // Notice: Will be dynamically modified in the Shooter's updateSpeed function
     public static double SHOOTER_SPEED_2 = 0.77;
