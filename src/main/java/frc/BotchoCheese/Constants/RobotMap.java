@@ -152,7 +152,7 @@ public class RobotMap {
 
     // Notice 1: Will be dynamically modified in the Shooter's updateSpeed function
     // Notice 2: This apparently does not control anything
-    public static double SHOOTER_SPEED = 0.87;
+    public static double SHOOTER_SPEED = 0.72;
     
     //TODO
     public static double SHOOTER_SPEED_REGRESSION_SLOPE = 1.0;
