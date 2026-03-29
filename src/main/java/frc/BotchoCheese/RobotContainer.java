@@ -42,6 +42,7 @@ import frc.BotchoCheese.Subsystems.Indexer;
 //import frc.BotchoCheese.Subsystems.Climber;
 import frc.BotchoCheese.Subsystems.Intake;
 import frc.BotchoCheese.Subsystems.Shooter;
+import frc.BotchoCheese.Subsystems.Pivot;
 
 
 public class RobotContainer {
@@ -81,6 +82,8 @@ public class RobotContainer {
 
     public final Indexer indexer = new Indexer();
 
+     public final Pivot pivot = new Pivot();
+
     /* Path follower */
     private final SendableChooser<Command> autoChooser;
 
@@ -88,10 +91,10 @@ public class RobotContainer {
         
         NamedCommands.registerCommand("Shoot", 
             Commands.sequence(
-                Commands.parallel(feeder.reverseFeeder().withTimeout(0.5), indexer.reverseIndexer().withTimeout(0.25), shooter.shootRps(80).withTimeout(0.5), intake.startIntake().withTimeout(0.5))).andThen(Commands.parallel(shooter.shootRps(80).withTimeout(2), feeder.runFeeder().withTimeout(2), indexer.indexerOn().withTimeout(2), intake.startIntake().withTimeout(2))                
+              //  Commands.parallel(feeder.reverseFeeder().withTimeout(0.5), indexer.reverseIndexer().withTimeout(0.25), shooter.shootRps(80).withTimeout(0.5), intake.startIntake().withTimeout(0.5))).andThen(Commands.parallel(shooter.shootRps(80).withTimeout(2), feeder.runFeeder().withTimeout(2), indexer.indexerOn().withTimeout(2), intake.startIntake().withTimeout(2))                
             )
         );
-        NamedCommands.registerCommand("PivotDown", intake.pivotDown().withTimeout(1.5).andThen(intake.startIntake().withTimeout(1.5)));
+        //NamedCommands.registerCommand("PivotDown", intake.pivotDown().withTimeout(1.5).andThen(intake.startIntake().withTimeout(1.5)));
         // NamedCommands.registerCommand("PivotUp", intake.pivotDown().withTimeout(3));
         NamedCommands.registerCommand("IntakeOn", intake.startIntake());
         //NamedCommands.registerCommand("IntakeOff", new InstantCommand(()->intake.stopIntake()));
@@ -176,36 +179,45 @@ public class RobotContainer {
 
         //Controller 2
 
-        JOYSTICK2_CONTROLLER.povUp().whileTrue(intake.pivotUp());
-        JOYSTICK2_CONTROLLER.povDown().whileTrue(intake.pivotDown());
+        JOYSTICK2_CONTROLLER.povUp().whileTrue(pivot.pivotUp());
+        JOYSTICK2_CONTROLLER.povDown().whileTrue(pivot.pivotDown());
 
+
+        //INTAKE BALLs
         JOYSTICK2_CONTROLLER.x().toggleOnTrue(
-    Commands.parallel(
+        Commands.parallel(
         intake.startIntake(),
-        indexer.indexerOn()
+        indexer.reverseIndexer(),
+        feeder.runFeeder(-0.5)
+     
     )
 );
 
 JOYSTICK2_CONTROLLER.b().toggleOnTrue(
     Commands.sequence(
         // Spin up shooter for 2s
-        shooter.shootRps(60).withTimeout(2.0),
+        shooter.shootRps(90).withTimeout(2.0),
 
         // Then run everything continuously until toggled off
         Commands.parallel(
-            shooter.shootRps(60),
-            feeder.runFeeder(),
+            shooter.shootRps(90),
+            feeder.runFeeder(0.5),
             indexer.indexerOn(),
-            intake.startIntake()
+            intake.startIntake(),
+            pivot.pivotUpToRotations(4)
         )
     )
 );
 
+
+
+//Test slow shoot
 JOYSTICK2_CONTROLLER.a().whileTrue(shooter.shootRps(10));
 
+//
 JOYSTICK2_CONTROLLER.y().whileTrue(
     Commands.parallel(
-        feeder.reverseFeeder(),
+        feeder.runFeeder(-0.5),
         indexer.reverseIndexer(),
         intake.reverseIntake()
     )

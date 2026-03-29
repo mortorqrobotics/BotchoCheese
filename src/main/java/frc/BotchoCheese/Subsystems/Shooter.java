@@ -68,8 +68,8 @@ private final VelocityVoltage shooterVelocityRequest = new VelocityVoltage(0);
 public Command shootRps(double targetRps) {
     return this.startEnd(
         () -> {
-            backLeftShooter.setControl(shooterVelocityRequest.withVelocity(targetRps));
-            frontShooter.setControl(shooterVelocityRequest.withVelocity(targetRps));
+            backLeftShooter.setControl(shooterVelocityRequest.withVelocity(-targetRps));
+            frontShooter.setControl(shooterVelocityRequest.withVelocity(-targetRps));
         },
         () -> {
             backLeftShooter.stopMotor();

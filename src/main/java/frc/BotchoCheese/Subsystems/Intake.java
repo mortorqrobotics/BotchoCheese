@@ -85,25 +85,8 @@ public class Intake extends SubsystemBase {
     }
 
 
-public Command pivotUp() {
-    final double upPercent = 0.30; // tune
-    return this.startEnd(
-        () -> pivotLeader.setControl(pivotDuty.withOutput(upPercent)),
-        () -> pivotLeader.setControl(pivotDuty.withOutput(0.0))
-    );
-}
-
-public Command pivotDown() {
-    final double downPercent = -0.30; // tune
-    return this.startEnd(
-        () -> pivotLeader.setControl(pivotDuty.withOutput(downPercent)),
-        () -> pivotLeader.setControl(pivotDuty.withOutput(0.0))
-    );
-}
-
-
 public Command startIntake() {
-    final double inPercent = Math.abs(RobotMap.INTAKE_SPEED); // intake in
+    final double inPercent = -Math.abs(RobotMap.INTAKE_SPEED); // intake in
     return this.startEnd(
         () -> intakeMotor.setControl(intakeDuty.withOutput(inPercent)),
         () -> intakeMotor.setControl(intakeDuty.withOutput(0.0))
@@ -112,7 +95,7 @@ public Command startIntake() {
 
 
 public Command reverseIntake() {
-    final double outPercent = -Math.abs(RobotMap.INTAKE_SPEED); // intake out
+    final double outPercent = Math.abs(RobotMap.INTAKE_SPEED); // intake out
     return this.startEnd(
         () -> intakeMotor.setControl(intakeDuty.withOutput(outPercent)),
         () -> intakeMotor.setControl(intakeDuty.withOutput(0.0))

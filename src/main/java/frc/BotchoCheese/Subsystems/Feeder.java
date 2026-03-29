@@ -35,17 +35,11 @@ public class Feeder extends SubsystemBase {
         feeder.getConfigurator().apply(config);
     }
 
-    public Command runFeeder() {
-    return this.startEnd(
-        () -> feeder.setControl(feederDuty.withOutput(RobotMap.FEEDER_SPEED)),
-        () -> feeder.stopMotor()
-    );
-}
 
-public Command reverseFeeder() {
+    public Command runFeeder(double percent) {
     return this.startEnd(
-        () -> feeder.setControl(feederDuty.withOutput(-RobotMap.FEEDER_SPEED)),
-        () -> feeder.stopMotor()
+        () -> feeder.setControl(feederDuty.withOutput(Math.max(-1.0, Math.min(1.0, percent)))),
+        () -> feeder.setControl(feederDuty.withOutput(0.0))
     );
 }
 
