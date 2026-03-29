@@ -186,19 +186,13 @@ public class Intake extends SubsystemBase {
     public Command pivotDown() {
         System.out.println("pivotDown executed=====================");
         final MotionMagicVoltage m_request = new MotionMagicVoltage(0);
-        //Get to target rotations
-        while(!m_bottomLimitSwitch.get()) {
-            return this.run(() -> {
-                //pivotLeader.setControl(pivot_output.withOutput(RobotMap.PIVOT_TARGET_ROTATIONS));
-                pivotLeader.setControl(m_request.withPosition(RobotMap.PIVOT_TARGET_ROTATIONS).withFeedForward(RobotMap.PIVOT_FEEDFORWARD));
-            }).finallyDo(() -> stopPivot());
-        }
 
-        System.out.println("Stopping motors==========================");
-        //Stop motors
         return this.run(() -> {
-           setPivotAtTarget();
-        });
+            pivotLeader.setControl(
+                m_request.withPosition(RobotMap.PIVOT_TARGET_ROTATIONS)
+                    .withFeedForward(RobotMap.PIVOT_FEEDFORWARD)
+            );
+        }).finallyDo(() -> stopPivot());
     }
 
     public Command setPivotAtTarget() {
