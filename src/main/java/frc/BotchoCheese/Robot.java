@@ -4,6 +4,12 @@
 
 package frc.BotchoCheese;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+
+import com.ctre.phoenix6.SignalLogger;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
@@ -22,6 +28,9 @@ import frc.BotchoCheese.Utils.LimelightHelpers;
 
 
 public class Robot extends TimedRobot {
+  private static final Path USB_MOUNT_PATH = Path.of("/U");
+  private static final Path USB_LOG_DIR = USB_MOUNT_PATH.resolve("logs");
+  private static final Path LOCAL_LOG_DIR = Path.of("logs");
 
   public static LimelightHelpers limelight;
   public static LimelightHelpers limelightTwo;
@@ -45,7 +54,11 @@ public class Robot extends TimedRobot {
 
     SmartDashboard.putData("Field", m_field);
     m_field.setRobotPose(RobotContainer.drivetrain.getState().Pose);
-    DataLogManager.start(); 
+  }
+
+  @Override
+  public void robotInit() {
+    startUsbLoggingIfAvailable();
   }
 
   @Override
@@ -152,4 +165,18 @@ public void disabledInit() {
 
   @Override
   public void simulationPeriodic() {}
+
+  private void startUsbLoggingIfAvailable() {
+    try {
+      Path logDir = Files.isDirectory(USB_MOUNT_PATH) ? USB_LOG_DIR : LOCAL_LOG_DIR;
+      Files.createDirectories(logDir);
+      DataLogManager.start(logDir.toString());
+      DriverStation.startDataLog(DataLogManager.getLog());
+      SignalLogger.setPath(logDir.toString());
+      SignalLogger.start();
+      DriverStation.reportWarning("Logging to " + logDir, false);
+    } catch (IOException ex) {
+      DriverStation.reportError("Failed to initialize robot logging: " + ex.getMessage(), ex.getStackTrace());
+    }
+  }
 }
