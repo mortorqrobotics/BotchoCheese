@@ -35,6 +35,8 @@ public class RobotMap {
     
     // Intake motor IDs
     public static final int INTAKE_MOTOR_ID = 22;
+
+    // Pivot motor IDs
     public static final int LEFT_PIVOT_MOTOR_ID = 20;
     public static final int RIGHT_PIVOT_MOTOR_ID = 21;
   
@@ -46,18 +48,20 @@ public class RobotMap {
 
     public static final double PIVOT_TARGET_ROTATIONS = 8.0;
     public static final double PIVOT_FEEDFORWARD = 9;
-  ; 
+    public static final double PIVOT_S_VALUE = 9;
+    public static final double PIVOT_V_VALUE = 0;
+    public static final double PIVOT_A_VALUE = 0;
+    public static final double PIVOT_P_VALUE = 0;
+    public static final double PIVOT_I_VALUE = 0;
+    public static final double PIVOT_D_VALUE = 0;
+
+  ; // Shooter motor IDs
     public static final int BACK_LEFT_SHOOTER_MOTOR_ID = 24;
     public static final int BACK_RIGHT_SHOOTER_MOTOR_ID = 25;
     public static final int FRONT_SHOOTER_MOTOR_ID = 26;
 
-    
     public static final double SHOOTER_ACCELERATION = 160.0;
     public static final double SHOOTER_JERK = 1600.0;
-
-    // Notice 1: Will be dynamically modified in the Shooter's updateSpeed function
-    // Notice 2: This apparently does not control anything
-    public static double SHOOTER_SPEED = 0.72;
     
     //TODO
     public static double SHOOTER_SPEED_REGRESSION_SLOPE = 1.0;
@@ -78,9 +82,6 @@ public class RobotMap {
 
     // Indexer ID
     public static final int INDEXER_MOTOR_ID = 18;
-
-    // Indexer speeds
-    public static final double INDEXER_MOTOR_SPEED =.4;
 
     // Feeder ID
     public static final int FEEDER_MOTOR_ID = 23;

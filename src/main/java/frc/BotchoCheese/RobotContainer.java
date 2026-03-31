@@ -196,11 +196,11 @@ public class RobotContainer {
 JOYSTICK2_CONTROLLER.rightTrigger().toggleOnTrue(
     Commands.sequence(
         // Spin up shooter for 2s
-        shooter.shootRps(110).withTimeout(1.0),
+        shooter.shootRps(90).withTimeout(1.0),
 
         // Then run everything continuously until toggled off
         Commands.parallel(
-            shooter.shootRps(110),
+            shooter.shootRps(90),
             feeder.runFeeder(0.5),
             indexer.runIndexer(0.5),
             intake.runIntake(0.5),
@@ -219,6 +219,7 @@ JOYSTICK2_CONTROLLER.b().whileTrue(
 );
 
     }
+    
     private static double applyDriveDeadband(double value) {
         return MathUtil.applyDeadband(value, 0.1);
     }

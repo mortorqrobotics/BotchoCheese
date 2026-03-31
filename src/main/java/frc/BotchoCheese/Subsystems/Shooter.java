@@ -32,7 +32,7 @@ public class Shooter extends SubsystemBase {
         TalonFXConfiguration config = new TalonFXConfiguration();
 
         // PID Shooter Values
-        // in init function, set slot 0 gains
+
         Slot0Configs shooterSlot0 = new Slot0Configs();
         shooterSlot0.kS = RobotMap.SHOOTER_S_VALUE;
         shooterSlot0.kV = RobotMap.SHOOTER_V_VALUE;
