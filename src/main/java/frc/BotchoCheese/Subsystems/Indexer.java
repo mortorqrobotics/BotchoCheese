@@ -50,13 +50,4 @@ public class Indexer extends SubsystemBase {
         );
     }
 
-    public Command indexerOn() {
-        return runIndexer(RobotMap.INDEXER_MOTOR_SPEED);
-    }
-
-    public Command reverseIndexer() {
-        return runIndexer(-RobotMap.INDEXER_MOTOR_SPEED);
-    }
-
-
 }

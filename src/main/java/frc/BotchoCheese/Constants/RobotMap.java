@@ -32,51 +32,13 @@ public class RobotMap {
 
     //Gyro
     public static final int PIGEON_ID = 30;
-
-    //TODO
-    // GLOBAL SPEED
-    public static final double GLOBAL_SPEED = 0.1;
-
-    // Climber
-    // Climber motor IDs
-    // public static final int LEFT_CLIMBER_MOTOR_ID = 27;
-    // public static final int RIGHT_CLIMBER_MOTOR_ID = 28;
-
-    // // Climber PID Values
-    // // TODO
-    // public static final double CLIMBER_P_VALUE = 0.3;
-    // public static final double CLIMBER_I_VALUE = 0.25;
-    // public static final double CLIMBER_D_VALUE = 0.4;
-
-    // // Climber speeds
-    // public static final double CLIMBER_UP_SPEED = -0.6;
-    // public static final double CLIMBER_DOWN_SPEED = 0.6;
-
-    // // TODO: Comfirm the new Climber Extension Limit
-    // public static final double CLIMBER_EXTENSION_LIMIT = 200; 
     
     // Intake motor IDs
     public static final int INTAKE_MOTOR_ID = 22;
     public static final int LEFT_PIVOT_MOTOR_ID = 20;
     public static final int RIGHT_PIVOT_MOTOR_ID = 21;
-    // public static final int CAN_RANGE_ID = 23;
-
   
     public static final double PIVOT_VOLTAGE_SPIKE_THRESHOLD = 12.0;
-
-    // Intake PID Values
-    // TODO
-    public static final double INTAKE_P_VALUE = 0.4;
-    public static final double INTAKE_I_VALUE = 0.3;
-    public static final double INTAKE_D_VALUE = 0.1;
-
-
-    public static final double PIVOT_S_VALUE = 9;
-    public static final double PIVOT_V_VALUE = 0.12;
-    public static final double PIVOT_A_VALUE = 0.01;
-    public static final double PIVOT_P_VALUE = 1;
-    public static final double PIVOT_I_VALUE = 0.3;
-    public static final double PIVOT_D_VALUE = 0.1;
 
     public static final double PIVOT_CRUISE_VELOCITY = 200; // Target cruise velocity of 10 rps
     public static final double PIVOT_ACCELERATION = 20; // Target acceleration of 10 rps^2 (1 seconds)
@@ -84,30 +46,14 @@ public class RobotMap {
 
     public static final double PIVOT_TARGET_ROTATIONS = 8.0;
     public static final double PIVOT_FEEDFORWARD = 9;
-
-    // Intake speeds
-    // Verify if values are correct and go in the right directions
-    public static final double INTAKE_SPEED = 0.83;
-    
-
-    public static final int FEEDER_MOTOR_ID = 23;
-    public static final double FEEDER_P_VALUE = 0.12;
-    public static final double FEEDER_I_VALUE = 0.0;
-    public static final double FEEDER_D_VALUE = 0.001;
-    public static final double FEEDER_SPEED = 1
   ; 
-
     public static final int BACK_LEFT_SHOOTER_MOTOR_ID = 24;
     public static final int BACK_RIGHT_SHOOTER_MOTOR_ID = 25;
     public static final int FRONT_SHOOTER_MOTOR_ID = 26;
 
-    public static final double SHOOTER_MULTIPLIER = 0.5;
-    public static double SHOOTER_SPEED_1 = 0.67; // Notice: Will be dynamically modified in the Shooter's updateSpeed function
-    public static double SHOOTER_SPEED_2 = 0.77;
-    public static double SHOOTER_SPEED_3 = 0.87;
     
-    public static final double SHOOTER_ACCELERATION = 160.0 * SHOOTER_MULTIPLIER;
-    public static final double SHOOTER_JERK = 1600.0 * SHOOTER_MULTIPLIER;
+    public static final double SHOOTER_ACCELERATION = 160.0;
+    public static final double SHOOTER_JERK = 1600.0;
 
     // Notice 1: Will be dynamically modified in the Shooter's updateSpeed function
     // Notice 2: This apparently does not control anything
@@ -135,6 +81,9 @@ public class RobotMap {
 
     // Indexer speeds
     public static final double INDEXER_MOTOR_SPEED =.4;
+
+    // Feeder ID
+    public static final int FEEDER_MOTOR_ID = 23;
 
     // CANdle Constants
     public static final int CANDLE_LED_START_INDEX = 0;

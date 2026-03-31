@@ -6,8 +6,6 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.configs.TalonFXSConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.Follower;
-import com.ctre.phoenix6.controls.MotionMagicVoltage;
-import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.hardware.TalonFXS;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
@@ -28,7 +26,6 @@ public class Intake extends SubsystemBase {
 
     // Control requests
     private final DutyCycleOut intakeDuty = new DutyCycleOut(0);
-    private final DutyCycleOut pivotDuty = new DutyCycleOut(0);
 
     
     public Intake() {
@@ -85,23 +82,14 @@ public class Intake extends SubsystemBase {
     }
 
 
-public Command startIntake() {
-    final double inPercent = -Math.abs(RobotMap.INTAKE_SPEED); // intake in
+public Command runIntake(double percent) {
     return this.startEnd(
-        () -> intakeMotor.setControl(intakeDuty.withOutput(inPercent)),
+        () -> intakeMotor.setControl(
+            intakeDuty.withOutput(-Math.max(-1.0, Math.min(1.0, percent)))
+        ),
         () -> intakeMotor.setControl(intakeDuty.withOutput(0.0))
     );
 }
-
-
-public Command reverseIntake() {
-    final double outPercent = Math.abs(RobotMap.INTAKE_SPEED); // intake out
-    return this.startEnd(
-        () -> intakeMotor.setControl(intakeDuty.withOutput(outPercent)),
-        () -> intakeMotor.setControl(intakeDuty.withOutput(0.0))
-    );
-}
-
 
 
 

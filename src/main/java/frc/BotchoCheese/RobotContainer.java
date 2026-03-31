@@ -95,7 +95,7 @@ public class RobotContainer {
         );
         //NamedCommands.registerCommand("PivotDown", intake.pivotDown().withTimeout(1.5).andThen(intake.startIntake().withTimeout(1.5)));
         // NamedCommands.registerCommand("PivotUp", intake.pivotDown().withTimeout(3));
-        NamedCommands.registerCommand("IntakeOn", intake.startIntake());
+        NamedCommands.registerCommand("IntakeOn", intake.runIntake(0.5));
         //NamedCommands.registerCommand("IntakeOff", new InstantCommand(()->intake.stopIntake()));
 
         autoChooser = new SendableChooser<>();
@@ -185,8 +185,8 @@ public class RobotContainer {
         //INTAKE BALLs
         JOYSTICK2_CONTROLLER.leftTrigger().toggleOnTrue(
         Commands.parallel(
-        intake.startIntake(),
-        indexer.reverseIndexer(),
+        intake.runIntake(-0.5),
+        indexer.runIndexer(-0.5),
         feeder.runFeeder(-0.5)
      
     )
@@ -202,38 +202,19 @@ JOYSTICK2_CONTROLLER.rightTrigger().toggleOnTrue(
         Commands.parallel(
             shooter.shootRps(110),
             feeder.runFeeder(0.5),
-            indexer.indexerOn(),
-            intake.startIntake(),
+            indexer.runIndexer(0.5),
+            intake.runIntake(0.5),
             pivot.pivotUpToRotations(4)
         )
     )
 );
-
-JOYSTICK2_CONTROLLER.rightBumper().toggleOnTrue(
-    Commands.sequence(
-        // Spin up shooter for 2s
-        shooter.shootRps(110).withTimeout(1.0),
-
-        // Then run everything continuously until toggled off
-        Commands.parallel(
-            shooter.shootRps(110),
-            feeder.runFeeder(0.5),
-            indexer.indexerOn(),
-            intake.startIntake(),
-            pivot.pivotUpToRotations(4)
-        )
-    )
-);
-
-
-
 
 //Reverse everything
 JOYSTICK2_CONTROLLER.b().whileTrue(
     Commands.parallel(
         feeder.runFeeder(-0.5),
-        indexer.reverseIndexer(),
-        intake.reverseIntake()
+        indexer.runIndexer(-0.5),
+        intake.runIntake(-0.5)
     )
 );
 
