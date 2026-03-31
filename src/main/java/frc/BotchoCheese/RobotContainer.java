@@ -103,6 +103,7 @@ public class RobotContainer {
         configureAutoChooser();
         SmartDashboard.putData(AUTO_CHOOSER_KEY, autoChooser);
         SmartDashboard.putNumber(SHOOTER_RPS_KEY, 90.0);
+        SmartDashboard.putData("Zero Pivot Encoder", new InstantCommand(pivot::zeroPivotEncoder, pivot));
 
         configureBindings();
     }

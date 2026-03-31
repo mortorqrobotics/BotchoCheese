@@ -84,6 +84,7 @@ public class Robot extends TimedRobot {
     SmartDashboard.putNumber("PoseX", RobotContainer.drivetrain.getState().Pose.getX());
     SmartDashboard.putNumber("PoseY", RobotContainer.drivetrain.getState().Pose.getY());
     SmartDashboard.putNumber("Yaw", RobotContainer.drivetrain.getState().Pose.getRotation().getDegrees());
+    SmartDashboard.putNumber("Pivot Rotations", m_robotContainer.pivot.getPivotRotations());
 
     if (kUseLimelight) {
       LimelightHomography.update(RobotContainer.drivetrain);

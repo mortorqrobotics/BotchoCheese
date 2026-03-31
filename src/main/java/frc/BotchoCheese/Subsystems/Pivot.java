@@ -71,6 +71,15 @@ public class Pivot extends SubsystemBase {
         pivotFollower.setNeutralMode(NeutralModeValue.Coast);
     }
 
+    public void zeroPivotEncoder() {
+        pivotLeader.setPosition(0.0);
+        pivotFollower.setPosition(0.0);
+    }
+
+    public double getPivotRotations() {
+        return pivotLeader.getPosition().getValueAsDouble();
+    }
+
     public Command pivotUp() {
         final double upVolts = -4.0;
         return this.startEnd(
