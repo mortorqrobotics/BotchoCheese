@@ -12,16 +12,6 @@
     "Auto 7; NZ Shoot",
     "Auto 8 Shoot Outpost Shoot (SOS)"
   ],
-  "autoFolders": [
-    "Autos 1",
-    "Autos 2",
-    "Autos 3",
-    "Autos 4",
-    "Autos 5",
-    "Autos 6",
-    "Autos 7",
-    "Autos 8"
-  ],
   "defaultMaxVel": 1.5,
   "defaultMaxAccel": 3.0,
   "defaultMaxAngVel": 540.0,
