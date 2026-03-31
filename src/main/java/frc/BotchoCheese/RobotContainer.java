@@ -48,6 +48,7 @@ public class RobotContainer {
     private static final String DEFAULT_AUTO_NAME = "Auto 1 (Default)";
     private static final String AUTO_CHOOSER_KEY = "Auto Mode";
     private static final String PATHPLANNER_AUTO_FOLDER = "pathplanner/autos";
+    private static final String SHOOTER_RPS_KEY = "Shooter Target RPS";
 
     public static double MaxSpeed = 1.0 * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
     
@@ -101,6 +102,7 @@ public class RobotContainer {
         autoChooser = new SendableChooser<>();
         configureAutoChooser();
         SmartDashboard.putData(AUTO_CHOOSER_KEY, autoChooser);
+        SmartDashboard.putNumber(SHOOTER_RPS_KEY, 90.0);
 
         configureBindings();
     }
@@ -192,15 +194,26 @@ public class RobotContainer {
     )
 );
 
-//Shooter sequence
+//Shooter sequence at fixed 90 RPS
 JOYSTICK2_CONTROLLER.rightTrigger().toggleOnTrue(
     Commands.sequence(
-        // Spin up shooter for 2s
         shooter.shootRps(90).withTimeout(1.0),
-
-        // Then run everything continuously until toggled off
         Commands.parallel(
             shooter.shootRps(90),
+            feeder.runFeeder(0.5),
+            indexer.runIndexer(0.5),
+            intake.runIntake(0.5),
+            pivot.pivotUpToRotations(4)
+        )
+    )
+);
+
+//Shooter sequence using SmartDashboard RPS
+JOYSTICK2_CONTROLLER.rightBumper().toggleOnTrue(
+    Commands.sequence(
+        shooter.shootRps(getShooterTargetRps()).withTimeout(1.0),
+        Commands.parallel(
+            shooter.shootRps(getShooterTargetRps()),
             feeder.runFeeder(0.5),
             indexer.runIndexer(0.5),
             intake.runIntake(0.5),
@@ -222,6 +235,10 @@ JOYSTICK2_CONTROLLER.b().whileTrue(
     
     private static double applyDriveDeadband(double value) {
         return MathUtil.applyDeadband(value, 0.1);
+    }
+
+    private double getShooterTargetRps() {
+        return SmartDashboard.getNumber(SHOOTER_RPS_KEY, 90.0);
     }
 
 
