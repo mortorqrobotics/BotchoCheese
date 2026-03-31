@@ -25,7 +25,7 @@
       },
       "nextControl": {
         "x": 10.289087512680096,
-        "y": 0.8078096421757129
+        "y": 0.807809642175713
       },
       "isLocked": false,
       "linkedName": null
@@ -36,7 +36,7 @@
         "y": 1.9
       },
       "prevControl": {
-        "x": 8.05,
+        "x": 8.3,
         "y": 1.9
       },
       "nextControl": null,
@@ -51,7 +51,7 @@
     },
     {
       "waypointRelativePos": 1.26,
-      "rotationDegrees": -20
+      "rotationDegrees": -20.0
     }
   ],
   "constraintZones": [],
@@ -73,7 +73,7 @@
   "folder": "Auto 2; Shoot and Intake",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 0
+    "rotation": 0.0
   },
   "useDefaultConstraints": false
 }
