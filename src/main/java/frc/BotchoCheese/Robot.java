@@ -99,7 +99,7 @@ public class Robot extends TimedRobot {
 
 @Override
 public void disabledInit() {
-
+  m_robotContainer.pivot.disableBrakeMode();
 }
 
 
@@ -113,6 +113,7 @@ public void disabledInit() {
 
   @Override
   public void autonomousInit() {
+    m_robotContainer.pivot.enableBrakeMode();
 
     try {  
       RobotContainer.gyro.setYaw(DriverStation.getAlliance().get() == Alliance.Blue ? Math.PI: 0); // this is esentually directly from the external IMU since we barely trust vision angle
@@ -138,6 +139,7 @@ public void disabledInit() {
 
   @Override
   public void teleopInit() {
+    m_robotContainer.pivot.enableBrakeMode();
     NetworkTableInstance.getDefault().getTable("limelight").getEntry("throttle_set").setNumber(0);
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
@@ -154,6 +156,7 @@ public void disabledInit() {
 
   @Override
   public void testInit() {
+    m_robotContainer.pivot.enableBrakeMode();
     CommandScheduler.getInstance().cancelAll();
   }
 

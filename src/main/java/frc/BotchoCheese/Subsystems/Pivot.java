@@ -61,37 +61,42 @@ public class Pivot extends SubsystemBase {
         pivotFollower.setControl(new Follower(pivotLeader.getDeviceID(), MotorAlignmentValue.Opposed));
     }
 
-public Command pivotUp() {
-    final double upVolts = -4.0; // tune
-    return this.startEnd(
-        () -> pivotLeader.setVoltage(upVolts),
-        () -> pivotLeader.setVoltage(0.0)
-    );
-}
+    public void enableBrakeMode() {
+        pivotLeader.setNeutralMode(NeutralModeValue.Brake);
+        pivotFollower.setNeutralMode(NeutralModeValue.Brake);
+    }
 
-public Command pivotDown() {
-    final double downVolts = 4.0; // tune
-    return this.startEnd(
-        () -> pivotLeader.setVoltage(downVolts),
-        () -> pivotLeader.setVoltage(0.0)
-    );
-}
+    public void disableBrakeMode() {
+        pivotLeader.setNeutralMode(NeutralModeValue.Coast);
+        pivotFollower.setNeutralMode(NeutralModeValue.Coast);
+    }
 
-
-public Command pivotUpToRotations(double deltaRotations) {
-    return this.defer(() -> {
-        double startPos = pivotLeader.getPosition().getValueAsDouble();
-        double targetPos = startPos - Math.abs(deltaRotations); // up is negative in your setup
-        final double upVolts = -4.0; // tune
-
+    public Command pivotUp() {
+        final double upVolts = -4.0;
         return this.startEnd(
             () -> pivotLeader.setVoltage(upVolts),
             () -> pivotLeader.setVoltage(0.0)
-        ).until(() -> pivotLeader.getPosition().getValueAsDouble() <= targetPos);
-    });
-}
+        );
+    }
 
+    public Command pivotDown() {
+        final double downVolts = 4.0;
+        return this.startEnd(
+            () -> pivotLeader.setVoltage(downVolts),
+            () -> pivotLeader.setVoltage(0.0)
+        );
+    }
 
+    public Command pivotUpToRotations(double deltaRotations) {
+        return this.defer(() -> {
+            double startPos = pivotLeader.getPosition().getValueAsDouble();
+            double targetPos = startPos - Math.abs(deltaRotations);
+            final double upVolts = -4.0;
 
-
+            return this.startEnd(
+                () -> pivotLeader.setVoltage(upVolts),
+                () -> pivotLeader.setVoltage(0.0)
+            ).until(() -> pivotLeader.getPosition().getValueAsDouble() <= targetPos);
+        });
+    }
 }
