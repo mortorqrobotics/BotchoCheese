@@ -22,6 +22,9 @@ public class Pivot extends SubsystemBase {
     private static final double PIVOT_CRUISE_VELOCITY = 200.0;
     private static final double PIVOT_ACCELERATION = 20.0;
     private static final double PIVOT_JERK = 20.0;
+    private static final double PIVOT_TARGET_ROTATIONS = 8.0;
+    private static final double PIVOT_FEEDFORWARD = 9.0;
+    private static final double PIVOT_VOLTAGE_SPIKE_THRESHOLD = 12.0;
 
     private final TalonFX pivotLeader;
     private final TalonFX pivotFollower;

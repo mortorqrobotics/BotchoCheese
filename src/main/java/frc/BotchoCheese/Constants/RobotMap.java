@@ -40,11 +40,6 @@ public class RobotMap {
     public static final int LEFT_PIVOT_MOTOR_ID = 20;
     public static final int RIGHT_PIVOT_MOTOR_ID = 21;
   
-    public static final double PIVOT_VOLTAGE_SPIKE_THRESHOLD = 12.0;
-
-    public static final double PIVOT_TARGET_ROTATIONS = 8.0;
-    public static final double PIVOT_FEEDFORWARD = 9;
-
   ; // Shooter motor IDs
     public static final int BACK_LEFT_SHOOTER_MOTOR_ID = 24;
     public static final int BACK_RIGHT_SHOOTER_MOTOR_ID = 25;
@@ -56,10 +51,7 @@ public class RobotMap {
     // Feeder ID
     public static final int FEEDER_MOTOR_ID = 23;
 
-    // CANdle Constants
-    public static final int CANDLE_LED_START_INDEX = 0;
-    public static final int CANDLE_LED_COUNT = 0;
+    // CANdle hardware mapping
     public static final int CANDLE_CAN_ID = 40;
     public static final String CANDLE_CAN_BUS = "Canivore1515";
-    public static final double CANDLE_BRIGHTNESS = 0.5;
 }
