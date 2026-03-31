@@ -42,27 +42,13 @@ public class RobotMap {
   
     public static final double PIVOT_VOLTAGE_SPIKE_THRESHOLD = 12.0;
 
-    public static final double PIVOT_CRUISE_VELOCITY = 200; // Target cruise velocity of 10 rps
-    public static final double PIVOT_ACCELERATION = 20; // Target acceleration of 10 rps^2 (1 seconds)
-    public static final double PIVOT_JERK = 20; // Target jerk
-
     public static final double PIVOT_TARGET_ROTATIONS = 8.0;
     public static final double PIVOT_FEEDFORWARD = 9;
-    public static final double PIVOT_S_VALUE = 9;
-    public static final double PIVOT_V_VALUE = 0;
-    public static final double PIVOT_A_VALUE = 0;
-    public static final double PIVOT_P_VALUE = 0;
-    public static final double PIVOT_I_VALUE = 0;
-    public static final double PIVOT_D_VALUE = 0;
-
   ; // Shooter motor IDs
     public static final int BACK_LEFT_SHOOTER_MOTOR_ID = 24;
     public static final int BACK_RIGHT_SHOOTER_MOTOR_ID = 25;
     public static final int FRONT_SHOOTER_MOTOR_ID = 26;
 
-    public static final double SHOOTER_ACCELERATION = 160.0;
-    public static final double SHOOTER_JERK = 1600.0;
-    
     //TODO
     public static double SHOOTER_SPEED_REGRESSION_SLOPE = 1.0;
     public static double SHOOTER_SPEED_REGRESSION_Y_INTERCEPT = 1.0;
@@ -70,15 +56,6 @@ public class RobotMap {
     //If the distance between the robot and tag is less than threshold, the distance is "short"
     public static final double SHORT_DISTANCE_THRESHOLD = 5.0;
     public static final double MEDIUM_DISTANCE_THRESHOLD = 10.0;
-
-    // Shooter PID Values
-    // TODO
-    public static final double SHOOTER_P_VALUE = 0.5; //Good enough
-    public static final double SHOOTER_I_VALUE = 0.0;  //Formerly 0.15
-    public static final double SHOOTER_D_VALUE = 0.0; //Formerly 0.2
-    public static final double SHOOTER_S_VALUE = 0.2; //Recommended range: 0.2--0.3 (formerly 0.25)
-    public static final double SHOOTER_V_VALUE = 0.05; //TODO: Important! Must be measured (formerly 0.12).
-    public static final double SHOOTER_A_VALUE = 0.01; //Recommended range: Small (<0.05)
 
     // Indexer ID
     public static final int INDEXER_MOTOR_ID = 18;

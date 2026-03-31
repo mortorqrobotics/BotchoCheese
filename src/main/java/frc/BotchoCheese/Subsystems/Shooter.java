@@ -16,6 +16,15 @@ import com.ctre.phoenix6.controls.VelocityVoltage;
 import frc.BotchoCheese.Constants.RobotMap;
 
 public class Shooter extends SubsystemBase {
+    private static final double SHOOTER_P_VALUE = 0.5;
+    private static final double SHOOTER_I_VALUE = 0.0;
+    private static final double SHOOTER_D_VALUE = 0.0;
+    private static final double SHOOTER_S_VALUE = 0.2;
+    private static final double SHOOTER_V_VALUE = 0.05;
+    private static final double SHOOTER_A_VALUE = 0.01;
+    private static final double SHOOTER_ACCELERATION = 160.0;
+    private static final double SHOOTER_JERK = 1600.0;
+
     // Motor controllers
     private final TalonFX backLeftShooter;
     private final TalonFX backRightShooter;
@@ -34,13 +43,15 @@ public class Shooter extends SubsystemBase {
         // PID Shooter Values
 
         Slot0Configs shooterSlot0 = new Slot0Configs();
-        shooterSlot0.kS = RobotMap.SHOOTER_S_VALUE;
-        shooterSlot0.kV = RobotMap.SHOOTER_V_VALUE;
-        shooterSlot0.kA = RobotMap.SHOOTER_A_VALUE;
-        shooterSlot0.kP = RobotMap.SHOOTER_P_VALUE;
-        shooterSlot0.kI = RobotMap.SHOOTER_I_VALUE;
-        shooterSlot0.kD = RobotMap.SHOOTER_D_VALUE;
+        shooterSlot0.kS = SHOOTER_S_VALUE;
+        shooterSlot0.kV = SHOOTER_V_VALUE;
+        shooterSlot0.kA = SHOOTER_A_VALUE;
+        shooterSlot0.kP = SHOOTER_P_VALUE;
+        shooterSlot0.kI = SHOOTER_I_VALUE;
+        shooterSlot0.kD = SHOOTER_D_VALUE;
         config.Slot0 = shooterSlot0;
+        config.MotionMagic.MotionMagicAcceleration = SHOOTER_ACCELERATION;
+        config.MotionMagic.MotionMagicJerk = SHOOTER_JERK;
     
         CurrentLimitsConfigs currentLimits = new CurrentLimitsConfigs();
         currentLimits.StatorCurrentLimit = 40.0; // Minions generally stay in the 30-50A range

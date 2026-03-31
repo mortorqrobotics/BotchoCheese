@@ -18,6 +18,16 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.BotchoCheese.Constants.RobotMap;
 
 public class Intake extends SubsystemBase {
+    private static final double PIVOT_S_VALUE = 9.0;
+    private static final double PIVOT_V_VALUE = 0.0;
+    private static final double PIVOT_A_VALUE = 0.0;
+    private static final double PIVOT_P_VALUE = 0.0;
+    private static final double PIVOT_I_VALUE = 0.0;
+    private static final double PIVOT_D_VALUE = 0.0;
+    private static final double PIVOT_CRUISE_VELOCITY = 200.0;
+    private static final double PIVOT_ACCELERATION = 20.0;
+    private static final double PIVOT_JERK = 20.0;
+
     // Hardware: 2x Kraken X44s for Pivot, 1x Minion for Intake
 
     private final TalonFX pivotLeader;
@@ -37,18 +47,18 @@ public class Intake extends SubsystemBase {
         
         // PID configuration for moving the pivot to set positions
         Slot0Configs pivotSlot0 = new Slot0Configs();
-        pivotSlot0.kS = RobotMap.PIVOT_S_VALUE;
-        pivotSlot0.kV = RobotMap.PIVOT_V_VALUE;
-        pivotSlot0.kA = RobotMap.PIVOT_A_VALUE;
-        pivotSlot0.kP = RobotMap.PIVOT_P_VALUE;
-        pivotSlot0.kI = RobotMap.PIVOT_I_VALUE;
-        pivotSlot0.kD = RobotMap.PIVOT_D_VALUE;
+        pivotSlot0.kS = PIVOT_S_VALUE;
+        pivotSlot0.kV = PIVOT_V_VALUE;
+        pivotSlot0.kA = PIVOT_A_VALUE;
+        pivotSlot0.kP = PIVOT_P_VALUE;
+        pivotSlot0.kI = PIVOT_I_VALUE;
+        pivotSlot0.kD = PIVOT_D_VALUE;
         pivotConfig.Slot0 = pivotSlot0;
 
         // var motionMagicConfigs = pivotConfig.MotionMagic;
-        // motionMagicConfigs.MotionMagicCruiseVelocity = RobotMap.PIVOT_CRUISE_VELOCITY; 
-        // motionMagicConfigs.MotionMagicAcceleration = RobotMap.PIVOT_ACCELERATION; 
-        // motionMagicConfigs.MotionMagicJerk = RobotMap.PIVOT_JERK; 
+        // motionMagicConfigs.MotionMagicCruiseVelocity = PIVOT_CRUISE_VELOCITY;
+        // motionMagicConfigs.MotionMagicAcceleration = PIVOT_ACCELERATION;
+        // motionMagicConfigs.MotionMagicJerk = PIVOT_JERK;
 
         // Current limits to protect the X44s and the pivot mechanism
         CurrentLimitsConfigs pivotLimits = new CurrentLimitsConfigs();
