@@ -22,7 +22,7 @@ public class CANdleLight extends SubsystemBase {
     private static final int LED_END_INDEX = LED_START_INDEX + LED_COUNT - 1;
     private static final double CANDLE_BRIGHTNESS = 0.5;
 
-    private final CANdle candle = new CANdle(RobotMap.CANDLE_CAN_ID, new CANBus(RobotMap.CANDLE_CAN_BUS));
+    private final CANdle candle = new CANdle(RobotMap.CANDLE_CAN_ID, new CANBus(RobotMap.CANIVORE_CAN_BUS));
 
     public CANdleLight() {
         CANdleConfiguration config = new CANdleConfiguration();

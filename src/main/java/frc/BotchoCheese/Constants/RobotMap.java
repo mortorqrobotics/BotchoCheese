@@ -52,6 +52,6 @@ public class RobotMap {
     public static final int FEEDER_MOTOR_ID = 23;
 
     // CANdle hardware mapping
+    public static final String CANIVORE_CAN_BUS = "1515Canivore";
     public static final int CANDLE_CAN_ID = 40;
-    public static final String CANDLE_CAN_BUS = "Canivore1515";
 }
