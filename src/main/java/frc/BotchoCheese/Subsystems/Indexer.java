@@ -43,19 +43,20 @@ public class Indexer extends SubsystemBase {
         indexer.getConfigurator().apply(config);
     }
 
-public Command indexerOn() {
-    return this.startEnd(
-        () -> indexer.setControl(indexerDuty.withOutput(RobotMap.INDEXER_MOTOR_SPEED)),
-        () -> indexer.stopMotor()
-    );
-}
+    public Command runIndexer(double percent) {
+        return this.startEnd(
+            () -> indexer.setControl(indexerDuty.withOutput(Math.max(-1.0, Math.min(1.0, percent)))),
+            () -> indexer.setControl(indexerDuty.withOutput(0.0))
+        );
+    }
 
-public Command reverseIndexer() {
-    return this.startEnd(
-        () -> indexer.setControl(indexerDuty.withOutput(-RobotMap.INDEXER_MOTOR_SPEED)),
-        () -> indexer.stopMotor()
-    );
-}
+    public Command indexerOn() {
+        return runIndexer(RobotMap.INDEXER_MOTOR_SPEED);
+    }
+
+    public Command reverseIndexer() {
+        return runIndexer(-RobotMap.INDEXER_MOTOR_SPEED);
+    }
 
 
 }

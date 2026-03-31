@@ -39,7 +39,6 @@ import frc.BotchoCheese.Constants.TunerConstants;
 import frc.BotchoCheese.Subsystems.CommandSwerveDrivetrain;
 import frc.BotchoCheese.Subsystems.Feeder;
 import frc.BotchoCheese.Subsystems.Indexer;
-//import frc.BotchoCheese.Subsystems.Climber;
 import frc.BotchoCheese.Subsystems.Intake;
 import frc.BotchoCheese.Subsystems.Shooter;
 import frc.BotchoCheese.Subsystems.Pivot;
@@ -177,14 +176,14 @@ public class RobotContainer {
         JOYSTICK1_CONTROLLER.leftTrigger().whileTrue(new StrafeToTag(drivetrain));
         JOYSTICK1_CONTROLLER.rightTrigger().whileTrue(new RotateToTag(drivetrain, 0));
 
-        //Controller 2
+        //Controller 2 Bindings
 
+        //Pivot Control
         JOYSTICK2_CONTROLLER.povUp().whileTrue(pivot.pivotUp());
         JOYSTICK2_CONTROLLER.povDown().whileTrue(pivot.pivotDown());
 
-
         //INTAKE BALLs
-        JOYSTICK2_CONTROLLER.x().toggleOnTrue(
+        JOYSTICK2_CONTROLLER.leftTrigger().toggleOnTrue(
         Commands.parallel(
         intake.startIntake(),
         indexer.reverseIndexer(),
@@ -193,14 +192,31 @@ public class RobotContainer {
     )
 );
 
-JOYSTICK2_CONTROLLER.b().toggleOnTrue(
+//Shooter sequence
+JOYSTICK2_CONTROLLER.rightTrigger().toggleOnTrue(
     Commands.sequence(
         // Spin up shooter for 2s
-        shooter.shootRps(90).withTimeout(2.0),
+        shooter.shootRps(110).withTimeout(1.0),
 
         // Then run everything continuously until toggled off
         Commands.parallel(
-            shooter.shootRps(90),
+            shooter.shootRps(110),
+            feeder.runFeeder(0.5),
+            indexer.indexerOn(),
+            intake.startIntake(),
+            pivot.pivotUpToRotations(4)
+        )
+    )
+);
+
+JOYSTICK2_CONTROLLER.rightBumper().toggleOnTrue(
+    Commands.sequence(
+        // Spin up shooter for 2s
+        shooter.shootRps(110).withTimeout(1.0),
+
+        // Then run everything continuously until toggled off
+        Commands.parallel(
+            shooter.shootRps(110),
             feeder.runFeeder(0.5),
             indexer.indexerOn(),
             intake.startIntake(),
@@ -211,11 +227,9 @@ JOYSTICK2_CONTROLLER.b().toggleOnTrue(
 
 
 
-//Test slow shoot
-JOYSTICK2_CONTROLLER.a().whileTrue(shooter.shootRps(10));
 
-//
-JOYSTICK2_CONTROLLER.y().whileTrue(
+//Reverse everything
+JOYSTICK2_CONTROLLER.b().whileTrue(
     Commands.parallel(
         feeder.runFeeder(-0.5),
         indexer.reverseIndexer(),
@@ -228,7 +242,7 @@ JOYSTICK2_CONTROLLER.y().whileTrue(
         return MathUtil.applyDeadband(value, 0.1);
     }
 
-   
+
 
     public Command getAutonomousCommand() {
         /* Run the path selected from the auto chooser */
