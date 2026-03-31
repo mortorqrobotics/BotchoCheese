@@ -20,8 +20,8 @@ public class Intake extends SubsystemBase {
 
     
     public Intake() {
+        
         intakeMotor = new TalonFXS(RobotMap.INTAKE_MOTOR_ID);
-
         // --- INTAKE CONFIGURATION (Minion) ---
         TalonFXSConfiguration intakeConfig = new TalonFXSConfiguration();
         
