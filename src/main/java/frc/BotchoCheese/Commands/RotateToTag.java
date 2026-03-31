@@ -27,7 +27,6 @@ public class RotateToTag extends Command {
         this.drivetrainSubsystem = drivetrainSubsystem;
         this.angleOffset = angleOffset;
         angleController = new PIDController(2, 0, 0);
-        // TODO tune PID and tolerance
         angleController.setTolerance(0.025);
         angleController.enableContinuousInput(-Math.PI, Math.PI);
 
