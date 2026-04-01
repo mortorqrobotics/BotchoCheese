@@ -8,6 +8,7 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import com.ctre.phoenix6.controls.Follower;
+import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 
@@ -61,6 +62,8 @@ public class Shooter extends SubsystemBase {
         config.CurrentLimits = currentLimits;
         
         config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+        // Preserve existing mechanism behavior while keeping positive command semantics in code.
+        config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 
         backLeftShooter.getConfigurator().apply(config);
         backRightShooter.getConfigurator().apply(config);
@@ -94,7 +97,7 @@ public Command shootRps(double... rpsValues) {
 }
 
 private void setShooterSpeeds(double backShooterTargetRps, double frontShooterTargetRps) {
-    backLeftShooter.setControl(shooterVelocityRequest.withVelocity(-backShooterTargetRps));
-    frontShooter.setControl(shooterVelocityRequest.withVelocity(-frontShooterTargetRps));
+    backLeftShooter.setControl(shooterVelocityRequest.withVelocity(backShooterTargetRps));
+    frontShooter.setControl(shooterVelocityRequest.withVelocity(frontShooterTargetRps));
 }
 }

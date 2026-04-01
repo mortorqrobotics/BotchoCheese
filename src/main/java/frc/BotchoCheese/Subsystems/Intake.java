@@ -4,6 +4,7 @@ import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.TalonFXSConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.hardware.TalonFXS;
+import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.MotorArrangementValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
@@ -33,6 +34,8 @@ public class Intake extends SubsystemBase {
         intakeConfig.CurrentLimits = intakeLimits;
     
         intakeConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+        // Preserve existing mechanism behavior while keeping positive command semantics in code.
+        intakeConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
         intakeConfig.Commutation.MotorArrangement = MotorArrangementValue.Minion_JST;
 
         intakeMotor.getConfigurator().apply(intakeConfig);
@@ -42,7 +45,7 @@ public class Intake extends SubsystemBase {
 public Command runIntake(double percent) {
     return this.startEnd(
         () -> intakeMotor.setControl(
-            intakeDuty.withOutput(-Math.max(-1.0, Math.min(1.0, percent)))
+            intakeDuty.withOutput(Math.max(-1.0, Math.min(1.0, percent)))
         ),
         () -> intakeMotor.setControl(intakeDuty.withOutput(0.0))
     );
