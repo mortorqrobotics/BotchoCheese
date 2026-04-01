@@ -226,7 +226,7 @@ JOYSTICK2_CONTROLLER.rightBumper().toggleOnTrue(
             intake.runIntake(0.75),
             indexer.runIndexer(0.75),
             feeder.runFeeder(0.75),
-            pivot.pivotUpToRotations(4)
+            Commands.waitSeconds(2.0).andThen(pivot.pivotUpToRotations(4))
         )
     )
 );
