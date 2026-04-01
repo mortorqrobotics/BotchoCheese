@@ -8,9 +8,13 @@ import com.ctre.phoenix6.SignalLogger;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.DoublePublisher;
+import edu.wpi.first.networktables.IntegerPublisher;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -32,6 +36,12 @@ public class Robot extends TimedRobot {
 
   private final boolean kUseLimelight = false;
   private final Field2d m_field = new Field2d();
+  private double lastCanHealthLogSeconds = 0.0;
+  private DoublePublisher canUtilizationPublisher;
+  private IntegerPublisher canBusOffPublisher;
+  private IntegerPublisher canTxFullPublisher;
+  private IntegerPublisher canRxErrorPublisher;
+  private IntegerPublisher canTxErrorPublisher;
 
   public Robot() {
     m_robotContainer = new RobotContainer();
@@ -47,6 +57,20 @@ public class Robot extends TimedRobot {
       SignalLogger.setPath("logs");
       SignalLogger.start();
       DebugLog.info("CTRE SignalLogger enabled (debug mode).");
+
+      var debugTable = NetworkTableInstance.getDefault().getTable("Debug");
+      canUtilizationPublisher = debugTable.getDoubleTopic("CAN/UtilizationPct").publish();
+      canBusOffPublisher = debugTable.getIntegerTopic("CAN/BusOffCount").publish();
+      canTxFullPublisher = debugTable.getIntegerTopic("CAN/TxFullCount").publish();
+      canRxErrorPublisher = debugTable.getIntegerTopic("CAN/RxErrorCount").publish();
+      canTxErrorPublisher = debugTable.getIntegerTopic("CAN/TxErrorCount").publish();
+
+      CommandScheduler.getInstance().onCommandInitialize(
+          command -> DebugLog.debug("[CMD INIT] " + command.getName()));
+      CommandScheduler.getInstance().onCommandFinish(
+          command -> DebugLog.debug("[CMD END] " + command.getName()));
+      CommandScheduler.getInstance().onCommandInterrupt(
+          command -> DebugLog.debug("[CMD INTERRUPT] " + command.getName()));
     }
     DebugLog.info("Startup complete (vision processing disabled, minimal telemetry mode).");
   }
@@ -60,6 +84,10 @@ public class Robot extends TimedRobot {
 
     if (kUseLimelight) {
       LimelightHomography.update(RobotContainer.drivetrain);
+    }
+
+    if (DebugLog.DEBUG) {
+      logCanHealthSnapshot();
     }
   }
 
@@ -134,6 +162,40 @@ public void disabledInit() {
 
   @Override
   public void simulationPeriodic() {}
+
+  private void logCanHealthSnapshot() {
+    double now = Timer.getFPGATimestamp();
+    if (now - lastCanHealthLogSeconds < 1.0) {
+      return;
+    }
+    lastCanHealthLogSeconds = now;
+
+    var canStatus = RobotController.getCANStatus();
+    DebugLog.debug(
+        String.format(
+            "[CAN] util=%.1f%% busOff=%d txFull=%d rxErr=%d txErr=%d",
+            canStatus.percentBusUtilization * 100.0,
+            canStatus.busOffCount,
+            canStatus.txFullCount,
+            canStatus.receiveErrorCount,
+            canStatus.transmitErrorCount));
+
+    if (canUtilizationPublisher != null) {
+      canUtilizationPublisher.set(canStatus.percentBusUtilization * 100.0);
+    }
+    if (canBusOffPublisher != null) {
+      canBusOffPublisher.set(canStatus.busOffCount);
+    }
+    if (canTxFullPublisher != null) {
+      canTxFullPublisher.set(canStatus.txFullCount);
+    }
+    if (canRxErrorPublisher != null) {
+      canRxErrorPublisher.set(canStatus.receiveErrorCount);
+    }
+    if (canTxErrorPublisher != null) {
+      canTxErrorPublisher.set(canStatus.transmitErrorCount);
+    }
+  }
 
   private void applyAllianceHeadingReference() {
     Alliance alliance = DriverStation.getAlliance().orElse(Alliance.Blue);
