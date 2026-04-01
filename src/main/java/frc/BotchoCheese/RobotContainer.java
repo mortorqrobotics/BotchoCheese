@@ -13,7 +13,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.ctre.phoenix6.hardware.Pigeon2;
@@ -22,13 +21,11 @@ import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
-import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.util.FlippingUtil;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -39,6 +36,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.BotchoCheese.Commands.RotateToTag;
 import frc.BotchoCheese.Commands.StrafeToTag;
+import frc.BotchoCheese.Constants.PathPlannerSetpoints;
 import frc.BotchoCheese.Constants.RobotMap;
 import frc.BotchoCheese.Constants.TunerConstants;
 import frc.BotchoCheese.Subsystems.CommandSwerveDrivetrain;
@@ -48,16 +46,12 @@ import frc.BotchoCheese.Subsystems.Intake;
 import frc.BotchoCheese.Subsystems.Pivot;
 import frc.BotchoCheese.Subsystems.Shooter;
 import frc.BotchoCheese.Utils.DebugLog;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
 
 public class RobotContainer {
     // Auto chooser/dashboard
     private static final String NO_AUTO_SELECTED = "Select Auto";
     private static final String AUTO_CHOOSER_KEY = "Auto Mode";
     private static final String PATHPLANNER_AUTO_FOLDER = "pathplanner/autos";
-    private static final String PATHPLANNER_PATHS_FOLDER = "pathplanner/paths";
 
     // Drive tuning
     private static final double DRIVE_DEADBAND = 0.1;
@@ -79,13 +73,6 @@ public class RobotContainer {
     public final Indexer indexer = new Indexer();
     public final Pivot pivot = new Pivot();
 
-    // Blue-side reference poses for teleop pathfind shot setpoints.
-    // These are loaded from linked waypoints and flipped automatically for Red.
-    private Pose2d hubHomePoseBlue;
-    private Pose2d leftHubShootingPoseBlue;
-    private Pose2d middleHubShootingPoseBlue;
-    private Pose2d rightHubShootingPoseBlue;
-
     // Drive requests
     public static final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
         .withDeadband(MaxSpeed * DRIVE_DEADBAND)
@@ -101,7 +88,6 @@ public class RobotContainer {
 
     public RobotContainer() {
         registerNamedCommands();
-        loadShotSetpointsFromLinkedWaypoints();
 
         autoChooser = new SendableChooser<>();
         configureAutoChooser();
@@ -173,107 +159,11 @@ public class RobotContainer {
                 .map(path -> path.getFileName().toString().replaceFirst("\\.auto$", ""))
                 .sorted(Comparator.naturalOrder())
                 .collect(Collectors.toList());
-
-            List<String> nonRedAutoNames = autoNames.stream()
-                .filter(name -> !name.toLowerCase().startsWith("red"))
-                .collect(Collectors.toList());
-
-            if (nonRedAutoNames.size() != autoNames.size()) {
-                DebugLog.warnThrottled(
-                    "autos.red_filtered",
-                    "Ignoring Red-prefixed autos in chooser; using blue-side autos with alliance flip instead.",
-                    10.0
-                );
-            }
-
-            return nonRedAutoNames;
+            return autoNames;
         } catch (IOException e) {
             DebugLog.error("Failed to read PathPlanner autos: " + e.getMessage(), e.getStackTrace());
             return List.of();
         }
-    }
-
-    private void loadShotSetpointsFromLinkedWaypoints() {
-        LinkedWaypointPose hubHome = findLinkedWaypointPose(Set.of("Hub home"));
-        if (hubHome != null) {
-            hubHomePoseBlue = hubHome.pose();
-        }
-
-        LinkedWaypointPose left = findLinkedWaypointPose(Set.of("Left shoot"));
-        if (left != null) {
-            leftHubShootingPoseBlue = left.pose();
-        }
-
-        LinkedWaypointPose middle = findLinkedWaypointPose(Set.of("Middle shoot"));
-        if (middle != null) {
-            middleHubShootingPoseBlue = middle.pose();
-        }
-
-        // Keep compatibility with existing path files that currently use "Right shooting".
-        LinkedWaypointPose right = findLinkedWaypointPose(Set.of("Right shoot", "Right shooting"));
-        if (right != null) {
-            rightHubShootingPoseBlue = right.pose();
-        }
-    }
-
-    private LinkedWaypointPose findLinkedWaypointPose(Set<String> linkedNames) {
-        Path pathsFolder = Filesystem.getDeployDirectory().toPath().resolve(PATHPLANNER_PATHS_FOLDER);
-        if (!Files.isDirectory(pathsFolder)) {
-            DebugLog.warnThrottled(
-                "paths.folder_missing",
-                "PathPlanner paths folder not found for linked setpoint lookup: " + pathsFolder,
-                10.0
-            );
-            return null;
-        }
-
-        try (var files = Files.list(pathsFolder)) {
-            List<Path> pathFiles = files
-                .filter(path -> path.toString().endsWith(".path"))
-                .sorted(Comparator.naturalOrder())
-                .collect(Collectors.toList());
-
-            JSONParser parser = new JSONParser();
-            for (Path pathFile : pathFiles) {
-                String content = Files.readString(pathFile);
-                JSONObject root = (JSONObject) parser.parse(content);
-                JSONArray waypoints = (JSONArray) root.get("waypoints");
-                if (waypoints == null) {
-                    continue;
-                }
-
-                double rotationDeg = 180.0;
-                JSONObject goalEndState = (JSONObject) root.get("goalEndState");
-                if (goalEndState != null && goalEndState.get("rotation") instanceof Number) {
-                    rotationDeg = ((Number) goalEndState.get("rotation")).doubleValue();
-                }
-
-                for (Object waypointObj : waypoints) {
-                    if (!(waypointObj instanceof JSONObject waypoint)) {
-                        continue;
-                    }
-
-                    Object linkedNameObj = waypoint.get("linkedName");
-                    if (!(linkedNameObj instanceof String linkedName) || !linkedNames.contains(linkedName)) {
-                        continue;
-                    }
-
-                    JSONObject anchor = (JSONObject) waypoint.get("anchor");
-                    if (anchor == null || !(anchor.get("x") instanceof Number) || !(anchor.get("y") instanceof Number)) {
-                        continue;
-                    }
-
-                    double x = ((Number) anchor.get("x")).doubleValue();
-                    double y = ((Number) anchor.get("y")).doubleValue();
-                    Pose2d pose = new Pose2d(x, y, Rotation2d.fromDegrees(rotationDeg));
-                    return new LinkedWaypointPose(pose, pathFile.getFileName().toString());
-                }
-            }
-        } catch (Exception ex) {
-            DebugLog.error("Failed to read linked shot setpoints from PathPlanner paths", ex.getStackTrace());
-        }
-
-        return null;
     }
 
     private static double applyDriveDeadband(double value) {
@@ -286,8 +176,6 @@ public class RobotContainer {
     }
 
     private void configureDriverBindings() {
-        final PathConstraints teleopPathfindConstraints = new PathConstraints(2.5, 2.0, 4.0, 6.0);
-
         drivetrain.setDefaultCommand(
             drivetrain.applyRequest(() ->
                 drive.withVelocityX(-applyDriveDeadband(JOYSTICK1_CONTROLLER.getLeftY()) * MaxSpeed)
@@ -315,17 +203,17 @@ public class RobotContainer {
 
         // Teleop pathfind shot setpoints
         JOYSTICK1_CONTROLLER.x().onTrue(new InstantCommand(
-            () -> scheduleShotPathIfConfigured("Left", leftHubShootingPoseBlue, teleopPathfindConstraints)
+            () -> scheduleShotPathIfConfigured("Left", PathPlannerSetpoints.LEFT_HUB_SHOOTING_POSE_BLUE)
         ));
         JOYSTICK1_CONTROLLER.x().onFalse(new InstantCommand(this::cancelActiveDriverPathfind));
 
         JOYSTICK1_CONTROLLER.y().onTrue(new InstantCommand(
-            () -> scheduleShotPathIfConfigured("Middle", middleHubShootingPoseBlue, teleopPathfindConstraints)
+            () -> scheduleShotPathIfConfigured("Middle", PathPlannerSetpoints.MIDDLE_HUB_SHOOTING_POSE_BLUE)
         ));
         JOYSTICK1_CONTROLLER.y().onFalse(new InstantCommand(this::cancelActiveDriverPathfind));
 
         JOYSTICK1_CONTROLLER.b().onTrue(new InstantCommand(
-            () -> scheduleShotPathIfConfigured("Right", rightHubShootingPoseBlue, teleopPathfindConstraints)
+            () -> scheduleShotPathIfConfigured("Right", PathPlannerSetpoints.RIGHT_HUB_SHOOTING_POSE_BLUE)
         ));
         JOYSTICK1_CONTROLLER.b().onFalse(new InstantCommand(this::cancelActiveDriverPathfind));
 
@@ -471,27 +359,16 @@ public class RobotContainer {
         }
     }
 
-    private record LinkedWaypointPose(Pose2d pose, String sourcePathFile) {}
-
     private void resetPoseAtHubHome() {
-        Pose2d bluePose = hubHomePoseBlue != null ? hubHomePoseBlue : middleHubShootingPoseBlue;
-        if (bluePose == null) {
-            DebugLog.warnThrottled(
-                "hub_home_missing",
-                "Hub home pose not loaded. Add linked waypoint \"Hub home\" to a path file.",
-                2.0
-            );
-            return;
-        }
-
         cancelActiveDriverPathfind();
+        Pose2d bluePose = PathPlannerSetpoints.HUB_HOME_POSE_BLUE;
         Pose2d alliancePose = AutoBuilder.shouldFlip() ? FlippingUtil.flipFieldPose(bluePose) : bluePose;
         drivetrain.resetPose(alliancePose);
         drivetrain.seedFieldCentric();
         DebugLog.info("Driver homed pose at hub front.");
     }
 
-    private void scheduleShotPathIfConfigured(String name, Pose2d bluePose, PathConstraints constraints) {
+    private void scheduleShotPathIfConfigured(String name, Pose2d bluePose) {
         if (bluePose == null) {
             DebugLog.warnThrottled(
                 "shot_setpoint_missing_" + name.toLowerCase(),
@@ -502,7 +379,8 @@ public class RobotContainer {
         }
 
         cancelActiveDriverPathfind();
-        activeDriverPathfindCommand = AutoBuilder.pathfindToPoseFlipped(bluePose, constraints);
+        activeDriverPathfindCommand =
+            AutoBuilder.pathfindToPoseFlipped(bluePose, PathPlannerSetpoints.TELEOP_SHOT_PATHFIND_CONSTRAINTS);
         activeDriverPathfindCommand.schedule();
     }
 
