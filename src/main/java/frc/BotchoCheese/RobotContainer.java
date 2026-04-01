@@ -48,12 +48,6 @@ public class RobotContainer {
     private static final String DEFAULT_AUTO_NAME = "Auto 1 (Default)";
     private static final String AUTO_CHOOSER_KEY = "Auto Mode";
     private static final String PATHPLANNER_AUTO_FOLDER = "pathplanner/autos";
-    private static final double LINE_DRIVE_FRONT_RPS = 120.0;
-    private static final double LINE_DRIVE_BACK_SCALE = 0.05;
-    private static final double LOB_BACK_RPS = 120.0;
-    private static final double LOB_FRONT_SCALE = 0.05;
-    private static final double REGULAR_SHOT_RPS = 75.0;
-    private static final double BIG_SHOT_RPS = 120.0;
 
     public static double MaxSpeed = 1.0 * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed; 1.0 placeholder for scaling
     
@@ -200,7 +194,7 @@ public class RobotContainer {
         intake.runIntake(0.75),
         indexer.runIndexer(-0.5), //reverse to prevent jam
         feeder.runFeeder(-0.75),  
-        shooter.frontShooterOutRps(-25.0) //runs outward to prevent jam
+        shooter.shootRps(0.0, -25.0) //runs outward to prevent jam (back stopped, front out)
      
     )
 );
@@ -208,9 +202,9 @@ public class RobotContainer {
 //Shooter sequence at big-shot 120 RPS
 JOYSTICK2_CONTROLLER.rightTrigger().toggleOnTrue(
     Commands.sequence(
-        shooter.shootRps(BIG_SHOT_RPS).withTimeout(1.0),
+        shooter.shootRps(120.0).withTimeout(1.0),
         Commands.parallel(
-            shooter.shootRps(BIG_SHOT_RPS),
+            shooter.shootRps(120.0),
             intake.runIntake(0.75),
             indexer.runIndexer(0.85),
             feeder.runFeeder(0.75),
@@ -222,9 +216,9 @@ JOYSTICK2_CONTROLLER.rightTrigger().toggleOnTrue(
 //Shooter sequence at regular-shot 75 RPS
 JOYSTICK2_CONTROLLER.rightBumper().toggleOnTrue(
     Commands.sequence(
-        shooter.shootRps(REGULAR_SHOT_RPS).withTimeout(1.0),
+        shooter.shootRps(75.0).withTimeout(1.0),
         Commands.parallel(
-            shooter.shootRps(REGULAR_SHOT_RPS),
+            shooter.shootRps(75.0),
             intake.runIntake(0.75),
             indexer.runIndexer(0.85),
             feeder.runFeeder(0.75),
@@ -235,9 +229,9 @@ JOYSTICK2_CONTROLLER.rightBumper().toggleOnTrue(
 
 JOYSTICK2_CONTROLLER.y().toggleOnTrue(
     Commands.sequence(
-        shooter.shootLoftRps(LOB_BACK_RPS, LOB_FRONT_SCALE).withTimeout(1.0),
+        shooter.shootRps(120.0, 6.0).withTimeout(1.0),
         Commands.parallel(
-            shooter.shootLoftRps(LOB_BACK_RPS, LOB_FRONT_SCALE),
+            shooter.shootRps(120.0, 6.0),
             intake.runIntake(0.75),
             indexer.runIndexer(0.85),
             feeder.runFeeder(0.75),
@@ -248,9 +242,9 @@ JOYSTICK2_CONTROLLER.y().toggleOnTrue(
 
 JOYSTICK2_CONTROLLER.a().toggleOnTrue(
     Commands.sequence(
-        shooter.shootDriveRps(LINE_DRIVE_FRONT_RPS, LINE_DRIVE_BACK_SCALE).withTimeout(1.0),
+        shooter.shootRps(6.0, 120.0).withTimeout(1.0),
         Commands.parallel(
-            shooter.shootDriveRps(LINE_DRIVE_FRONT_RPS, LINE_DRIVE_BACK_SCALE),
+            shooter.shootRps(6.0, 120.0),
             intake.runIntake(0.75),
             indexer.runIndexer(0.85),
             feeder.runFeeder(0.75),

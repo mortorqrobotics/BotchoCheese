@@ -11,18 +11,10 @@ import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 
-import java.util.function.DoubleSupplier;
-
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 // import frc.BotchoCheese.Utils.LimelightHelpers;
 import frc.BotchoCheese.Constants.RobotMap;
 
 public class Shooter extends SubsystemBase {
-    private static final String SHOOTER_ACTUAL_RPS_KEY = "Shooter Actual RPS";
-    private static final String BACK_LEFT_SHOOTER_ACTUAL_RPS_KEY = "Shooter Back Left Actual RPS";
-    private static final String FRONT_SHOOTER_ACTUAL_RPS_KEY = "Shooter Front Actual RPS";
-    private static final double DEFAULT_LOFT_FRONT_SPEED_SCALE = 0.75;
-    private static final double DEFAULT_DRIVE_BACK_SPEED_SCALE = 0.75;
     private static final double SHOOTER_P_VALUE = 0.5;
     private static final double SHOOTER_I_VALUE = 0.0;
     private static final double SHOOTER_D_VALUE = 0.0;
@@ -87,11 +79,11 @@ public class Shooter extends SubsystemBase {
     // Command to shoot at a specific RPS (revolutions per second)
 private final VelocityVoltage shooterVelocityRequest = new VelocityVoltage(0);
 
-public Command shootRps(double targetRps) {
-    return this.startEnd(
+public Command shootRps(double... rpsValues) {
+    return this.runEnd(
         () -> {
-            backLeftShooter.setControl(shooterVelocityRequest.withVelocity(-targetRps));
-            frontShooter.setControl(shooterVelocityRequest.withVelocity(-targetRps));
+            double[] resolvedRps = resolveShooterRps(rpsValues);
+            setShooterSpeeds(resolvedRps[0], resolvedRps[1]);
         },
         () -> {
             backLeftShooter.stopMotor();
@@ -100,135 +92,22 @@ public Command shootRps(double targetRps) {
     );
 }
 
-public Command shootRps(DoubleSupplier targetRpsSupplier) {
-    return this.runEnd(
-        () -> {
-            double targetRps = targetRpsSupplier.getAsDouble();
-            backLeftShooter.setControl(shooterVelocityRequest.withVelocity(-targetRps));
-            frontShooter.setControl(shooterVelocityRequest.withVelocity(-targetRps));
-        },
-        () -> {
-            backLeftShooter.stopMotor();
-            frontShooter.stopMotor();
-        }
-    );
-}
-
-public Command shootLoftRps(double backShooterTargetRps) {
-    return shootLoftRps(backShooterTargetRps, DEFAULT_LOFT_FRONT_SPEED_SCALE);
-}
-
-public Command shootLoftRps(double backShooterTargetRps, double frontSpeedScale) {
-    return this.startEnd(
-        () -> setLoftShotSpeeds(backShooterTargetRps, frontSpeedScale),
-        () -> {
-            backLeftShooter.stopMotor();
-            frontShooter.stopMotor();
-        }
-    );
-}
-
-public Command shootLoftRps(DoubleSupplier backShooterTargetRpsSupplier, double frontSpeedScale) {
-    return this.runEnd(
-        () -> setLoftShotSpeeds(backShooterTargetRpsSupplier.getAsDouble(), frontSpeedScale),
-        () -> {
-            backLeftShooter.stopMotor();
-            frontShooter.stopMotor();
-        }
-    );
-}
-
-public Command shootLoftRps(
-    DoubleSupplier backShooterTargetRpsSupplier,
-    DoubleSupplier frontSpeedScaleSupplier
-) {
-    return this.runEnd(
-        () -> setLoftShotSpeeds(
-            backShooterTargetRpsSupplier.getAsDouble(),
-            frontSpeedScaleSupplier.getAsDouble()
-        ),
-        () -> {
-            backLeftShooter.stopMotor();
-            frontShooter.stopMotor();
-        }
-    );
-}
-
-public Command shootDriveRps(double frontShooterTargetRps) {
-    return shootDriveRps(frontShooterTargetRps, DEFAULT_DRIVE_BACK_SPEED_SCALE);
-}
-
-public Command shootDriveRps(double frontShooterTargetRps, double backSpeedScale) {
-    return this.startEnd(
-        () -> setDriveShotSpeeds(frontShooterTargetRps, backSpeedScale),
-        () -> {
-            backLeftShooter.stopMotor();
-            frontShooter.stopMotor();
-        }
-    );
-}
-
-public Command shootDriveRps(DoubleSupplier frontShooterTargetRpsSupplier, double backSpeedScale) {
-    return this.runEnd(
-        () -> setDriveShotSpeeds(frontShooterTargetRpsSupplier.getAsDouble(), backSpeedScale),
-        () -> {
-            backLeftShooter.stopMotor();
-            frontShooter.stopMotor();
-        }
-    );
-}
-
-public Command shootDriveRps(
-    DoubleSupplier frontShooterTargetRpsSupplier,
-    DoubleSupplier backSpeedScaleSupplier
-) {
-    return this.runEnd(
-        () -> setDriveShotSpeeds(
-            frontShooterTargetRpsSupplier.getAsDouble(),
-            backSpeedScaleSupplier.getAsDouble()
-        ),
-        () -> {
-            backLeftShooter.stopMotor();
-            frontShooter.stopMotor();
-        }
-    );
-}
-
-public Command frontShooterOutRps(double targetRps) {
-    return this.startEnd(
-        () -> frontShooter.setControl(shooterVelocityRequest.withVelocity(Math.abs(targetRps))),
-        () -> frontShooter.stopMotor()
-    );
-}
-
-public double getBackLeftRps() {
-    return Math.abs(backLeftShooter.getVelocity().getValueAsDouble());
-}
-
-public double getFrontRps() {
-    return Math.abs(frontShooter.getVelocity().getValueAsDouble());
-}
-
-public double getAverageRps() {
-    return (getBackLeftRps() + getFrontRps()) / 2.0;
-}
-
-private void setLoftShotSpeeds(double backShooterTargetRps, double frontSpeedScale) {
-    double frontShooterTargetRps = backShooterTargetRps * Math.abs(frontSpeedScale);
+private void setShooterSpeeds(double backShooterTargetRps, double frontShooterTargetRps) {
     backLeftShooter.setControl(shooterVelocityRequest.withVelocity(-backShooterTargetRps));
     frontShooter.setControl(shooterVelocityRequest.withVelocity(-frontShooterTargetRps));
 }
 
-private void setDriveShotSpeeds(double frontShooterTargetRps, double backSpeedScale) {
-    double backShooterTargetRps = frontShooterTargetRps * Math.abs(backSpeedScale);
-    backLeftShooter.setControl(shooterVelocityRequest.withVelocity(-backShooterTargetRps));
-    frontShooter.setControl(shooterVelocityRequest.withVelocity(-frontShooterTargetRps));
+private double[] resolveShooterRps(double... rpsValues) {
+    validateRpsValues(rpsValues);
+    if (rpsValues.length == 1) {
+        return new double[] {rpsValues[0], rpsValues[0]};
+    }
+    return new double[] {rpsValues[0], rpsValues[1]};
 }
 
-@Override
-public void periodic() {
-    SmartDashboard.putNumber(SHOOTER_ACTUAL_RPS_KEY, getAverageRps());
-    SmartDashboard.putNumber(BACK_LEFT_SHOOTER_ACTUAL_RPS_KEY, getBackLeftRps());
-    SmartDashboard.putNumber(FRONT_SHOOTER_ACTUAL_RPS_KEY, getFrontRps());
+private void validateRpsValues(double... rpsValues) {
+    if (rpsValues.length < 1 || rpsValues.length > 2) {
+        throw new IllegalArgumentException("shootRps expects 1 value (same back/front) or 2 values (back, front)");
+    }
 }
 }
