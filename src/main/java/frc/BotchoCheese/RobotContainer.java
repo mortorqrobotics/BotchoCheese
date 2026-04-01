@@ -239,7 +239,7 @@ JOYSTICK2_CONTROLLER.y().toggleOnTrue(
             feeder.runFeeder(0.5),
             indexer.runIndexer(0.5),
             intake.runIntake(0.5),
-            pivot.pivotMotionMagicUpToRotations(4.0, 0.5, 0.5)
+            pivot.pivotMotionMagicUpToRotations(6.0, 1, 0.5)
         )
     )
 );
