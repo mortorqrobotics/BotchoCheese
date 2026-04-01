@@ -51,7 +51,7 @@ public class RobotContainer {
     private static final String SHOOTER_SETPOINT_RPS_KEY = "Shooter Setpoint RPS";
     private static final String ACTIVE_SHOOTER_SETPOINT_RPS_KEY = "Shooter Applied Setpoint RPS";
 
-    public static double MaxSpeed = 1.0 * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
+    public static double MaxSpeed = 1.0 * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed; 1.0 placeholder for scaling
     
     public static boolean pivotIsUp = true;
     
