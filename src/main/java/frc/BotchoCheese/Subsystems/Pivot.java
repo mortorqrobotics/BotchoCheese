@@ -15,7 +15,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.BotchoCheese.Constants.RobotMap;
 
 public class Pivot extends SubsystemBase {
-    private static final double PIVOT_S_VALUE = 9.0;
+    private static final double PIVOT_S_VALUE = 2.0;
     private static final double PIVOT_V_VALUE = 0.0;
     private static final double PIVOT_A_VALUE = 0.0;
     private static final double PIVOT_P_VALUE = 0.0;
@@ -25,8 +25,6 @@ public class Pivot extends SubsystemBase {
     private static final double PIVOT_ACCELERATION = 20.0;
     private static final double PIVOT_JERK = 20.0;
     private static final double PIVOT_MOTION_MAGIC_TARGET_TOLERANCE = 0.05;
-    private static final double PIVOT_OSCILLATION_VOLTAGE_KP = 4.0;
-    private static final double PIVOT_OSCILLATION_MAX_VOLTS = 2.0;
     //private static final double PIVOT_TARGET_ROTATIONS = 8.0;
     //private static final double PIVOT_FEEDFORWARD = 9.0;
 
@@ -150,17 +148,12 @@ public class Pivot extends SubsystemBase {
                     }
 
                     double elapsedSeconds = Timer.getFPGATimestamp() - oscillationStartTime[0];
-                    double desiredPosition =
-                        targetPos
-                            + oscillationAmplitude
-                                * Math.sin(2.0 * Math.PI * oscillationFrequency * elapsedSeconds);
-                    double positionError = desiredPosition - currentPos;
-                    double oscillationVoltage = Math.max(
-                        -PIVOT_OSCILLATION_MAX_VOLTS,
-                        Math.min(PIVOT_OSCILLATION_MAX_VOLTS, positionError * PIVOT_OSCILLATION_VOLTAGE_KP)
-                    );
+                    double oscillationOffset =
+                        oscillationAmplitude * Math.sin(2.0 * Math.PI * oscillationFrequency * elapsedSeconds);
 
-                    pivotLeader.setVoltage(oscillationVoltage);
+                    pivotLeader.setControl(
+                        pivotMotionMagicRequest.withPosition(targetPos + oscillationOffset)
+                    );
                 },
                 () -> pivotLeader.setVoltage(0.0)
             );
