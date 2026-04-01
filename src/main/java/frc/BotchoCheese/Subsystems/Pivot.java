@@ -25,6 +25,8 @@ public class Pivot extends SubsystemBase {
     private static final double PIVOT_ACCELERATION = 20.0;
     private static final double PIVOT_JERK = 20.0;
     private static final double PIVOT_MOTION_MAGIC_TARGET_TOLERANCE = 0.05;
+    private static final double PIVOT_OSCILLATION_VOLTAGE_KP = 4.0;
+    private static final double PIVOT_OSCILLATION_MAX_VOLTS = 2.0;
     //private static final double PIVOT_TARGET_ROTATIONS = 8.0;
     //private static final double PIVOT_FEEDFORWARD = 9.0;
 
@@ -148,12 +150,17 @@ public class Pivot extends SubsystemBase {
                     }
 
                     double elapsedSeconds = Timer.getFPGATimestamp() - oscillationStartTime[0];
-                    double oscillationOffset =
-                        oscillationAmplitude * Math.sin(2.0 * Math.PI * oscillationFrequency * elapsedSeconds);
-
-                    pivotLeader.setControl(
-                        pivotMotionMagicRequest.withPosition(targetPos + oscillationOffset)
+                    double desiredPosition =
+                        targetPos
+                            + oscillationAmplitude
+                                * Math.sin(2.0 * Math.PI * oscillationFrequency * elapsedSeconds);
+                    double positionError = desiredPosition - currentPos;
+                    double oscillationVoltage = Math.max(
+                        -PIVOT_OSCILLATION_MAX_VOLTS,
+                        Math.min(PIVOT_OSCILLATION_MAX_VOLTS, positionError * PIVOT_OSCILLATION_VOLTAGE_KP)
                     );
+
+                    pivotLeader.setVoltage(oscillationVoltage);
                 },
                 () -> pivotLeader.setVoltage(0.0)
             );

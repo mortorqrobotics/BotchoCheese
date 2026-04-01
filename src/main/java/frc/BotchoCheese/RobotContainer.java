@@ -196,9 +196,9 @@ public class RobotContainer {
         JOYSTICK2_CONTROLLER.leftTrigger().toggleOnTrue(
         Commands.parallel(
         intake.runIntake(0.75),
-        indexer.runIndexer(0.75),
+        indexer.runIndexer(-0.55),
         feeder.runFeeder(-0.5), 
-        shooter.frontShooterOutRps(5.0) //runs outward to prevent jam
+        shooter.frontShooterOutRps(-5.0) //runs outward to prevent jam
      
     )
 );

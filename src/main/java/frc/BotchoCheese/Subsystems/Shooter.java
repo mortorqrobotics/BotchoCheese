@@ -114,7 +114,7 @@ public Command shootRps(DoubleSupplier targetRpsSupplier) {
 
 public Command frontShooterOutRps(double targetRps) {
     return this.startEnd(
-        () -> frontShooter.setControl(shooterVelocityRequest.withVelocity(-Math.abs(targetRps))),
+        () -> frontShooter.setControl(shooterVelocityRequest.withVelocity(Math.abs(targetRps))),
         () -> frontShooter.stopMotor()
     );
 }
