@@ -81,6 +81,7 @@ public class RobotContainer {
 
     // Blue-side reference poses for teleop pathfind shot setpoints.
     // These are loaded from linked waypoints and flipped automatically for Red.
+    private Pose2d hubHomePoseBlue;
     private Pose2d leftHubShootingPoseBlue;
     private Pose2d middleHubShootingPoseBlue;
     private Pose2d rightHubShootingPoseBlue;
@@ -193,6 +194,11 @@ public class RobotContainer {
     }
 
     private void loadShotSetpointsFromLinkedWaypoints() {
+        LinkedWaypointPose hubHome = findLinkedWaypointPose(Set.of("Hub home"));
+        if (hubHome != null) {
+            hubHomePoseBlue = hubHome.pose();
+        }
+
         LinkedWaypointPose left = findLinkedWaypointPose(Set.of("Left shoot"));
         if (left != null) {
             leftHubShootingPoseBlue = left.pose();
@@ -305,7 +311,7 @@ public class RobotContainer {
             forwardStraight.withVelocityX(0).withVelocityY(0.5))
         );
 
-        JOYSTICK1_CONTROLLER.start().onTrue(new InstantCommand(() -> drivetrain.seedFieldCentric()));
+        JOYSTICK1_CONTROLLER.start().onTrue(new InstantCommand(this::resetPoseAtHubHome));
 
         // Teleop pathfind shot setpoints
         JOYSTICK1_CONTROLLER.x().onTrue(new InstantCommand(
@@ -466,6 +472,24 @@ public class RobotContainer {
     }
 
     private record LinkedWaypointPose(Pose2d pose, String sourcePathFile) {}
+
+    private void resetPoseAtHubHome() {
+        Pose2d bluePose = hubHomePoseBlue != null ? hubHomePoseBlue : middleHubShootingPoseBlue;
+        if (bluePose == null) {
+            DebugLog.warnThrottled(
+                "hub_home_missing",
+                "Hub home pose not loaded. Add linked waypoint \"Hub home\" to a path file.",
+                2.0
+            );
+            return;
+        }
+
+        cancelActiveDriverPathfind();
+        Pose2d alliancePose = AutoBuilder.shouldFlip() ? FlippingUtil.flipFieldPose(bluePose) : bluePose;
+        drivetrain.resetPose(alliancePose);
+        drivetrain.seedFieldCentric();
+        DebugLog.info("Driver homed pose at hub front.");
+    }
 
     private void scheduleShotPathIfConfigured(String name, Pose2d bluePose, PathConstraints constraints) {
         if (bluePose == null) {
