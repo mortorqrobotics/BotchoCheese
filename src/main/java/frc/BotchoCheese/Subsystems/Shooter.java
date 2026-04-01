@@ -82,8 +82,9 @@ private final VelocityVoltage shooterVelocityRequest = new VelocityVoltage(0);
 public Command shootRps(double... rpsValues) {
     return this.runEnd(
         () -> {
-            double[] resolvedRps = resolveShooterRps(rpsValues);
-            setShooterSpeeds(resolvedRps[0], resolvedRps[1]);
+            double backRps = rpsValues[0];
+            double frontRps = rpsValues.length > 1 ? rpsValues[1] : rpsValues[0];
+            setShooterSpeeds(backRps, frontRps);
         },
         () -> {
             backLeftShooter.stopMotor();
@@ -95,19 +96,5 @@ public Command shootRps(double... rpsValues) {
 private void setShooterSpeeds(double backShooterTargetRps, double frontShooterTargetRps) {
     backLeftShooter.setControl(shooterVelocityRequest.withVelocity(-backShooterTargetRps));
     frontShooter.setControl(shooterVelocityRequest.withVelocity(-frontShooterTargetRps));
-}
-
-private double[] resolveShooterRps(double... rpsValues) {
-    validateRpsValues(rpsValues);
-    if (rpsValues.length == 1) {
-        return new double[] {rpsValues[0], rpsValues[0]};
-    }
-    return new double[] {rpsValues[0], rpsValues[1]};
-}
-
-private void validateRpsValues(double... rpsValues) {
-    if (rpsValues.length < 1 || rpsValues.length > 2) {
-        throw new IllegalArgumentException("shootRps expects 1 value (same back/front) or 2 values (back, front)");
-    }
 }
 }
