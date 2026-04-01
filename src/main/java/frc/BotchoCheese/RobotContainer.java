@@ -373,7 +373,8 @@ public class RobotContainer {
         if (bluePose == null) {
             DebugLog.warnThrottled(
                 "shot_setpoint_missing_" + name.toLowerCase(),
-                "Shot setpoint not loaded for " + name + ". Button press ignored.",
+                "Shot setpoint missing for " + name
+                    + ". Update src/main/java/frc/BotchoCheese/Constants/PathPlannerSetpoints.java.",
                 2.0
             );
             return;
