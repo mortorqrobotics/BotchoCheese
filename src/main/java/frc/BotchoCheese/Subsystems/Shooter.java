@@ -11,11 +11,16 @@ import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 
+import java.util.function.DoubleSupplier;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 // import frc.BotchoCheese.Utils.LimelightHelpers;
 import frc.BotchoCheese.Constants.RobotMap;
 
 public class Shooter extends SubsystemBase {
+    private static final String SHOOTER_RPS_KEY = "Shooter RPS";
+    private static final String BACK_LEFT_SHOOTER_RPS_KEY = "Shooter Back Left RPS";
+    private static final String FRONT_SHOOTER_RPS_KEY = "Shooter Front RPS";
     private static final double SHOOTER_P_VALUE = 0.5;
     private static final double SHOOTER_I_VALUE = 0.0;
     private static final double SHOOTER_D_VALUE = 0.0;
@@ -87,5 +92,38 @@ public Command shootRps(double targetRps) {
             frontShooter.stopMotor();
         }
     );
+}
+
+public Command shootRps(DoubleSupplier targetRpsSupplier) {
+    return this.runEnd(
+        () -> {
+            double targetRps = targetRpsSupplier.getAsDouble();
+            backLeftShooter.setControl(shooterVelocityRequest.withVelocity(-targetRps));
+            frontShooter.setControl(shooterVelocityRequest.withVelocity(-targetRps));
+        },
+        () -> {
+            backLeftShooter.stopMotor();
+            frontShooter.stopMotor();
+        }
+    );
+}
+
+public double getBackLeftRps() {
+    return Math.abs(backLeftShooter.getVelocity().getValueAsDouble());
+}
+
+public double getFrontRps() {
+    return Math.abs(frontShooter.getVelocity().getValueAsDouble());
+}
+
+public double getAverageRps() {
+    return (getBackLeftRps() + getFrontRps()) / 2.0;
+}
+
+@Override
+public void periodic() {
+    SmartDashboard.putNumber(SHOOTER_RPS_KEY, getAverageRps());
+    SmartDashboard.putNumber(BACK_LEFT_SHOOTER_RPS_KEY, getBackLeftRps());
+    SmartDashboard.putNumber(FRONT_SHOOTER_RPS_KEY, getFrontRps());
 }
 }

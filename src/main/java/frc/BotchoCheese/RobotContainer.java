@@ -188,9 +188,9 @@ public class RobotContainer {
         //INTAKE BALLs
         JOYSTICK2_CONTROLLER.leftTrigger().toggleOnTrue(
         Commands.parallel(
-        intake.runIntake(-0.5),
-        indexer.runIndexer(-0.5),
-        feeder.runFeeder(-0.5)
+        intake.runIntake(0.5),
+        indexer.runIndexer(0.5),
+        feeder.runFeeder(0.5)
      
     )
 );
