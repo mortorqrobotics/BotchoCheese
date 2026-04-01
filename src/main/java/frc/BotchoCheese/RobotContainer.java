@@ -197,7 +197,8 @@ public class RobotContainer {
         Commands.parallel(
         intake.runIntake(0.75),
         indexer.runIndexer(0.75),
-        feeder.runFeeder(-0.5)
+        feeder.runFeeder(-0.5),
+        shooter.frontShooterOutRps(5.0)
      
     )
 );
@@ -249,7 +250,7 @@ JOYSTICK2_CONTROLLER.b().whileTrue(
     Commands.parallel(
         intake.runIntake(-0.75),
         indexer.runIndexer(-0.75),
-        feeder.runFeeder(0.5)
+        feeder.runFeeder(-0.5)
     )
 );
 

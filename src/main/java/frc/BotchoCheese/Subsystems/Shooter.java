@@ -112,6 +112,13 @@ public Command shootRps(DoubleSupplier targetRpsSupplier) {
     );
 }
 
+public Command frontShooterOutRps(double targetRps) {
+    return this.startEnd(
+        () -> frontShooter.setControl(shooterVelocityRequest.withVelocity(-Math.abs(targetRps))),
+        () -> frontShooter.stopMotor()
+    );
+}
+
 public double getBackLeftRps() {
     return Math.abs(backLeftShooter.getVelocity().getValueAsDouble());
 }
