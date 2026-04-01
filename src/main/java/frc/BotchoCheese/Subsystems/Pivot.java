@@ -4,10 +4,12 @@ import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
+import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.BotchoCheese.Constants.RobotMap;
@@ -22,11 +24,14 @@ public class Pivot extends SubsystemBase {
     private static final double PIVOT_CRUISE_VELOCITY = 200.0;
     private static final double PIVOT_ACCELERATION = 20.0;
     private static final double PIVOT_JERK = 20.0;
+    private static final double PIVOT_MOTION_MAGIC_TARGET_TOLERANCE = 0.05;
+    private static final double PIVOT_OSCILLATION_FREQUENCY_HZ = 0.5;
     //private static final double PIVOT_TARGET_ROTATIONS = 8.0;
     //private static final double PIVOT_FEEDFORWARD = 9.0;
 
     private final TalonFX pivotLeader;
     private final TalonFX pivotFollower;
+    private final MotionMagicVoltage pivotMotionMagicRequest = new MotionMagicVoltage(0.0);
 
     public Pivot() {
         pivotLeader = new TalonFX(RobotMap.LEFT_PIVOT_MOTOR_ID);
@@ -106,6 +111,48 @@ public class Pivot extends SubsystemBase {
                 () -> pivotLeader.setVoltage(upVolts),
                 () -> pivotLeader.setVoltage(0.0)
             ).until(() -> pivotLeader.getPosition().getValueAsDouble() <= targetPos);
+        });
+    }
+
+    public Command pivotMotionMagicToRotations(double targetRotations) {
+        return this.runEnd(
+            () -> pivotLeader.setControl(pivotMotionMagicRequest.withPosition(targetRotations)),
+            () -> pivotLeader.setVoltage(0.0)
+        );
+    }
+
+    public Command pivotMotionMagicUpToRotations(double deltaRotations, double oscillationAmplitudeRotations) {
+        return this.defer(() -> {
+            double startPos = pivotLeader.getPosition().getValueAsDouble();
+            double targetPos = startPos - Math.abs(deltaRotations);
+            double oscillationAmplitude = Math.abs(oscillationAmplitudeRotations);
+            boolean[] reachedTarget = {false};
+            double[] oscillationStartTime = {0.0};
+
+            return this.runEnd(
+                () -> {
+                    double currentPos = pivotLeader.getPosition().getValueAsDouble();
+
+                    if (!reachedTarget[0]) {
+                        pivotLeader.setControl(pivotMotionMagicRequest.withPosition(targetPos));
+
+                        if (currentPos <= targetPos + PIVOT_MOTION_MAGIC_TARGET_TOLERANCE) {
+                            reachedTarget[0] = true;
+                            oscillationStartTime[0] = Timer.getFPGATimestamp();
+                        }
+                        return;
+                    }
+
+                    double elapsedSeconds = Timer.getFPGATimestamp() - oscillationStartTime[0];
+                    double oscillationOffset =
+                        oscillationAmplitude * Math.sin(2.0 * Math.PI * PIVOT_OSCILLATION_FREQUENCY_HZ * elapsedSeconds);
+
+                    pivotLeader.setControl(
+                        pivotMotionMagicRequest.withPosition(targetPos + oscillationOffset)
+                    );
+                },
+                () -> pivotLeader.setVoltage(0.0)
+            );
         });
     }
 }
