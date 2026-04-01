@@ -105,8 +105,7 @@ public class RobotContainer {
         configureAutoChooser();
         SmartDashboard.putData(AUTO_CHOOSER_KEY, autoChooser);
         SmartDashboard.putNumber(SHOOTER_SETPOINT_RPS_KEY, 90.0);
-        SmartDashboard.putNumber(SHOOTER_LOFT_FRONT_SCALE_KEY, 0.75);
-        SmartDashboard.putData("Zero Pivot Encoder", new InstantCommand(pivot::zeroPivotEncoder, pivot));
+0        SmartDashboard.putData("Zero Pivot Encoder", new InstantCommand(pivot::zeroPivotEncoder, pivot));
 
         configureBindings();
     }
@@ -234,9 +233,9 @@ JOYSTICK2_CONTROLLER.rightBumper().toggleOnTrue(
 
 JOYSTICK2_CONTROLLER.y().toggleOnTrue(
     Commands.sequence(
-        shooter.shootLoftRps(this::getShooterTargetRps, getShooterLoftFrontScale()).withTimeout(1.0),
+        shooter.shootLoftRps(this::getShooterTargetRps, 0.01).withTimeout(1.0),
         Commands.parallel(
-            shooter.shootLoftRps(this::getShooterTargetRps, getShooterLoftFrontScale()),
+            shooter.shootLoftRps(this::getShooterTargetRps, 0.01),
             intake.runIntake(0.75),
             indexer.runIndexer(0.85),
             feeder.runFeeder(0.75),
