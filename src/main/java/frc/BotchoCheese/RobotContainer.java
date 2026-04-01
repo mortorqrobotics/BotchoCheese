@@ -197,8 +197,8 @@ public class RobotContainer {
         Commands.parallel(
         intake.runIntake(0.75),
         indexer.runIndexer(0.75),
-        feeder.runFeeder(-0.5),
-        shooter.frontShooterOutRps(5.0)
+        feeder.runFeeder(-0.5), 
+        shooter.frontShooterOutRps(5.0) //runs outward to prevent jam
      
     )
 );
