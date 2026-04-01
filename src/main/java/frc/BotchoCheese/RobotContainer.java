@@ -212,7 +212,7 @@ JOYSTICK2_CONTROLLER.rightTrigger().toggleOnTrue(
             intake.runIntake(0.75),
             indexer.runIndexer(0.75),
             feeder.runFeeder(0.75),
-            pivot.pivotUpToRotations(6)
+            Commands.waitSeconds(2.0).andThen(pivot.pivotUpToRotations(6))
         )
     )
 );
@@ -226,7 +226,7 @@ JOYSTICK2_CONTROLLER.rightBumper().toggleOnTrue(
             intake.runIntake(0.75),
             indexer.runIndexer(0.75),
             feeder.runFeeder(0.75),
-            pivot.pivotUpToRotations(6)
+            Commands.waitSeconds(2.0).andThen(pivot.pivotUpToRotations(6))
         )
     )
 );
@@ -240,7 +240,7 @@ JOYSTICK2_CONTROLLER.y().toggleOnTrue(
             intake.runIntake(0.75),
             indexer.runIndexer(0.75),
             feeder.runFeeder(0.75),
-            pivot.pivotUpToRotationsOscillatingVoltage(2.0, 0.5, 0.5)
+            Commands.waitSeconds(2.0).andThen(pivot.pivotUpToRotationsOscillatingVoltage(2.0, 0.5, 0.5))
         )
     )
 );
