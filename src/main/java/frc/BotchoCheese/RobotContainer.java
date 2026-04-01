@@ -52,6 +52,8 @@ public class RobotContainer {
     public static double MaxSpeed = 1.0 * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed; 1.0 placeholder for scaling
     
     public static boolean pivotIsUp = true;
+    private boolean pivotRightPovInitialized = false;
+    private boolean pivotRightPovUpNext = false;
     
     public static double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
 
@@ -187,6 +189,21 @@ public class RobotContainer {
         //Pivot Control
         JOYSTICK2_CONTROLLER.povUp().whileTrue(pivot.pivotUp());
         JOYSTICK2_CONTROLLER.povDown().whileTrue(pivot.pivotDown());
+        JOYSTICK2_CONTROLLER.povRight().onTrue(
+            new InstantCommand(() -> {
+                Command commandToRun;
+                if (!pivotRightPovInitialized) {
+                    pivotRightPovInitialized = true;
+                    commandToRun = pivot.pivotUpToRotations(6.0);
+                } else {
+                    commandToRun = pivotRightPovUpNext
+                        ? pivot.pivotUp().withTimeout(0.6)
+                        : pivot.pivotDown().withTimeout(0.6);
+                    pivotRightPovUpNext = !pivotRightPovUpNext;
+                }
+                commandToRun.schedule();
+            })
+        );
 
         //INTAKE BALLs
         JOYSTICK2_CONTROLLER.leftTrigger().toggleOnTrue(
@@ -207,8 +224,7 @@ JOYSTICK2_CONTROLLER.rightTrigger().toggleOnTrue(
             shooter.shootRps(120.0),
             intake.runIntake(0.75),
             indexer.runIndexer(0.85),
-            feeder.runFeeder(0.75),
-            pivot.pivotUpToRotations(4)
+            feeder.runFeeder(0.75)
         )
     )
 );
@@ -221,8 +237,7 @@ JOYSTICK2_CONTROLLER.rightBumper().toggleOnTrue(
             shooter.shootRps(75.0),
             intake.runIntake(0.75),
             indexer.runIndexer(0.85),
-            feeder.runFeeder(0.75),
-            pivot.pivotUpToRotations(4)
+            feeder.runFeeder(0.75)
         )
     )
 );
@@ -234,8 +249,7 @@ JOYSTICK2_CONTROLLER.y().toggleOnTrue(
             shooter.shootRps(120.0, 6.0),
             intake.runIntake(0.75),
             indexer.runIndexer(0.85),
-            feeder.runFeeder(0.75),
-            pivot.pivotUpToRotations(4)
+            feeder.runFeeder(0.75)
         )
     )
 );
@@ -247,8 +261,7 @@ JOYSTICK2_CONTROLLER.a().toggleOnTrue(
             shooter.shootRps(6.0, 120.0),
             intake.runIntake(0.75),
             indexer.runIndexer(0.85),
-            feeder.runFeeder(0.75),
-            pivot.pivotUpToRotations(4)
+            feeder.runFeeder(0.75)
         )
     )
 );
