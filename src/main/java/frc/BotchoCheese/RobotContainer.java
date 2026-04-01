@@ -100,14 +100,14 @@ public class RobotContainer {
         NamedCommands.registerCommand(
             "Shoot",
             Commands.sequence(
-                shooter.shootRps(75.0).withTimeout(1.0),
+                shooter.shootRps(75.0).withTimeout(0.5),
                 Commands.parallel(
                     shooter.shootRps(75.0),
                     intake.runIntake(0.75),
                     indexer.runIndexer(0.85),
                     feeder.runFeeder(0.75)
-                ).withTimeout(1.5)
-            )
+                )
+            ).withTimeout(10.0)
         );
 
         NamedCommands.registerCommand("PivotDown", pivot.pivotDown().withTimeout(pivotDownSeconds));
@@ -274,7 +274,7 @@ public class RobotContainer {
         // Big shot
         JOYSTICK2_CONTROLLER.rightTrigger().toggleOnTrue(
             Commands.sequence(
-                shooter.shootRps(120.0).withTimeout(1.0),
+                shooter.shootRps(120.0).withTimeout(0.5),
                 Commands.parallel(
                     shooter.shootRps(120.0),
                     intake.runIntake(0.75),
@@ -287,7 +287,7 @@ public class RobotContainer {
         // Regular shot
         JOYSTICK2_CONTROLLER.rightBumper().toggleOnTrue(
             Commands.sequence(
-                shooter.shootRps(75.0).withTimeout(1.0),
+                shooter.shootRps(75.0).withTimeout(0.5),
                 Commands.parallel(
                     shooter.shootRps(75.0),
                     intake.runIntake(0.75),
@@ -300,7 +300,7 @@ public class RobotContainer {
         // Lob shot (back, front)
         JOYSTICK2_CONTROLLER.y().toggleOnTrue(
             Commands.sequence(
-                shooter.shootRps(120.0, 6.0).withTimeout(1.0),
+                shooter.shootRps(120.0, 6.0).withTimeout(0.5),
                 Commands.parallel(
                     shooter.shootRps(120.0, 6.0),
                     intake.runIntake(0.75),
@@ -313,7 +313,7 @@ public class RobotContainer {
         // Line-drive shot (back, front)
         JOYSTICK2_CONTROLLER.a().toggleOnTrue(
             Commands.sequence(
-                shooter.shootRps(6.0, 120.0).withTimeout(1.0),
+                shooter.shootRps(6.0, 120.0).withTimeout(0.5),
                 Commands.parallel(
                     shooter.shootRps(6.0, 120.0),
                     intake.runIntake(0.75),
