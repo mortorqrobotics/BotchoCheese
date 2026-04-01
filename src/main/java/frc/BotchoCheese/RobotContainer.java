@@ -147,8 +147,13 @@ public class RobotContainer {
         }
     }
 
+     //Deadband setting for Driver Joysticks   
+    private static double applyDriveDeadband(double value) {
+        return MathUtil.applyDeadband(value, 0.1);
+    }
+
     private void configureBindings() {
-        
+
         // Note that X is defined as forward according to WPILib convention,
         // and Y is defined as to the left according to WPILib convention.
         drivetrain.setDefaultCommand(
@@ -185,7 +190,7 @@ public class RobotContainer {
         //Pivot Control
         JOYSTICK2_CONTROLLER.povUp().whileTrue(pivot.pivotUp());
         JOYSTICK2_CONTROLLER.povDown().whileTrue(pivot.pivotDown());
-        JOYSTICK2_CONTROLLER.povRight().whileTrue(pivot.pivotMotionMagicUpToRotations(4.0, 0.5, 0.5));
+        JOYSTICK2_CONTROLLER.povRight().whileTrue(pivot.pivotMotionMagicUpToRotations(4.0, 0.5, 0.25));
 
         //INTAKE BALLs
         JOYSTICK2_CONTROLLER.leftTrigger().toggleOnTrue(
@@ -234,10 +239,6 @@ JOYSTICK2_CONTROLLER.b().whileTrue(
     )
 );
 
-    }
-    
-    private static double applyDriveDeadband(double value) {
-        return MathUtil.applyDeadband(value, 0.1);
     }
 
     private double getShooterTargetRps() {
