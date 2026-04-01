@@ -211,7 +211,7 @@ JOYSTICK2_CONTROLLER.rightTrigger().toggleOnTrue(
             feeder.runFeeder(0.5),
             indexer.runIndexer(0.5),
             intake.runIntake(0.5),
-            pivot.pivotUpToRotations(4)
+            pivot.pivotUpToRotations(6)
         )
     )
 );
@@ -225,7 +225,21 @@ JOYSTICK2_CONTROLLER.rightBumper().toggleOnTrue(
             feeder.runFeeder(0.5),
             indexer.runIndexer(0.5),
             intake.runIntake(0.5),
-            pivot.pivotUpToRotations(4)
+            pivot.pivotUpToRotations(6)
+        )
+    )
+);
+
+//Shooter sequence using SmartDashboard RPS with pivot oscillation
+JOYSTICK2_CONTROLLER.y().toggleOnTrue(
+    Commands.sequence(
+        shooter.shootRps(this::getShooterTargetRps).withTimeout(1.0),
+        Commands.parallel(
+            shooter.shootRps(this::getShooterTargetRps),
+            feeder.runFeeder(0.5),
+            indexer.runIndexer(0.5),
+            intake.runIntake(0.5),
+            pivot.pivotMotionMagicUpToRotations(4.0, 0.5, 0.5)
         )
     )
 );
