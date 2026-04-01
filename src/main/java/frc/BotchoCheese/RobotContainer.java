@@ -185,6 +185,7 @@ public class RobotContainer {
         //Pivot Control
         JOYSTICK2_CONTROLLER.povUp().whileTrue(pivot.pivotUp());
         JOYSTICK2_CONTROLLER.povDown().whileTrue(pivot.pivotDown());
+        JOYSTICK2_CONTROLLER.povRight().whileTrue(pivot.pivotMotionMagicUpToRotations(4.0, 0.5, 0.5));
 
         //INTAKE BALLs
         JOYSTICK2_CONTROLLER.leftTrigger().toggleOnTrue(

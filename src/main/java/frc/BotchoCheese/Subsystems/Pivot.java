@@ -25,7 +25,6 @@ public class Pivot extends SubsystemBase {
     private static final double PIVOT_ACCELERATION = 20.0;
     private static final double PIVOT_JERK = 20.0;
     private static final double PIVOT_MOTION_MAGIC_TARGET_TOLERANCE = 0.05;
-    private static final double PIVOT_OSCILLATION_FREQUENCY_HZ = 0.5;
     //private static final double PIVOT_TARGET_ROTATIONS = 8.0;
     //private static final double PIVOT_FEEDFORWARD = 9.0;
 
@@ -121,11 +120,16 @@ public class Pivot extends SubsystemBase {
         );
     }
 
-    public Command pivotMotionMagicUpToRotations(double deltaRotations, double oscillationAmplitudeRotations) {
+    public Command pivotMotionMagicUpToRotations(
+        double deltaRotations,
+        double oscillationAmplitudeRotations,
+        double oscillationsPerSecond
+    ) {
         return this.defer(() -> {
             double startPos = pivotLeader.getPosition().getValueAsDouble();
             double targetPos = startPos - Math.abs(deltaRotations);
             double oscillationAmplitude = Math.abs(oscillationAmplitudeRotations);
+            double oscillationFrequency = Math.abs(oscillationsPerSecond);
             boolean[] reachedTarget = {false};
             double[] oscillationStartTime = {0.0};
 
@@ -145,7 +149,7 @@ public class Pivot extends SubsystemBase {
 
                     double elapsedSeconds = Timer.getFPGATimestamp() - oscillationStartTime[0];
                     double oscillationOffset =
-                        oscillationAmplitude * Math.sin(2.0 * Math.PI * PIVOT_OSCILLATION_FREQUENCY_HZ * elapsedSeconds);
+                        oscillationAmplitude * Math.sin(2.0 * Math.PI * oscillationFrequency * elapsedSeconds);
 
                     pivotLeader.setControl(
                         pivotMotionMagicRequest.withPosition(targetPos + oscillationOffset)
