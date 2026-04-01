@@ -137,6 +137,22 @@ public Command shootLoftRps(DoubleSupplier backShooterTargetRpsSupplier, double 
     );
 }
 
+public Command shootLoftRps(
+    DoubleSupplier backShooterTargetRpsSupplier,
+    DoubleSupplier frontSpeedScaleSupplier
+) {
+    return this.runEnd(
+        () -> setLoftShotSpeeds(
+            backShooterTargetRpsSupplier.getAsDouble(),
+            frontSpeedScaleSupplier.getAsDouble()
+        ),
+        () -> {
+            backLeftShooter.stopMotor();
+            frontShooter.stopMotor();
+        }
+    );
+}
+
 public Command frontShooterOutRps(double targetRps) {
     return this.startEnd(
         () -> frontShooter.setControl(shooterVelocityRequest.withVelocity(Math.abs(targetRps))),
