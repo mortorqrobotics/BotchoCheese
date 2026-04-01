@@ -92,8 +92,31 @@ public class RobotContainer {
     }
 
     private void registerNamedCommands() {
-        NamedCommands.registerCommand("Shoot", Commands.sequence());
-        NamedCommands.registerCommand("IntakeOn", intake.runIntake(0.5));
+        final double pivotDownSeconds = 1.0; // tune this "X seconds" value
+
+        NamedCommands.registerCommand(
+            "Shoot",
+            Commands.sequence(
+                shooter.shootRps(75.0).withTimeout(1.0),
+                Commands.parallel(
+                    shooter.shootRps(75.0),
+                    intake.runIntake(0.75),
+                    indexer.runIndexer(0.85),
+                    feeder.runFeeder(0.75)
+                ).withTimeout(1.5)
+            )
+        );
+
+        NamedCommands.registerCommand("PivotDown", pivot.pivotDown().withTimeout(pivotDownSeconds));
+        NamedCommands.registerCommand(
+            "Intake",
+            Commands.parallel(
+                intake.runIntake(0.75),
+                indexer.runIndexer(-0.5),
+                feeder.runFeeder(-0.75),
+                shooter.shootRps(0.0, -25.0)
+            )
+        );
     }
 
     private void configureDashboard() {
