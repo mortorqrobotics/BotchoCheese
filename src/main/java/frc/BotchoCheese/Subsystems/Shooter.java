@@ -82,8 +82,8 @@ private final VelocityVoltage shooterVelocityRequest = new VelocityVoltage(0);
 public Command shootRps(double... rpsValues) {
     return this.runEnd(
         () -> {
-            double backRps = rpsValues[0];
-            double frontRps = rpsValues.length > 1 ? rpsValues[1] : rpsValues[0];
+            double backRps = rpsValues.length > 0 ? rpsValues[0] : 75.0;
+            double frontRps = rpsValues.length > 1 ? rpsValues[1] : backRps;
             setShooterSpeeds(backRps, frontRps);
         },
         () -> {

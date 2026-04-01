@@ -11,14 +11,13 @@ import frc.BotchoCheese.Constants.RobotMap;
 
 
 public class Feeder extends SubsystemBase {
-    // Single Minion motor controlled by a Talon FXS
+    // Feeder motor
     private final TalonFX feeder;
 
     // Control request object
     private final DutyCycleOut feederDuty  = new DutyCycleOut(0);
 
     public Feeder() {
-        // Updated to TalonFXS class
         feeder = new TalonFX(RobotMap.FEEDER_MOTOR_ID);
 
         TalonFXConfiguration config = new TalonFXConfiguration();

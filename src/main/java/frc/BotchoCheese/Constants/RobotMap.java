@@ -39,8 +39,8 @@ public class RobotMap {
     // Pivot motor IDs
     public static final int LEFT_PIVOT_MOTOR_ID = 20;
     public static final int RIGHT_PIVOT_MOTOR_ID = 21;
-  
-  ; // Shooter motor IDs
+
+    // Shooter motor IDs
     public static final int BACK_LEFT_SHOOTER_MOTOR_ID = 24;
     public static final int BACK_RIGHT_SHOOTER_MOTOR_ID = 25;
     public static final int FRONT_SHOOTER_MOTOR_ID = 26;

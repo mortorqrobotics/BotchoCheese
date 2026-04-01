@@ -76,14 +76,7 @@ public void disabledInit() {
   @Override
   public void autonomousInit() {
     m_robotContainer.pivot.enableBrakeMode();
-
-    try {  
-      RobotContainer.gyro.setYaw(DriverStation.getAlliance().get() == Alliance.Blue ? Math.PI: 0); // this is esentually directly from the external IMU since we barely trust vision angle
-      RobotContainer.drivetrain.resetRotation(new Rotation2d(DriverStation.getAlliance().get() == Alliance.Blue ? Math.PI: 0));
-    } 
-    catch (Exception e) {
-      System.out.print(e);
-    }
+    applyAllianceHeadingReference();
 
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
@@ -130,4 +123,13 @@ public void disabledInit() {
 
   @Override
   public void simulationPeriodic() {}
+
+  private void applyAllianceHeadingReference() {
+    Alliance alliance = DriverStation.getAlliance().orElse(Alliance.Blue);
+    double headingRad = alliance == Alliance.Red ? Math.PI : 0.0;
+    double headingDeg = Math.toDegrees(headingRad);
+
+    RobotContainer.gyro.setYaw(headingDeg);
+    RobotContainer.drivetrain.resetRotation(new Rotation2d(headingRad));
+  }
 }

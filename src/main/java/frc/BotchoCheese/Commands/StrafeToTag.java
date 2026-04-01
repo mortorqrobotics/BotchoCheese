@@ -89,8 +89,6 @@ public class StrafeToTag extends Command {
         yController.reset();
         xController.setSetpoint(xSetpoint);
         yController.setSetpoint(ySetpoint);
-
-        System.out.println("StrafeToTag initialized");
     }
 
 
@@ -125,6 +123,5 @@ public class StrafeToTag extends Command {
     public void end(boolean interrupted) {
         // Stop the robot when the command ends or the driver lets go of the button
         drivetrainSubsystem.setControl(new SwerveRequest.Idle());
-        System.out.println("StrafeToTag Ended");
     }
 }
