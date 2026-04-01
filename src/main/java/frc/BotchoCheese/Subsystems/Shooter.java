@@ -22,6 +22,7 @@ public class Shooter extends SubsystemBase {
     private static final String BACK_LEFT_SHOOTER_ACTUAL_RPS_KEY = "Shooter Back Left Actual RPS";
     private static final String FRONT_SHOOTER_ACTUAL_RPS_KEY = "Shooter Front Actual RPS";
     private static final double DEFAULT_LOFT_FRONT_SPEED_SCALE = 0.75;
+    private static final double DEFAULT_DRIVE_BACK_SPEED_SCALE = 0.75;
     private static final double SHOOTER_P_VALUE = 0.5;
     private static final double SHOOTER_I_VALUE = 0.0;
     private static final double SHOOTER_D_VALUE = 0.0;
@@ -153,6 +154,46 @@ public Command shootLoftRps(
     );
 }
 
+public Command shootDriveRps(double frontShooterTargetRps) {
+    return shootDriveRps(frontShooterTargetRps, DEFAULT_DRIVE_BACK_SPEED_SCALE);
+}
+
+public Command shootDriveRps(double frontShooterTargetRps, double backSpeedScale) {
+    return this.startEnd(
+        () -> setDriveShotSpeeds(frontShooterTargetRps, backSpeedScale),
+        () -> {
+            backLeftShooter.stopMotor();
+            frontShooter.stopMotor();
+        }
+    );
+}
+
+public Command shootDriveRps(DoubleSupplier frontShooterTargetRpsSupplier, double backSpeedScale) {
+    return this.runEnd(
+        () -> setDriveShotSpeeds(frontShooterTargetRpsSupplier.getAsDouble(), backSpeedScale),
+        () -> {
+            backLeftShooter.stopMotor();
+            frontShooter.stopMotor();
+        }
+    );
+}
+
+public Command shootDriveRps(
+    DoubleSupplier frontShooterTargetRpsSupplier,
+    DoubleSupplier backSpeedScaleSupplier
+) {
+    return this.runEnd(
+        () -> setDriveShotSpeeds(
+            frontShooterTargetRpsSupplier.getAsDouble(),
+            backSpeedScaleSupplier.getAsDouble()
+        ),
+        () -> {
+            backLeftShooter.stopMotor();
+            frontShooter.stopMotor();
+        }
+    );
+}
+
 public Command frontShooterOutRps(double targetRps) {
     return this.startEnd(
         () -> frontShooter.setControl(shooterVelocityRequest.withVelocity(Math.abs(targetRps))),
@@ -174,6 +215,12 @@ public double getAverageRps() {
 
 private void setLoftShotSpeeds(double backShooterTargetRps, double frontSpeedScale) {
     double frontShooterTargetRps = backShooterTargetRps * Math.abs(frontSpeedScale);
+    backLeftShooter.setControl(shooterVelocityRequest.withVelocity(-backShooterTargetRps));
+    frontShooter.setControl(shooterVelocityRequest.withVelocity(-frontShooterTargetRps));
+}
+
+private void setDriveShotSpeeds(double frontShooterTargetRps, double backSpeedScale) {
+    double backShooterTargetRps = frontShooterTargetRps * Math.abs(backSpeedScale);
     backLeftShooter.setControl(shooterVelocityRequest.withVelocity(-backShooterTargetRps));
     frontShooter.setControl(shooterVelocityRequest.withVelocity(-frontShooterTargetRps));
 }

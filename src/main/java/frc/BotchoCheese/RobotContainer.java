@@ -51,6 +51,7 @@ public class RobotContainer {
     private static final String SHOOTER_SETPOINT_RPS_KEY = "Shooter Setpoint RPS";
     private static final String ACTIVE_SHOOTER_SETPOINT_RPS_KEY = "Shooter Applied Setpoint RPS";
     private static final String SHOOTER_LOFT_FRONT_SCALE_KEY = "Shooter Loft Front Scale";
+    private static final String SHOOTER_DRIVE_BACK_SCALE_KEY = "Shooter Drive Back Scale";
 
     public static double MaxSpeed = 1.0 * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed; 1.0 placeholder for scaling
     
@@ -105,6 +106,8 @@ public class RobotContainer {
         configureAutoChooser();
         SmartDashboard.putData(AUTO_CHOOSER_KEY, autoChooser);
         SmartDashboard.putNumber(SHOOTER_SETPOINT_RPS_KEY, 90.0);
+        SmartDashboard.putNumber(SHOOTER_LOFT_FRONT_SCALE_KEY, 0.75);
+        SmartDashboard.putNumber(SHOOTER_DRIVE_BACK_SCALE_KEY, 0.75);
         SmartDashboard.putData("Zero Pivot Encoder", new InstantCommand(pivot::zeroPivotEncoder, pivot));
 
         configureBindings();
@@ -233,9 +236,22 @@ JOYSTICK2_CONTROLLER.rightBumper().toggleOnTrue(
 
 JOYSTICK2_CONTROLLER.y().toggleOnTrue(
     Commands.sequence(
-        shooter.shootLoftRps(this::getShooterTargetRps, 0.01).withTimeout(1.0),
+        shooter.shootLoftRps(this::getShooterTargetRps, this::getShooterLoftFrontScale).withTimeout(1.0),
         Commands.parallel(
-            shooter.shootLoftRps(this::getShooterTargetRps, 0.01),
+            shooter.shootLoftRps(this::getShooterTargetRps, this::getShooterLoftFrontScale),
+            intake.runIntake(0.75),
+            indexer.runIndexer(0.85),
+            feeder.runFeeder(0.75),
+            pivot.pivotUpToRotations(4)
+        )
+    )
+);
+
+JOYSTICK2_CONTROLLER.a().toggleOnTrue(
+    Commands.sequence(
+        shooter.shootDriveRps(this::getShooterTargetRps, this::getShooterDriveBackScale).withTimeout(1.0),
+        Commands.parallel(
+            shooter.shootDriveRps(this::getShooterTargetRps, this::getShooterDriveBackScale),
             intake.runIntake(0.75),
             indexer.runIndexer(0.85),
             feeder.runFeeder(0.75),
@@ -264,6 +280,10 @@ JOYSTICK2_CONTROLLER.b().whileTrue(
 
     private double getShooterLoftFrontScale() {
         return SmartDashboard.getNumber(SHOOTER_LOFT_FRONT_SCALE_KEY, 0.75);
+    }
+
+    private double getShooterDriveBackScale() {
+        return SmartDashboard.getNumber(SHOOTER_DRIVE_BACK_SCALE_KEY, 0.75);
     }
 
 
