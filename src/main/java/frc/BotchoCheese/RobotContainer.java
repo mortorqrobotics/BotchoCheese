@@ -190,7 +190,7 @@ public class RobotContainer {
         //Pivot Control
         JOYSTICK2_CONTROLLER.povUp().whileTrue(pivot.pivotUp());
         JOYSTICK2_CONTROLLER.povDown().whileTrue(pivot.pivotDown());
-        JOYSTICK2_CONTROLLER.povRight().whileTrue(pivot.pivotMotionMagicUpToRotations(4.0, 0.5, 0.25));
+        JOYSTICK2_CONTROLLER.povRight().whileTrue(pivot.pivotUpToRotationsOscillatingVoltage(4.0, 0.5, 0.25));
 
         //INTAKE BALLs
         JOYSTICK2_CONTROLLER.leftTrigger().toggleOnTrue(
@@ -240,7 +240,7 @@ JOYSTICK2_CONTROLLER.y().toggleOnTrue(
             intake.runIntake(0.75),
             indexer.runIndexer(0.75),
             feeder.runFeeder(0.75),
-            pivot.pivotMotionMagicUpToRotations(2.0, 0.5, 0.5)
+            pivot.pivotUpToRotationsOscillatingVoltage(2.0, 0.5, 0.5)
         )
     )
 );
