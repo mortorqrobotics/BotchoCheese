@@ -12,7 +12,6 @@ import com.ctre.phoenix6.SignalLogger;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.wpilibj.DataLogManager;
@@ -31,6 +30,7 @@ public class Robot extends TimedRobot {
   private static final Path USB_MOUNT_PATH = Path.of("/U");
   private static final Path USB_LOG_DIR = USB_MOUNT_PATH.resolve("logs");
   private static final Path LOCAL_LOG_DIR = Path.of("logs");
+  private static final long LIMELIGHT_IDLE_THROTTLE = 100;
 
   public static LimelightHelpers limelight;
   public static LimelightHelpers limelightTwo;
@@ -39,8 +39,7 @@ public class Robot extends TimedRobot {
 
   private final RobotContainer m_robotContainer;
 
-  private final boolean kUseLimelight = true;
-
+  private final boolean kUseLimelight = false;
   private StructPublisher<Pose2d> publisher;
 
   private final Field2d m_field = new Field2d();
@@ -58,6 +57,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void robotInit() {
+    setLimelightThrottle(LIMELIGHT_IDLE_THROTTLE);
     startUsbLoggingIfAvailable();
   }
 
@@ -65,48 +65,32 @@ public class Robot extends TimedRobot {
   public void robotPeriodic() {
     CommandScheduler.getInstance().run();
 
-    //Module Offsets
-    SmartDashboard.putNumber("Mod0 Offset", Units.rotationsToDegrees(RobotContainer.drivetrain.getModule(0).getEncoder().getAbsolutePosition().getValueAsDouble()));
-    SmartDashboard.putNumber("Mod1 Offset", Units.rotationsToDegrees(RobotContainer.drivetrain.getModule(1).getEncoder().getAbsolutePosition().getValueAsDouble()));
-    SmartDashboard.putNumber("Mod2 Offset", Units.rotationsToDegrees(RobotContainer.drivetrain.getModule(2).getEncoder().getAbsolutePosition().getValueAsDouble()));
-    SmartDashboard.putNumber("Mod3 Offset", Units.rotationsToDegrees(RobotContainer.drivetrain.getModule(3).getEncoder().getAbsolutePosition().getValueAsDouble()));
+    // SmartDashboard numeric telemetry is temporarily disabled.
+    // publishDashboardData();
 
-    SmartDashboard.putNumber("Mod0 Drive Speed", RobotContainer.drivetrain.getModule(0).getEncoder().getVelocity().getValueAsDouble());
-    SmartDashboard.putNumber("Mod1 Drive Speed", RobotContainer.drivetrain.getModule(1).getEncoder().getVelocity().getValueAsDouble());
-    SmartDashboard.putNumber("Mod2 Drive Speed", RobotContainer.drivetrain.getModule(2).getEncoder().getVelocity().getValueAsDouble());
-    SmartDashboard.putNumber("Mod3 Drive Speed", RobotContainer.drivetrain.getModule(3).getEncoder().getVelocity().getValueAsDouble());
-
-    // SmartDashboard.putNumber("Mod0 Offset", Units.rotationsToDegrees(RobotContainer.drivetrain.getModule(0).getEncoder().getAbsolutePosition().getValueAsDouble()));
-    // SmartDashboard.putNumber("Mod1 Offset", Units.rotationsToDegrees(RobotContainer.drivetrain.getModule(1).getEncoder().getAbsolutePosition().getValueAsDouble()));
-    // SmartDashboard.putNumber("Mod2 new Offset", Units.rotationsToDegrees(RobotContainer.drivetrain.getModule(2).getEncoder().getAbsolutePosition().getValueAsDouble()));
-    // SmartDashboard.putNumber("Mod3 new Offset", Units.rotationsToDegrees(RobotContainer.drivetrain.getModule(3).getEncoder().getAbsolutePosition().getValueAsDouble()));
-    
-    SmartDashboard.putNumber("PoseX", RobotContainer.drivetrain.getState().Pose.getX());
-    SmartDashboard.putNumber("PoseY", RobotContainer.drivetrain.getState().Pose.getY());
-    SmartDashboard.putNumber("Yaw", RobotContainer.drivetrain.getState().Pose.getRotation().getDegrees());
-    SmartDashboard.putNumber("Pivot Rotations", m_robotContainer.pivot.getPivotRotations());
+    // AdvantageScope simulation
+    Pose2d poseA = RobotContainer.drivetrain.getState().Pose;
+    publisher.set(poseA);
 
     if (kUseLimelight) {
       LimelightHomography.update(RobotContainer.drivetrain);
     }
-  
-  //AdvantageScope simulation
-  Pose2d poseA = RobotContainer.drivetrain.getState().Pose;
-  //System.out.println("Current pose: " + poseA);
-  publisher.set(poseA);
-  
-}
+  }
+
+  private void setLimelightThrottle(long throttleValue) {
+    NetworkTableInstance.getDefault().getTable("limelight").getEntry("throttle_set").setNumber(throttleValue);
+  }
 
 
 @Override
 public void disabledInit() {
   m_robotContainer.pivot.disableBrakeMode();
+  setLimelightThrottle(LIMELIGHT_IDLE_THROTTLE);
 }
 
 
   @Override
   public void disabledPeriodic() {
-     NetworkTableInstance.getDefault().getTable("limelight").getEntry("throttle_set").setNumber(100);
   }
 
   @Override
@@ -141,7 +125,6 @@ public void disabledInit() {
   @Override
   public void teleopInit() {
     m_robotContainer.pivot.enableBrakeMode();
-    NetworkTableInstance.getDefault().getTable("limelight").getEntry("throttle_set").setNumber(0);
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
