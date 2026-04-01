@@ -2,16 +2,8 @@
   "robotWidth": 0.86,
   "robotLength": 0.86,
   "holonomicMode": true,
-  "pathFolders": [
-    "Auto 1; Shoot and Climb",
-    "Auto 2; Shoot and Intake",
-    "Auto 3; Climb",
-    "Auto 4; Intake and Shoot",
-    "Auto 5; Collect",
-    "Auto 6; Depot and Shoot",
-    "Auto 7; NZ Shoot",
-    "Auto 8 Shoot Outpost Shoot (SOS)"
-  ],
+  "pathFolders": [],
+  "autoFolders": [],
   "defaultMaxVel": 1.5,
   "defaultMaxAccel": 3.0,
   "defaultMaxAngVel": 540.0,

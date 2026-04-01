@@ -153,11 +153,24 @@ public class RobotContainer {
         }
 
         try (var files = Files.list(autoFolder)) {
-            return files
+            List<String> autoNames = files
                 .filter(path -> path.toString().endsWith(".auto"))
                 .map(path -> path.getFileName().toString().replaceFirst("\\.auto$", ""))
                 .sorted(Comparator.naturalOrder())
                 .collect(Collectors.toList());
+
+            List<String> nonRedAutoNames = autoNames.stream()
+                .filter(name -> !name.toLowerCase().startsWith("red"))
+                .collect(Collectors.toList());
+
+            if (nonRedAutoNames.size() != autoNames.size()) {
+                DriverStation.reportWarning(
+                    "Ignoring Red-prefixed autos in chooser; using blue-side autos with alliance flip instead.",
+                    false
+                );
+            }
+
+            return nonRedAutoNames;
         } catch (IOException e) {
             DriverStation.reportError("Failed to read PathPlanner autos: " + e.getMessage(), e.getStackTrace());
             return List.of();
