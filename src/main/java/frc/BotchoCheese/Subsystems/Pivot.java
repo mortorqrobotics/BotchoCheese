@@ -120,49 +120,4 @@ public class Pivot extends SubsystemBase {
             () -> pivotLeader.setVoltage(0.0)
         );
     }
-
-    public Command pivotUpToRotationsOscillatingVoltage(
-        double deltaRotations,
-        double oscillationAmplitudeRotations,
-        double oscillationsPerSecond
-    ) {
-        return this.defer(() -> {
-            double startPos = pivotLeader.getPosition().getValueAsDouble();
-            double targetPos = startPos - Math.abs(deltaRotations);
-            double oscillationAmplitude = Math.abs(oscillationAmplitudeRotations);
-            double oscillationFrequency = Math.abs(oscillationsPerSecond);
-            boolean[] reachedTarget = {false};
-            double[] oscillationStartTime = {0.0};
-
-            return this.runEnd(
-                () -> {
-                    double currentPos = pivotLeader.getPosition().getValueAsDouble();
-
-                    if (!reachedTarget[0]) {
-                        pivotLeader.setVoltage(PIVOT_UP_VOLTS);
-
-                        if (currentPos <= targetPos + PIVOT_MOTION_MAGIC_TARGET_TOLERANCE) {
-                            reachedTarget[0] = true;
-                            oscillationStartTime[0] = Timer.getFPGATimestamp();
-                        }
-                        return;
-                    }
-
-                    double elapsedSeconds = Timer.getFPGATimestamp() - oscillationStartTime[0];
-                    double desiredPosition =
-                        targetPos
-                            + oscillationAmplitude
-                                * Math.sin(2.0 * Math.PI * oscillationFrequency * elapsedSeconds);
-                    double positionError = desiredPosition - currentPos;
-                    double oscillationVoltage = Math.max(
-                        -PIVOT_OSCILLATION_MAX_VOLTS,
-                        Math.min(PIVOT_OSCILLATION_MAX_VOLTS, positionError * PIVOT_OSCILLATION_VOLTAGE_KP)
-                    );
-
-                    pivotLeader.setVoltage(oscillationVoltage);
-                },
-                () -> pivotLeader.setVoltage(0.0)
-            );
-        });
-    }
 }

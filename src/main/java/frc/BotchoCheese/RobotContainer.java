@@ -190,15 +190,14 @@ public class RobotContainer {
         //Pivot Control
         JOYSTICK2_CONTROLLER.povUp().whileTrue(pivot.pivotUp());
         JOYSTICK2_CONTROLLER.povDown().whileTrue(pivot.pivotDown());
-        JOYSTICK2_CONTROLLER.povRight().whileTrue(pivot.pivotUpToRotationsOscillatingVoltage(4.0, 0.5, 0.25));
 
         //INTAKE BALLs
         JOYSTICK2_CONTROLLER.leftTrigger().toggleOnTrue(
         Commands.parallel(
         intake.runIntake(0.75),
         indexer.runIndexer(-0.5), //reverse to prevent jam
-        feeder.runFeeder(-0.5),  
-        shooter.frontShooterOutRps(-5.0) //runs outward to prevent jam
+        feeder.runFeeder(-0.75),  
+        shooter.frontShooterOutRps(-25.0) //runs outward to prevent jam
      
     )
 );
@@ -210,7 +209,7 @@ JOYSTICK2_CONTROLLER.rightTrigger().toggleOnTrue(
         Commands.parallel(
             shooter.shootRps(90),
             intake.runIntake(0.75),
-            indexer.runIndexer(0.75),
+            indexer.runIndexer(0.85),
             feeder.runFeeder(0.75),
             pivot.pivotUpToRotations(4)
         )
@@ -224,9 +223,9 @@ JOYSTICK2_CONTROLLER.rightBumper().toggleOnTrue(
         Commands.parallel(
             shooter.shootRps(this::getShooterTargetRps),
             intake.runIntake(0.75),
-            indexer.runIndexer(0.75),
+            indexer.runIndexer(0.85),
             feeder.runFeeder(0.75),
-            Commands.waitSeconds(2.0).andThen(pivot.pivotUpToRotations(4))
+            pivot.pivotUpToRotations(4)
         )
     )
 );
@@ -240,7 +239,7 @@ JOYSTICK2_CONTROLLER.y().toggleOnTrue(
             intake.runIntake(0.75),
             indexer.runIndexer(0.75),
             feeder.runFeeder(0.75),
-            pivot.pivotUpToRotationsOscillatingVoltage(4.0, 0.5, 0.5)
+            pivot.pivotUpToRotations(4)
         )
     )
 );
