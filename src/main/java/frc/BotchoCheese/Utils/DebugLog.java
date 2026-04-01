@@ -15,7 +15,9 @@ public final class DebugLog {
     private DebugLog() {}
 
     public static void info(String message) {
-        DriverStation.reportWarning("[INFO] " + message, false);
+        if (DEBUG) {
+            DriverStation.reportWarning("[INFO] " + message, false);
+        }
     }
 
     public static void debug(String message) {
@@ -25,10 +27,16 @@ public final class DebugLog {
     }
 
     public static void warn(String message) {
-        DriverStation.reportWarning(message, false);
+        if (DEBUG) {
+            DriverStation.reportWarning(message, false);
+        }
     }
 
     public static void warnThrottled(String key, String message, double minIntervalSeconds) {
+        if (!DEBUG) {
+            return;
+        }
+
         double now = Timer.getFPGATimestamp();
         double lastTime = lastWarningTimeByKey.getOrDefault(key, Double.NEGATIVE_INFINITY);
         if (now - lastTime >= minIntervalSeconds) {

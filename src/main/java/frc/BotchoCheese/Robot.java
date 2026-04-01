@@ -4,6 +4,8 @@
 
 package frc.BotchoCheese;
 
+import com.ctre.phoenix6.SignalLogger;
+
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -41,6 +43,11 @@ public class Robot extends TimedRobot {
   @Override
   public void robotInit() {
     setLimelightThrottle(LIMELIGHT_IDLE_THROTTLE);
+    if (DebugLog.DEBUG) {
+      SignalLogger.setPath("logs");
+      SignalLogger.start();
+      DebugLog.info("CTRE SignalLogger enabled (debug mode).");
+    }
     DebugLog.info("Startup complete (vision processing disabled, minimal telemetry mode).");
   }
 
