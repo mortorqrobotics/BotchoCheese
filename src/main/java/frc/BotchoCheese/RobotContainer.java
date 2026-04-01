@@ -31,6 +31,7 @@ import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -381,7 +382,7 @@ public class RobotContainer {
         cancelActiveDriverPathfind();
         activeDriverPathfindCommand =
             AutoBuilder.pathfindToPoseFlipped(bluePose, PathPlannerSetpoints.TELEOP_SHOT_PATHFIND_CONSTRAINTS);
-        activeDriverPathfindCommand.schedule();
+        CommandScheduler.getInstance().schedule(activeDriverPathfindCommand);
     }
 
     private void cancelActiveDriverPathfind() {
