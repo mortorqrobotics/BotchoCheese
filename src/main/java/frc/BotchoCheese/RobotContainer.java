@@ -139,7 +139,6 @@ public class RobotContainer {
 
     private void configureDashboard() {
         SmartDashboard.putData(AUTO_CHOOSER_KEY, autoChooser);
-        SmartDashboard.putData("Zero Pivot Encoder", new InstantCommand(pivot::zeroPivotEncoder, pivot));
     }
 
     private void configureAutoChooser() {
