@@ -48,7 +48,8 @@ public class RobotContainer {
     private static final String DEFAULT_AUTO_NAME = "Auto 1 (Default)";
     private static final String AUTO_CHOOSER_KEY = "Auto Mode";
     private static final String PATHPLANNER_AUTO_FOLDER = "pathplanner/autos";
-    private static final String SHOOTER_RPS_KEY = "Shooter Target RPS";
+    private static final String SHOOTER_SETPOINT_RPS_KEY = "Shooter Setpoint RPS";
+    private static final String ACTIVE_SHOOTER_SETPOINT_RPS_KEY = "Shooter Applied Setpoint RPS";
 
     public static double MaxSpeed = 1.0 * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
     
@@ -102,7 +103,7 @@ public class RobotContainer {
         autoChooser = new SendableChooser<>();
         configureAutoChooser();
         SmartDashboard.putData(AUTO_CHOOSER_KEY, autoChooser);
-        SmartDashboard.putNumber(SHOOTER_RPS_KEY, 90.0);
+        SmartDashboard.putNumber(SHOOTER_SETPOINT_RPS_KEY, 90.0);
         SmartDashboard.putData("Zero Pivot Encoder", new InstantCommand(pivot::zeroPivotEncoder, pivot));
 
         configureBindings();
@@ -212,9 +213,9 @@ JOYSTICK2_CONTROLLER.rightTrigger().toggleOnTrue(
 //Shooter sequence using SmartDashboard RPS
 JOYSTICK2_CONTROLLER.rightBumper().toggleOnTrue(
     Commands.sequence(
-        shooter.shootRps(getShooterTargetRps()).withTimeout(1.0),
+        shooter.shootRps(this::getShooterTargetRps).withTimeout(1.0),
         Commands.parallel(
-            shooter.shootRps(getShooterTargetRps()),
+            shooter.shootRps(this::getShooterTargetRps),
             feeder.runFeeder(0.5),
             indexer.runIndexer(0.5),
             intake.runIntake(0.5),
@@ -239,7 +240,9 @@ JOYSTICK2_CONTROLLER.b().whileTrue(
     }
 
     private double getShooterTargetRps() {
-        return SmartDashboard.getNumber(SHOOTER_RPS_KEY, 90.0);
+        double shooterTargetRps = SmartDashboard.getNumber(SHOOTER_SETPOINT_RPS_KEY, 90.0);
+        SmartDashboard.putNumber(ACTIVE_SHOOTER_SETPOINT_RPS_KEY, shooterTargetRps);
+        return shooterTargetRps;
     }
 
 

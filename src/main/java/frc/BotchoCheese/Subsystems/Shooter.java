@@ -18,9 +18,9 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.BotchoCheese.Constants.RobotMap;
 
 public class Shooter extends SubsystemBase {
-    private static final String SHOOTER_RPS_KEY = "Shooter RPS";
-    private static final String BACK_LEFT_SHOOTER_RPS_KEY = "Shooter Back Left RPS";
-    private static final String FRONT_SHOOTER_RPS_KEY = "Shooter Front RPS";
+    private static final String SHOOTER_ACTUAL_RPS_KEY = "Shooter Actual RPS";
+    private static final String BACK_LEFT_SHOOTER_ACTUAL_RPS_KEY = "Shooter Back Left Actual RPS";
+    private static final String FRONT_SHOOTER_ACTUAL_RPS_KEY = "Shooter Front Actual RPS";
     private static final double SHOOTER_P_VALUE = 0.5;
     private static final double SHOOTER_I_VALUE = 0.0;
     private static final double SHOOTER_D_VALUE = 0.0;
@@ -122,8 +122,8 @@ public double getAverageRps() {
 
 @Override
 public void periodic() {
-    SmartDashboard.putNumber(SHOOTER_RPS_KEY, getAverageRps());
-    SmartDashboard.putNumber(BACK_LEFT_SHOOTER_RPS_KEY, getBackLeftRps());
-    SmartDashboard.putNumber(FRONT_SHOOTER_RPS_KEY, getFrontRps());
+    SmartDashboard.putNumber(SHOOTER_ACTUAL_RPS_KEY, getAverageRps());
+    SmartDashboard.putNumber(BACK_LEFT_SHOOTER_ACTUAL_RPS_KEY, getBackLeftRps());
+    SmartDashboard.putNumber(FRONT_SHOOTER_ACTUAL_RPS_KEY, getFrontRps());
 }
 }
