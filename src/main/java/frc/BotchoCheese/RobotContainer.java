@@ -20,9 +20,12 @@ import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.path.PathConstraints;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
@@ -171,6 +174,13 @@ public class RobotContainer {
     }
 
     private void configureDriverBindings() {
+        final PathConstraints teleopPathfindConstraints = new PathConstraints(2.5, 2.0, 4.0, 6.0);
+
+        // Blue-side reference poses. AutoBuilder.pathfindToPoseFlipped mirrors these for Red.
+        final Pose2d leftHubShootingPose = new Pose2d(4.60, 4.90, Rotation2d.fromDegrees(180.0));
+        final Pose2d middleHubShootingPose = new Pose2d(4.60, 4.00, Rotation2d.fromDegrees(180.0));
+        final Pose2d rightHubShootingPose = new Pose2d(4.60, 3.10, Rotation2d.fromDegrees(180.0));
+
         drivetrain.setDefaultCommand(
             drivetrain.applyRequest(() ->
                 drive.withVelocityX(-applyDriveDeadband(JOYSTICK1_CONTROLLER.getLeftY()) * MaxSpeed)
@@ -179,7 +189,7 @@ public class RobotContainer {
             )
         );
 
-        JOYSTICK1_CONTROLLER.x().whileTrue(drivetrain.applyRequest(() -> brake));
+        JOYSTICK1_CONTROLLER.leftBumper().whileTrue(drivetrain.applyRequest(() -> brake));
 
         JOYSTICK1_CONTROLLER.povUp().whileTrue(drivetrain.applyRequest(() ->
             forwardStraight.withVelocityX(0.5).withVelocityY(0))
@@ -195,6 +205,17 @@ public class RobotContainer {
         );
 
         JOYSTICK1_CONTROLLER.start().onTrue(new InstantCommand(() -> drivetrain.seedFieldCentric()));
+
+        // Teleop pathfind shot setpoints
+        JOYSTICK1_CONTROLLER.x().onTrue(
+            AutoBuilder.pathfindToPoseFlipped(leftHubShootingPose, teleopPathfindConstraints)
+        );
+        JOYSTICK1_CONTROLLER.y().onTrue(
+            AutoBuilder.pathfindToPoseFlipped(middleHubShootingPose, teleopPathfindConstraints)
+        );
+        JOYSTICK1_CONTROLLER.b().onTrue(
+            AutoBuilder.pathfindToPoseFlipped(rightHubShootingPose, teleopPathfindConstraints)
+        );
 
         JOYSTICK1_CONTROLLER.leftTrigger().whileTrue(new StrafeToTag(drivetrain));
         JOYSTICK1_CONTROLLER.rightTrigger().whileTrue(new RotateToTag(drivetrain, 0));
