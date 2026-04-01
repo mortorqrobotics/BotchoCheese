@@ -195,9 +195,9 @@ public class RobotContainer {
         //INTAKE BALLs
         JOYSTICK2_CONTROLLER.leftTrigger().toggleOnTrue(
         Commands.parallel(
-        intake.runIntake(0.5),
-        indexer.runIndexer(0.5),
-        feeder.runFeeder(0.5)
+        intake.runIntake(0.75),
+        indexer.runIndexer(0.75),
+        feeder.runFeeder(-0.5)
      
     )
 );
@@ -208,9 +208,9 @@ JOYSTICK2_CONTROLLER.rightTrigger().toggleOnTrue(
         shooter.shootRps(90).withTimeout(1.0),
         Commands.parallel(
             shooter.shootRps(90),
-            feeder.runFeeder(0.5),
-            indexer.runIndexer(0.5),
-            intake.runIntake(0.5),
+            intake.runIntake(0.75),
+            indexer.runIndexer(0.75),
+            feeder.runFeeder(0.75),
             pivot.pivotUpToRotations(6)
         )
     )
@@ -222,9 +222,9 @@ JOYSTICK2_CONTROLLER.rightBumper().toggleOnTrue(
         shooter.shootRps(this::getShooterTargetRps).withTimeout(1.0),
         Commands.parallel(
             shooter.shootRps(this::getShooterTargetRps),
-            feeder.runFeeder(0.5),
-            indexer.runIndexer(0.5),
-            intake.runIntake(0.5),
+            intake.runIntake(0.75),
+            indexer.runIndexer(0.75),
+            feeder.runFeeder(0.75),
             pivot.pivotUpToRotations(6)
         )
     )
@@ -236,9 +236,9 @@ JOYSTICK2_CONTROLLER.y().toggleOnTrue(
         shooter.shootRps(this::getShooterTargetRps).withTimeout(1.0),
         Commands.parallel(
             shooter.shootRps(this::getShooterTargetRps),
-            feeder.runFeeder(0.5),
-            indexer.runIndexer(0.5),
-            intake.runIntake(0.5),
+            intake.runIntake(0.75),
+            indexer.runIndexer(0.75),
+            feeder.runFeeder(0.75),
             pivot.pivotMotionMagicUpToRotations(6.0, 1, 0.5)
         )
     )
@@ -247,9 +247,9 @@ JOYSTICK2_CONTROLLER.y().toggleOnTrue(
 //Reverse everything
 JOYSTICK2_CONTROLLER.b().whileTrue(
     Commands.parallel(
-        feeder.runFeeder(-0.5),
-        indexer.runIndexer(-0.5),
-        intake.runIntake(-0.5)
+        intake.runIntake(-0.75),
+        indexer.runIndexer(-0.75),
+        feeder.runFeeder(0.5)
     )
 );
 

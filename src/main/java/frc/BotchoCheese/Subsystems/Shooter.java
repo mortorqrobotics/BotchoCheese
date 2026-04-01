@@ -72,6 +72,10 @@ public class Shooter extends SubsystemBase {
         backRightShooter.getConfigurator().apply(config);
         frontShooter.getConfigurator().apply(config);
 
+        backLeftShooter.setNeutralMode(NeutralModeValue.Brake);
+        backRightShooter.setNeutralMode(NeutralModeValue.Brake);
+        frontShooter.setNeutralMode(NeutralModeValue.Brake);
+
         backRightShooter.setControl(
         new Follower(backLeftShooter.getDeviceID(), MotorAlignmentValue.Aligned)
 );
