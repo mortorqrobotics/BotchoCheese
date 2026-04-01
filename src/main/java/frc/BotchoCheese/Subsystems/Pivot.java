@@ -82,4 +82,14 @@ public class Pivot extends SubsystemBase {
             ).until(() -> pivotLeader.getPosition().getValueAsDouble() <= targetPos);
         });
     }
+
+    public Command pivotToBottomAndHome() {
+        return this.runEnd(
+            () -> pivotLeader.setVoltage(PIVOT_VOLTS),
+            () -> {
+                pivotLeader.setVoltage(0.0);
+                zeroPivotEncoder();
+            }
+        );
+    }
 }

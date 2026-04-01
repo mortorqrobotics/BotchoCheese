@@ -54,9 +54,6 @@ public class RobotContainer {
     public static double MaxSpeed = 1.0 * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond);
     public static double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond);
 
-    private boolean pivotRightPovInitialized = false;
-    private boolean pivotRightPovUpNext = false;
-
     // Controllers
     private static final CommandXboxController JOYSTICK1_CONTROLLER = new CommandXboxController(0);
     private static final CommandXboxController JOYSTICK2_CONTROLLER = new CommandXboxController(1);
@@ -181,25 +178,22 @@ public class RobotContainer {
     }
 
     private void configureOperatorBindings() {
-        final double pivotInitialUpRotations = 6.0;
+        final double pivotUpForShotRotations = 6.0;
         final double pivotToggleTimeoutSeconds = 0.6;
 
         // Pivot controls
         JOYSTICK2_CONTROLLER.povUp().whileTrue(pivot.pivotUp());
         JOYSTICK2_CONTROLLER.povDown().whileTrue(pivot.pivotDown());
-        JOYSTICK2_CONTROLLER.povRight().onTrue(new InstantCommand(() -> {
-            Command commandToRun;
-            if (!pivotRightPovInitialized) {
-                pivotRightPovInitialized = true;
-                commandToRun = pivot.pivotUpToRotations(pivotInitialUpRotations);
-            } else {
-                commandToRun = pivotRightPovUpNext
-                    ? pivot.pivotUp().withTimeout(pivotToggleTimeoutSeconds)
-                    : pivot.pivotDown().withTimeout(pivotToggleTimeoutSeconds);
-                pivotRightPovUpNext = !pivotRightPovUpNext;
-            }
-            commandToRun.schedule();
-        }));
+        JOYSTICK2_CONTROLLER.povLeft().whileTrue(pivot.pivotToBottomAndHome());
+        JOYSTICK2_CONTROLLER.povRight().whileTrue(
+            Commands.sequence(
+                pivot.pivotUpToRotations(pivotUpForShotRotations),
+                Commands.repeatingSequence(
+                    pivot.pivotDown().withTimeout(pivotToggleTimeoutSeconds),
+                    pivot.pivotUp().withTimeout(pivotToggleTimeoutSeconds)
+                )
+            )
+        );
 
         // Intake balls / anti-jam
         JOYSTICK2_CONTROLLER.leftTrigger().toggleOnTrue(
