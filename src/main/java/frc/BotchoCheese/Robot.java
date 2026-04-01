@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.BotchoCheese.Commands.LimelightHomography;
+import frc.BotchoCheese.Utils.DebugLog;
 import frc.BotchoCheese.Utils.LimelightHelpers;
 
 
@@ -40,6 +41,7 @@ public class Robot extends TimedRobot {
   @Override
   public void robotInit() {
     setLimelightThrottle(LIMELIGHT_IDLE_THROTTLE);
+    DebugLog.info("Startup complete (vision processing disabled, minimal telemetry mode).");
   }
 
   @Override
@@ -77,6 +79,7 @@ public void disabledInit() {
   public void autonomousInit() {
     m_robotContainer.pivot.enableBrakeMode();
     applyAllianceHeadingReference();
+    DebugLog.info("Autonomous init");
 
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
@@ -96,6 +99,7 @@ public void disabledInit() {
   public void teleopInit() {
     m_robotContainer.pivot.enableBrakeMode();
     m_robotContainer.seedPoseFromSelectedAuto();
+    DebugLog.info("Teleop init");
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }

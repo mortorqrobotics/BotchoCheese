@@ -47,6 +47,7 @@ import frc.BotchoCheese.Subsystems.Indexer;
 import frc.BotchoCheese.Subsystems.Intake;
 import frc.BotchoCheese.Subsystems.Pivot;
 import frc.BotchoCheese.Subsystems.Shooter;
+import frc.BotchoCheese.Utils.DebugLog;
 
 public class RobotContainer {
     // Auto chooser/dashboard
@@ -135,7 +136,11 @@ public class RobotContainer {
         autoChooser.setDefaultOption(NO_AUTO_SELECTED, NO_AUTO_SELECTED);
 
         if (autoNames.isEmpty()) {
-            DriverStation.reportWarning("No PathPlanner autos found in deploy/pathplanner/autos", false);
+            DebugLog.warnThrottled(
+                "autos.none_found",
+                "No PathPlanner autos found in deploy/pathplanner/autos",
+                10.0
+            );
             return;
         }
 
@@ -162,15 +167,16 @@ public class RobotContainer {
                 .collect(Collectors.toList());
 
             if (nonRedAutoNames.size() != autoNames.size()) {
-                DriverStation.reportWarning(
+                DebugLog.warnThrottled(
+                    "autos.red_filtered",
                     "Ignoring Red-prefixed autos in chooser; using blue-side autos with alliance flip instead.",
-                    false
+                    10.0
                 );
             }
 
             return nonRedAutoNames;
         } catch (IOException e) {
-            DriverStation.reportError("Failed to read PathPlanner autos: " + e.getMessage(), e.getStackTrace());
+            DebugLog.error("Failed to read PathPlanner autos: " + e.getMessage(), e.getStackTrace());
             return List.of();
         }
     }
@@ -325,17 +331,25 @@ public class RobotContainer {
     public Command getAutonomousCommand() {
         String selectedAutoName = autoChooser.getSelected();
         if (selectedAutoName == null || selectedAutoName.equals(NO_AUTO_SELECTED)) {
-            DriverStation.reportWarning("No autonomous selected; running no-op command.", false);
+            DebugLog.warnThrottled(
+                "auto.none_selected",
+                "No autonomous selected; running no-op command.",
+                5.0
+            );
             return Commands.none();
         }
-        System.out.println(selectedAutoName);
+        DebugLog.info("Auto selected: " + selectedAutoName);
         return AutoBuilder.buildAuto(selectedAutoName);
     }
 
     public void seedPoseFromSelectedAuto() {
         String selectedAutoName = autoChooser.getSelected();
         if (selectedAutoName == null || selectedAutoName.equals(NO_AUTO_SELECTED)) {
-            DriverStation.reportWarning("No auto selected for pose seeding.", false);
+            DebugLog.warnThrottled(
+                "pose_seed.no_auto",
+                "No auto selected for pose seeding.",
+                5.0
+            );
             return;
         }
 
@@ -343,18 +357,19 @@ public class RobotContainer {
             PathPlannerAuto auto = new PathPlannerAuto(selectedAutoName);
             Pose2d bluePose = auto.getStartingPose();
             if (bluePose == null) {
-                DriverStation.reportWarning(
+                DebugLog.warnThrottled(
+                    "pose_seed.no_start_pose",
                     "Selected auto has no path-based starting pose: " + selectedAutoName,
-                    false
+                    5.0
                 );
                 return;
             }
 
             Pose2d alliancePose = AutoBuilder.shouldFlip() ? FlippingUtil.flipFieldPose(bluePose) : bluePose;
             drivetrain.resetPose(alliancePose);
-            DriverStation.reportWarning("Seeded pose from auto: " + selectedAutoName, false);
+            DebugLog.info("Seeded pose from auto: " + selectedAutoName);
         } catch (Exception ex) {
-            DriverStation.reportError(
+            DebugLog.error(
                 "Failed to seed pose from selected auto: " + selectedAutoName,
                 ex.getStackTrace()
             );
