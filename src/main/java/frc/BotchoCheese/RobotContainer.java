@@ -189,6 +189,8 @@ public class RobotContainer {
         //Pivot Control
         JOYSTICK2_CONTROLLER.povUp().whileTrue(pivot.pivotUp());
         JOYSTICK2_CONTROLLER.povDown().whileTrue(pivot.pivotDown());
+        
+        
         JOYSTICK2_CONTROLLER.povRight().onTrue(
             new InstantCommand(() -> {
                 Command commandToRun;
@@ -205,16 +207,25 @@ public class RobotContainer {
             })
         );
 
-        //INTAKE BALLs
+        //Intake balls
         JOYSTICK2_CONTROLLER.leftTrigger().toggleOnTrue(
         Commands.parallel(
         intake.runIntake(0.75),
         indexer.runIndexer(-0.5), //reverse to prevent jam
-        feeder.runFeeder(-0.75),  
+        feeder.runFeeder(-0.75),  //reverse to prevent jam
         shooter.shootRps(0.0, -25.0) //runs outward to prevent jam (back stopped, front out)
      
     )
 );
+
+        //Reverse everything
+        JOYSTICK2_CONTROLLER.b().whileTrue(
+            Commands.parallel(
+                intake.runIntake(-0.75),
+                indexer.runIndexer(-0.75),
+                feeder.runFeeder(-0.5)
+            )
+        );
 
 //Shooter sequence at big-shot 120 RPS
 JOYSTICK2_CONTROLLER.rightTrigger().toggleOnTrue(
@@ -223,7 +234,7 @@ JOYSTICK2_CONTROLLER.rightTrigger().toggleOnTrue(
         Commands.parallel(
             shooter.shootRps(120.0),
             intake.runIntake(0.75),
-            indexer.runIndexer(0.85),
+            indexer.runIndexer(0.75),
             feeder.runFeeder(0.75)
         )
     )
@@ -242,6 +253,7 @@ JOYSTICK2_CONTROLLER.rightBumper().toggleOnTrue(
     )
 );
 
+//Lob Shooter sequence at low-shot
 JOYSTICK2_CONTROLLER.y().toggleOnTrue(
     Commands.sequence(
         shooter.shootRps(120.0, 6.0).withTimeout(1.0),
@@ -254,6 +266,7 @@ JOYSTICK2_CONTROLLER.y().toggleOnTrue(
     )
 );
 
+//Line drive shooter sequence
 JOYSTICK2_CONTROLLER.a().toggleOnTrue(
     Commands.sequence(
         shooter.shootRps(6.0, 120.0).withTimeout(1.0),
@@ -266,15 +279,6 @@ JOYSTICK2_CONTROLLER.a().toggleOnTrue(
     )
 );
 
-
-//Reverse everything
-JOYSTICK2_CONTROLLER.b().whileTrue(
-    Commands.parallel(
-        intake.runIntake(-0.75),
-        indexer.runIndexer(-0.75),
-        feeder.runFeeder(-0.5)
-    )
-);
 
     }
     public Command getAutonomousCommand() {
