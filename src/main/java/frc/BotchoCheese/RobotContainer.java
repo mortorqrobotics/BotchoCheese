@@ -48,10 +48,12 @@ public class RobotContainer {
     private static final String DEFAULT_AUTO_NAME = "Auto 1 (Default)";
     private static final String AUTO_CHOOSER_KEY = "Auto Mode";
     private static final String PATHPLANNER_AUTO_FOLDER = "pathplanner/autos";
-    private static final String SHOOTER_SETPOINT_RPS_KEY = "Shooter Setpoint RPS";
-    private static final String ACTIVE_SHOOTER_SETPOINT_RPS_KEY = "Shooter Applied Setpoint RPS";
-    private static final String SHOOTER_LOFT_FRONT_SCALE_KEY = "Shooter Loft Front Scale";
-    private static final String SHOOTER_DRIVE_BACK_SCALE_KEY = "Shooter Drive Back Scale";
+    private static final double LINE_DRIVE_FRONT_RPS = 120.0;
+    private static final double LINE_DRIVE_BACK_SCALE = 0.05;
+    private static final double LOB_BACK_RPS = 120.0;
+    private static final double LOB_FRONT_SCALE = 0.05;
+    private static final double REGULAR_SHOT_RPS = 75.0;
+    private static final double BIG_SHOT_RPS = 120.0;
 
     public static double MaxSpeed = 1.0 * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed; 1.0 placeholder for scaling
     
@@ -105,9 +107,6 @@ public class RobotContainer {
         autoChooser = new SendableChooser<>();
         configureAutoChooser();
         SmartDashboard.putData(AUTO_CHOOSER_KEY, autoChooser);
-        SmartDashboard.putNumber(SHOOTER_SETPOINT_RPS_KEY, 90.0);
-        SmartDashboard.putNumber(SHOOTER_LOFT_FRONT_SCALE_KEY, 0.75);
-        SmartDashboard.putNumber(SHOOTER_DRIVE_BACK_SCALE_KEY, 0.75);
         SmartDashboard.putData("Zero Pivot Encoder", new InstantCommand(pivot::zeroPivotEncoder, pivot));
 
         configureBindings();
@@ -206,12 +205,12 @@ public class RobotContainer {
     )
 );
 
-//Shooter sequence at fixed 90 RPS
+//Shooter sequence at big-shot 120 RPS
 JOYSTICK2_CONTROLLER.rightTrigger().toggleOnTrue(
     Commands.sequence(
-        shooter.shootRps(90).withTimeout(1.0),
+        shooter.shootRps(BIG_SHOT_RPS).withTimeout(1.0),
         Commands.parallel(
-            shooter.shootRps(90),
+            shooter.shootRps(BIG_SHOT_RPS),
             intake.runIntake(0.75),
             indexer.runIndexer(0.85),
             feeder.runFeeder(0.75),
@@ -220,12 +219,12 @@ JOYSTICK2_CONTROLLER.rightTrigger().toggleOnTrue(
     )
 );
 
-//Shooter sequence using SmartDashboard RPS
+//Shooter sequence at regular-shot 75 RPS
 JOYSTICK2_CONTROLLER.rightBumper().toggleOnTrue(
     Commands.sequence(
-        shooter.shootRps(this::getShooterTargetRps).withTimeout(1.0),
+        shooter.shootRps(REGULAR_SHOT_RPS).withTimeout(1.0),
         Commands.parallel(
-            shooter.shootRps(this::getShooterTargetRps),
+            shooter.shootRps(REGULAR_SHOT_RPS),
             intake.runIntake(0.75),
             indexer.runIndexer(0.85),
             feeder.runFeeder(0.75),
@@ -236,9 +235,9 @@ JOYSTICK2_CONTROLLER.rightBumper().toggleOnTrue(
 
 JOYSTICK2_CONTROLLER.y().toggleOnTrue(
     Commands.sequence(
-        shooter.shootLoftRps(this::getShooterTargetRps, this::getShooterLoftFrontScale).withTimeout(1.0),
+        shooter.shootLoftRps(LOB_BACK_RPS, LOB_FRONT_SCALE).withTimeout(1.0),
         Commands.parallel(
-            shooter.shootLoftRps(this::getShooterTargetRps, this::getShooterLoftFrontScale),
+            shooter.shootLoftRps(LOB_BACK_RPS, LOB_FRONT_SCALE),
             intake.runIntake(0.75),
             indexer.runIndexer(0.85),
             feeder.runFeeder(0.75),
@@ -249,9 +248,9 @@ JOYSTICK2_CONTROLLER.y().toggleOnTrue(
 
 JOYSTICK2_CONTROLLER.a().toggleOnTrue(
     Commands.sequence(
-        shooter.shootDriveRps(this::getShooterTargetRps, this::getShooterDriveBackScale).withTimeout(1.0),
+        shooter.shootDriveRps(LINE_DRIVE_FRONT_RPS, LINE_DRIVE_BACK_SCALE).withTimeout(1.0),
         Commands.parallel(
-            shooter.shootDriveRps(this::getShooterTargetRps, this::getShooterDriveBackScale),
+            shooter.shootDriveRps(LINE_DRIVE_FRONT_RPS, LINE_DRIVE_BACK_SCALE),
             intake.runIntake(0.75),
             indexer.runIndexer(0.85),
             feeder.runFeeder(0.75),
@@ -271,23 +270,6 @@ JOYSTICK2_CONTROLLER.b().whileTrue(
 );
 
     }
-
-    private double getShooterTargetRps() {
-        double shooterTargetRps = SmartDashboard.getNumber(SHOOTER_SETPOINT_RPS_KEY, 90.0);
-        SmartDashboard.putNumber(ACTIVE_SHOOTER_SETPOINT_RPS_KEY, shooterTargetRps);
-        return shooterTargetRps;
-    }
-
-    private double getShooterLoftFrontScale() {
-        return SmartDashboard.getNumber(SHOOTER_LOFT_FRONT_SCALE_KEY, 0.75);
-    }
-
-    private double getShooterDriveBackScale() {
-        return SmartDashboard.getNumber(SHOOTER_DRIVE_BACK_SCALE_KEY, 0.75);
-    }
-
-
-
     public Command getAutonomousCommand() {
         /* Run the path selected from the auto chooser */
         Command selected = autoChooser.getSelected();
