@@ -4,17 +4,8 @@
 
 package frc.BotchoCheese;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-
-import com.ctre.phoenix6.SignalLogger;
-
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.networktables.StructPublisher;
-import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.TimedRobot;
@@ -27,9 +18,6 @@ import frc.BotchoCheese.Utils.LimelightHelpers;
 
 
 public class Robot extends TimedRobot {
-  private static final Path USB_MOUNT_PATH = Path.of("/U");
-  private static final Path USB_LOG_DIR = USB_MOUNT_PATH.resolve("logs");
-  private static final Path LOCAL_LOG_DIR = Path.of("logs");
   private static final long LIMELIGHT_IDLE_THROTTLE = 100;
 
   public static LimelightHelpers limelight;
@@ -40,16 +28,10 @@ public class Robot extends TimedRobot {
   private final RobotContainer m_robotContainer;
 
   private final boolean kUseLimelight = false;
-  private StructPublisher<Pose2d> publisher;
-
   private final Field2d m_field = new Field2d();
 
   public Robot() {
     m_robotContainer = new RobotContainer();
-
-    publisher = NetworkTableInstance.getDefault()
-    .getStructTopic("MyPose", Pose2d.struct)
-    .publish();
 
     SmartDashboard.putData("Field", m_field);
     m_field.setRobotPose(RobotContainer.drivetrain.getState().Pose);
@@ -58,7 +40,6 @@ public class Robot extends TimedRobot {
   @Override
   public void robotInit() {
     setLimelightThrottle(LIMELIGHT_IDLE_THROTTLE);
-    startUsbLoggingIfAvailable();
   }
 
   @Override
@@ -67,10 +48,6 @@ public class Robot extends TimedRobot {
 
     // SmartDashboard numeric telemetry is temporarily disabled.
     // publishDashboardData();
-
-    // AdvantageScope simulation
-    Pose2d poseA = RobotContainer.drivetrain.getState().Pose;
-    publisher.set(poseA);
 
     if (kUseLimelight) {
       LimelightHomography.update(RobotContainer.drivetrain);
@@ -152,18 +129,4 @@ public void disabledInit() {
 
   @Override
   public void simulationPeriodic() {}
-
-  private void startUsbLoggingIfAvailable() {
-    try {
-      Path logDir = Files.isDirectory(USB_MOUNT_PATH) ? USB_LOG_DIR : LOCAL_LOG_DIR;
-      Files.createDirectories(logDir);
-      DataLogManager.start(logDir.toString());
-      DriverStation.startDataLog(DataLogManager.getLog());
-      SignalLogger.setPath(logDir.toString());
-      SignalLogger.start();
-      DriverStation.reportWarning("Logging to " + logDir, false);
-    } catch (IOException ex) {
-      DriverStation.reportError("Failed to initialize robot logging: " + ex.getMessage(), ex.getStackTrace());
-    }
-  }
 }
