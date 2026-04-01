@@ -50,7 +50,6 @@ public class Pivot extends SubsystemBase {
 
     public void zeroPivotEncoder() {
         pivotLeader.setPosition(0.0);
-        pivotFollower.setPosition(0.0);
     }
 
     public double getPivotRotations() {
