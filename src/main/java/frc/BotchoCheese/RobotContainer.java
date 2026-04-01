@@ -20,7 +20,9 @@ import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.path.PathConstraints;
+import com.pathplanner.lib.util.FlippingUtil;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.VecBuilder;
@@ -48,7 +50,7 @@ import frc.BotchoCheese.Subsystems.Shooter;
 
 public class RobotContainer {
     // Auto chooser/dashboard
-    private static final String DEFAULT_AUTO_NAME = "Auto 1 (Default)";
+    private static final String NO_AUTO_SELECTED = "Select Auto";
     private static final String AUTO_CHOOSER_KEY = "Auto Mode";
     private static final String PATHPLANNER_AUTO_FOLDER = "pathplanner/autos";
 
@@ -130,19 +132,15 @@ public class RobotContainer {
     private void configureAutoChooser() {
         List<String> autoNames = getAutoNamesFromDeploy();
 
+        autoChooser.setDefaultOption(NO_AUTO_SELECTED, NO_AUTO_SELECTED);
+
         if (autoNames.isEmpty()) {
-            autoChooser.setDefaultOption("Do Nothing", "Do Nothing");
             DriverStation.reportWarning("No PathPlanner autos found in deploy/pathplanner/autos", false);
             return;
         }
 
-        String defaultAuto = autoNames.contains(DEFAULT_AUTO_NAME) ? DEFAULT_AUTO_NAME : autoNames.get(0);
-        autoChooser.setDefaultOption(defaultAuto, defaultAuto);
-
         for (String autoName : autoNames) {
-            if (!autoName.equals(defaultAuto)) {
-                autoChooser.addOption(autoName, autoName);
-            }
+            autoChooser.addOption(autoName, autoName);
         }
     }
 
@@ -326,12 +324,41 @@ public class RobotContainer {
 
     public Command getAutonomousCommand() {
         String selectedAutoName = autoChooser.getSelected();
-        if (selectedAutoName == null || selectedAutoName.equals("Do Nothing")) {
+        if (selectedAutoName == null || selectedAutoName.equals(NO_AUTO_SELECTED)) {
             DriverStation.reportWarning("No autonomous selected; running no-op command.", false);
             return Commands.none();
         }
         System.out.println(selectedAutoName);
         return AutoBuilder.buildAuto(selectedAutoName);
+    }
+
+    public void seedPoseFromSelectedAuto() {
+        String selectedAutoName = autoChooser.getSelected();
+        if (selectedAutoName == null || selectedAutoName.equals(NO_AUTO_SELECTED)) {
+            DriverStation.reportWarning("No auto selected for pose seeding.", false);
+            return;
+        }
+
+        try {
+            PathPlannerAuto auto = new PathPlannerAuto(selectedAutoName);
+            Pose2d bluePose = auto.getStartingPose();
+            if (bluePose == null) {
+                DriverStation.reportWarning(
+                    "Selected auto has no path-based starting pose: " + selectedAutoName,
+                    false
+                );
+                return;
+            }
+
+            Pose2d alliancePose = AutoBuilder.shouldFlip() ? FlippingUtil.flipFieldPose(bluePose) : bluePose;
+            drivetrain.resetPose(alliancePose);
+            DriverStation.reportWarning("Seeded pose from auto: " + selectedAutoName, false);
+        } catch (Exception ex) {
+            DriverStation.reportError(
+                "Failed to seed pose from selected auto: " + selectedAutoName,
+                ex.getStackTrace()
+            );
+        }
     }
 
     public static CommandSwerveDrivetrain createDrivetrain() {
