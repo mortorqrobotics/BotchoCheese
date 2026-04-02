@@ -42,6 +42,9 @@ public class Robot extends TimedRobot {
   private IntegerPublisher canTxFullPublisher;
   private IntegerPublisher canRxErrorPublisher;
   private IntegerPublisher canTxErrorPublisher;
+  private DoublePublisher poseXPublisher;
+  private DoublePublisher poseYPublisher;
+  private DoublePublisher poseHeadingDegPublisher;
 
   public Robot() {
     m_robotContainer = new RobotContainer();
@@ -65,6 +68,11 @@ public class Robot extends TimedRobot {
       canRxErrorPublisher = debugTable.getIntegerTopic("CAN/RxErrorCount").publish();
       canTxErrorPublisher = debugTable.getIntegerTopic("CAN/TxErrorCount").publish();
 
+      var poseTable = NetworkTableInstance.getDefault().getTable("Pose");
+      poseXPublisher = poseTable.getDoubleTopic("X").publish();
+      poseYPublisher = poseTable.getDoubleTopic("Y").publish();
+      poseHeadingDegPublisher = poseTable.getDoubleTopic("HeadingDeg").publish();
+
       CommandScheduler.getInstance().onCommandInitialize(
           command -> DebugLog.debug("[CMD INIT] " + command.getName()));
       CommandScheduler.getInstance().onCommandFinish(
@@ -85,6 +93,8 @@ public class Robot extends TimedRobot {
       LimelightHomography.update(RobotContainer.drivetrain);
     }
 
+    publishPoseData();
+
     if (DebugLog.DEBUG) {
       logCanHealthSnapshot();
     }
@@ -103,6 +113,17 @@ public class Robot extends TimedRobot {
     SmartDashboard.putNumber(
         "Swerve/BackRight Raw Abs (rot)",
         RobotContainer.drivetrain.getModule(3).getEncoder().getAbsolutePosition().getValueAsDouble());
+  }
+
+  private void publishPoseData() {
+    if (poseXPublisher == null || poseYPublisher == null || poseHeadingDegPublisher == null) {
+      return;
+    }
+
+    var pose = RobotContainer.drivetrain.getState().Pose;
+    poseXPublisher.set(pose.getX());
+    poseYPublisher.set(pose.getY());
+    poseHeadingDegPublisher.set(pose.getRotation().getDegrees());
   }
 
   private void setLimelightThrottle(long throttleValue) {
