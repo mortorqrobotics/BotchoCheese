@@ -407,7 +407,9 @@ public class RobotContainer {
         gyro.setYaw(alliancePose.getRotation().getDegrees());
         drivetrain.resetPose(alliancePose);
         drivetrain.resetRotation(alliancePose.getRotation());
-        drivetrain.seedFieldCentric();
+        drivetrain.setOperatorPerspectiveForward(
+            isRedAlliance ? Rotation2d.k180deg : Rotation2d.kZero
+        );
         DebugLog.info("Driver homed pose at hub front for alliance: " + (isRedAlliance ? "Red" : "Blue"));
     }
 
