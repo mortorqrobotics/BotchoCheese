@@ -207,7 +207,7 @@ public class RobotContainer {
             forwardStraight.withVelocityX(0).withVelocityY(0.5))
         );
 
-        JOYSTICK1_CONTROLLER.start().onTrue(new InstantCommand(this::resetPoseAtHubHome));
+        JOYSTICK1_CONTROLLER.start().onTrue(new InstantCommand(()->drivetrain.seedFieldCentric()));
     }
 
     private void configureOperatorBindings() {
