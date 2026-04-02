@@ -28,6 +28,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -400,12 +401,14 @@ public class RobotContainer {
     private void resetPoseAtHubHome() {
         cancelActiveDriverPathfind();
         Pose2d bluePose = PathPlannerSetpoints.HUB_HOME_POSE_BLUE;
-        Pose2d alliancePose = AutoBuilder.shouldFlip() ? FlippingUtil.flipFieldPose(bluePose) : bluePose;
+        boolean isRedAlliance =
+            DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Red;
+        Pose2d alliancePose = isRedAlliance ? FlippingUtil.flipFieldPose(bluePose) : bluePose;
         gyro.setYaw(alliancePose.getRotation().getDegrees());
         drivetrain.resetPose(alliancePose);
         drivetrain.resetRotation(alliancePose.getRotation());
         drivetrain.seedFieldCentric();
-        DebugLog.info("Driver homed pose at hub front.");
+        DebugLog.info("Driver homed pose at hub front for alliance: " + (isRedAlliance ? "Red" : "Blue"));
     }
 
     private void scheduleShotPathIfConfigured(
