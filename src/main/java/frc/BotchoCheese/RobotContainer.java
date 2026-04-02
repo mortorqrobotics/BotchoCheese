@@ -54,6 +54,8 @@ public class RobotContainer {
     private static final String NO_AUTO_SELECTED = "Select Auto";
     private static final String AUTO_CHOOSER_KEY = "Auto Mode";
     private static final String PATHPLANNER_AUTO_FOLDER = "pathplanner/autos";
+    private static final String X_SHOT_BACK_RPS_KEY = "Shots/X Back RPS";
+    private static final String X_SHOT_FRONT_RPS_KEY = "Shots/X Front RPS";
 
     // Drive tuning
     private static final double DRIVE_DEADBAND = 0.1;
@@ -128,6 +130,8 @@ public class RobotContainer {
 
     private void configureDashboard() {
         SmartDashboard.putData(AUTO_CHOOSER_KEY, autoChooser);
+        SmartDashboard.putNumber(X_SHOT_BACK_RPS_KEY, 75.0);
+        SmartDashboard.putNumber(X_SHOT_FRONT_RPS_KEY, 75.0);
     }
 
     private void configureAutoChooser() {
@@ -182,7 +186,7 @@ public class RobotContainer {
             drivetrain.applyRequest(() ->
                 drive.withVelocityX(-applyDriveDeadband(JOYSTICK1_CONTROLLER.getLeftY()) * MaxSpeed)
                     .withVelocityY(-applyDriveDeadband(JOYSTICK1_CONTROLLER.getLeftX()) * MaxSpeed)
-                    .withRotationalRate(-applyDriveDeadband(JOYSTICK1_CONTROLLER.getRightX()) * MaxAngularRate)
+                    .withRotationalRate(applyDriveDeadband(JOYSTICK1_CONTROLLER.getRightX()) * MaxAngularRate)
             )
         );
 
@@ -269,7 +273,7 @@ public class RobotContainer {
                 shooter.shootRps(120.0).withTimeout(0.5),
                 Commands.parallel(
                     shooter.shootRps(120.0),
-                    intake.runIntake(0.75),
+                    intake.runIntake(0.9),
                     indexer.runIndexer(0.75),
                     feeder.runFeeder(0.85)
                 )
@@ -282,7 +286,20 @@ public class RobotContainer {
                 shooter.shootRps(90.0).withTimeout(0.5),
                 Commands.parallel(
                     shooter.shootRps(90.0),
-                    intake.runIntake(0.75),
+                    intake.runIntake(0.9),
+                    indexer.runIndexer(0.85),
+                    feeder.runFeeder(0.85)
+                )
+            )
+        );
+
+        // SmartDashboard-programmed X shot
+        JOYSTICK2_CONTROLLER.x().toggleOnTrue(
+            Commands.sequence(
+                shooter.shootRps(getXShotBackRps(), getXShotFrontRps()).withTimeout(0.5),
+                Commands.parallel(
+                    shooter.shootRps(getXShotBackRps(), getXShotFrontRps()),
+                    intake.runIntake(0.9),
                     indexer.runIndexer(0.85),
                     feeder.runFeeder(0.85)
                 )
@@ -292,10 +309,10 @@ public class RobotContainer {
         // Lob shot (back, front)
         JOYSTICK2_CONTROLLER.y().toggleOnTrue(
             Commands.sequence(
-                shooter.shootRps(120.0, 6.0).withTimeout(0.5),
+                shooter.shootRps(120.0, 20).withTimeout(0.5),
                 Commands.parallel(
-                    shooter.shootRps(120.0, 6.0),
-                    intake.runIntake(0.75),
+                    shooter.shootRps(120.0, 20),
+                    intake.runIntake(0.9),
                     indexer.runIndexer(0.85),
                     feeder.runFeeder(0.85)
                 )
@@ -305,10 +322,10 @@ public class RobotContainer {
         // Line-drive shot (back, front)
         JOYSTICK2_CONTROLLER.a().toggleOnTrue(
             Commands.sequence(
-                shooter.shootRps(6.0, 120.0).withTimeout(0.5),
+                shooter.shootRps(20, 120.0).withTimeout(0.5),
                 Commands.parallel(
-                    shooter.shootRps(6.0, 120.0),
-                    intake.runIntake(0.75),
+                    shooter.shootRps(20, 120.0),
+                    intake.runIntake(0.9),
                     indexer.runIndexer(0.85),
                     feeder.runFeeder(0.85)
                 )
@@ -394,6 +411,14 @@ public class RobotContainer {
         if (activeDriverPathfindCommand != null && activeDriverPathfindCommand.isScheduled()) {
             activeDriverPathfindCommand.cancel();
         }
+    }
+
+    private double getXShotBackRps() {
+        return SmartDashboard.getNumber(X_SHOT_BACK_RPS_KEY, 75.0);
+    }
+
+    private double getXShotFrontRps() {
+        return SmartDashboard.getNumber(X_SHOT_FRONT_RPS_KEY, 75.0);
     }
 
     public static CommandSwerveDrivetrain createDrivetrain() {
