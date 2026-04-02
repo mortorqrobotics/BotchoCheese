@@ -169,7 +169,6 @@ public void disabledInit() {
   @Override
   public void teleopInit() {
     m_robotContainer.pivot.enableBrakeMode();
-    m_robotContainer.seedPoseFromSelectedAuto();
     DebugLog.info("Teleop init");
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
