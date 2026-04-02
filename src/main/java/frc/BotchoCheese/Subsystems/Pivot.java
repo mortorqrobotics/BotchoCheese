@@ -70,30 +70,4 @@ public class Pivot extends SubsystemBase {
         );
     }
 
-    public Command pivotUpToRotations(double deltaRotations) {
-        return pivotUpToRotations(deltaRotations, PIVOT_VOLTS);
-    }
-
-    public Command pivotUpToRotations(double deltaRotations, double pivotVolts) {
-        return this.defer(() -> {
-            double startPos = pivotLeader.getPosition().getValueAsDouble();
-            double targetPos = startPos - Math.abs(deltaRotations);
-            double commandedVolts = Math.abs(pivotVolts);
-
-            return this.startEnd(
-                () -> pivotLeader.setVoltage(-commandedVolts),
-                () -> pivotLeader.setVoltage(0.0)
-            ).until(() -> pivotLeader.getPosition().getValueAsDouble() <= targetPos);
-        });
-    }
-
-    public Command pivotToBottomAndHome() {
-        return this.runEnd(
-            () -> pivotLeader.setVoltage(PIVOT_VOLTS),
-            () -> {
-                pivotLeader.setVoltage(0.0);
-                zeroPivotEncoder();
-            }
-        );
-    }
 }

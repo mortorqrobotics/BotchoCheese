@@ -1,94 +1,72 @@
 # Team 1515 Mortorq - 2026 Rebuilt Robot Code
 
-This README is for drivers, programmers, and pit crew to understand how the robot behaves right now.
+This README is the current quick-reference for drivers, operators, pit crew, and programmers.
 
-## Robot Behavior Summary
+## Robot Summary
 
 - Drivetrain is CTRE Phoenix 6 swerve with field-centric default driving.
-- Driver has teleop shot alignment buttons (`X`, `Y`, `B`) that pathfind to fixed shooting poses.
-- Driver has a homing/reset button (`Start`) to reset pose estimate at the hub-front reference spot.
-- Autonomous options are loaded from `src/main/deploy/pathplanner/autos/*.auto`.
-- Alliance flipping is automatic for both auto and teleop shot pathfinding.
+- Autonomous modes are loaded from `src/main/deploy/pathplanner/autos/`.
+- Teleop no longer resets pose from the selected auto when enabled.
+- Pivot is manual only. There is no working auto-home routine in the current code.
+- Limelight pose fusion is present in code but currently disabled.
 
 ## Current Controller Bindings
 
 ### Driver Controller (`port 0`)
 
-- Left stick `Y/X`: field-centric translation.
-- Right stick `X`: field-centric rotation.
+- Left stick `Y`: drive forward and backward.
+- Left stick `X`: strafe left and right.
+- Right stick `X`: rotate robot.
 - Left bumper (hold): swerve brake.
 - D-pad up/down/left/right (hold): robot-centric crawl at fixed speed.
-- Start (press): reset pose to hub-home reference and reseed field-centric.
-- X (press): pathfind to left shot setpoint.
-- Y (press): pathfind to middle shot setpoint.
-- B (press): pathfind to right shot setpoint.
-- X/Y/B (release): cancel active driver pathfind command.
-- Left trigger (hold): `StrafeToTag`.
-- Right trigger (hold): `RotateToTag`.
+- Start (press): reseed field-centric heading only.
 
 ### Operator Controller (`port 1`)
 
 - D-pad up (hold): pivot up.
 - D-pad down (hold): pivot down.
-- D-pad left (hold): pivot to bottom and home.
-- D-pad right (hold): pivot up, then oscillate down/up sequence.
-- Left trigger (toggle): intake + reverse index/feed + shooter anti-jam behavior.
-- B (hold): reverse intake/indexer/feeder.
-- Right trigger (toggle): big shot sequence.
-- Right bumper (toggle): regular shot sequence.
-- Y (toggle): lob shot sequence.
-- A (toggle): line-drive shot sequence.
+- Left trigger (hold): intake / anti-jam sequence.
+- B (hold): reverse intake, indexer, and feeder.
+- Right trigger (toggle): big shot.
+- Right bumper (toggle): regular shot.
+- X (toggle): SmartDashboard-programmed shot using `Shots/X Back RPS` and `Shots/X Front RPS`.
+- Y (toggle): lob shot.
+- A (toggle): line-drive shot.
 
-## How Teleop Shot Alignment Works
+## Operator Notes
 
-1. Driver physically places robot at the front of the hub reference spot.
-2. Driver presses `Start` to reset pose estimate to `HUB_HOME_POSE_BLUE` (flipped automatically on Red).
-3. Driver presses `X`, `Y`, or `B` to pathfind to left/middle/right shot poses.
-4. Releasing `X`, `Y`, or `B` cancels the active pathfind command.
+- Left trigger is hold-to-run. Releasing it stops the intake sequence.
+- `B` is hold-to-run. Releasing it stops the reverse/un-jam sequence.
+- Right trigger, right bumper, `X`, `Y`, and `A` are toggled shots. Press once to start, press again to stop.
+- Pivot control is manual. Do not expect it to home itself or move to saved positions.
 
-This method is used because a full `resetPose(...)` is more reliable than only reseeding heading when the robot has been moved by hand.
+## Autonomous
 
-## PathPlanner and Setpoint Source of Truth
+- Dashboard chooser key: `Auto Mode`.
+- If no auto is selected, the robot runs a no-op command in autonomous.
+- Deploy now deletes old files from the roboRIO deploy directory, which helps prevent stale autos and paths from lingering between events.
 
-### Runtime files
+## Dashboard Items
 
-- Autos: `src/main/deploy/pathplanner/autos/`
-- Paths: `src/main/deploy/pathplanner/paths/`
-- Navgrid: `src/main/deploy/pathplanner/navgrid.json`
-
-### Code source of truth for teleop shot/homing setpoints
-
-- `src/main/java/frc/BotchoCheese/Constants/PathPlannerSetpoints.java`
-
-The robot does not parse path JSON at runtime for these teleop shot targets anymore.
-If you tune shot/homing poses in PathPlanner, copy updated values into `PathPlannerSetpoints.java`.
-
-Current headings for shot setpoints are intentionally tied to `goalEndState.rotation` from:
-
-- `Left side.path`
-- `Middle.path`
-- `Right side.path`
-
-## Autonomous Selection
-
-- Auto chooser key on dashboard: `Auto Mode`.
-- All `.auto` files are listed; no Red-name filtering is applied.
-- In teleop init, robot seeds pose from selected auto start pose when available.
+- `Auto Mode`: autonomous chooser.
+- `Shots/X Back RPS`: custom back shooter speed for the `X` shot.
+- `Shots/X Front RPS`: custom front shooter speed for the `X` shot.
+- `Swerve/* Raw Abs (rot)`: raw absolute encoder values for each swerve module.
 
 ## Vision Notes
 
-- `StrafeToTag` and `RotateToTag` are available from driver triggers.
-- `LimelightHomography.update(...)` is currently disabled in `Robot` (`kUseLimelight = false`).
+- `LimelightHomography.update(...)` is currently disabled in `Robot`.
+- The codebase still contains some vision alignment commands, but they are not currently bound to the driver controller.
 
 ## Important Files
 
-- `src/main/java/frc/BotchoCheese/RobotContainer.java` (all bindings and command wiring)
-- `src/main/java/frc/BotchoCheese/Robot.java` (mode lifecycle behavior)
-- `src/main/java/frc/BotchoCheese/Constants/PathPlannerSetpoints.java` (teleop shot/home setpoints)
-- `src/main/deploy/pathplanner/` (auto/path assets)
+- `src/main/java/frc/BotchoCheese/RobotContainer.java`: controller bindings and command wiring.
+- `src/main/java/frc/BotchoCheese/Robot.java`: robot mode lifecycle behavior.
+- `src/main/java/frc/BotchoCheese/Subsystems/Pivot.java`: manual pivot behavior.
+- `src/main/deploy/pathplanner/`: autonomous and path assets.
 
 ## Team Workflow Notes
 
-- Keep this README and `PathPlannerSetpoints.java` in sync with current driver behavior.
-- If controls change in `RobotContainer`, update this document in the same PR.
-- Old `controllerbounds.txt` may be stale; use `RobotContainer` and this README as the current reference.
+- Keep this README in sync with `RobotContainer.java`.
+- If bindings change, update this document in the same PR.
+- Treat `controllerbounds.txt` as potentially stale unless it is updated alongside the code.

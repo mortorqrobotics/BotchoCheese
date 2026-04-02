@@ -209,7 +209,7 @@ public class RobotContainer {
         JOYSTICK2_CONTROLLER.povDown().whileTrue(pivot.pivotDown());
 
         // Intake balls / anti-jam
-        JOYSTICK2_CONTROLLER.leftTrigger().toggleOnTrue(
+        JOYSTICK2_CONTROLLER.leftTrigger().whileTrue(
             Commands.parallel(
                 intake.runIntake(0.75),
                 indexer.runIndexer(-0.5),
