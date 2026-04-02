@@ -405,7 +405,7 @@ public class RobotContainer {
         boolean isRedAlliance =
             DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Red;
         Pose2d alliancePose = isRedAlliance ? FlippingUtil.flipFieldPose(bluePose) : bluePose;
-        gyro.setYaw(alliancePose.getRotation().getDegrees());
+        gyro.setYaw(-alliancePose.getRotation().getDegrees());
         drivetrain.resetPose(alliancePose);
         drivetrain.resetRotation(alliancePose.getRotation());
         drivetrain.setOperatorPerspectiveForward(
