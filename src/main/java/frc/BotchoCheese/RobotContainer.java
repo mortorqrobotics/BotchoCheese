@@ -35,6 +35,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+// import frc.BotchoCheese.Commands.MoveToHub;
 import frc.BotchoCheese.Commands.RotateToTag;
 import frc.BotchoCheese.Commands.StrafeToTag;
 import frc.BotchoCheese.Constants.PathPlannerSetpoints;
@@ -220,6 +221,8 @@ public class RobotContainer {
 
         JOYSTICK1_CONTROLLER.leftTrigger().whileTrue(new StrafeToTag(drivetrain));
         JOYSTICK1_CONTROLLER.rightTrigger().whileTrue(new RotateToTag(drivetrain, 0));
+
+        // JOYSTICK1_CONTROLLER.rightTrigger().whileTrue(new MoveToHub(drivetrain, 0, 0.4, 1.0)); Consider implementing MoveToHub for testing.
     }
 
     private void configureOperatorBindings() {
