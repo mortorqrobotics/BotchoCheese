@@ -238,7 +238,7 @@ public void disabledInit() {
     double headingRad = alliance == Alliance.Red ? Math.PI : 0.0;
     double headingDeg = Math.toDegrees(headingRad);
 
-    RobotContainer.gyro.setYaw(-headingDeg);
+    RobotContainer.gyro.setYaw(headingDeg);
     RobotContainer.drivetrain.resetRotation(new Rotation2d(headingRad));
   }
 }
