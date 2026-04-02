@@ -227,7 +227,8 @@ public class RobotContainer {
 
     private void configureOperatorBindings() {
         final double pivotUpForShotRotations = 6.0;
-        final double pivotToggleTimeoutSeconds = 0.6;
+        final double pivotToggleTimeoutSeconds = 0.1;
+        final double pivotUpForOscillationVolts = 2.0;
 
         // Pivot controls
         JOYSTICK2_CONTROLLER.povUp().whileTrue(pivot.pivotUp());
@@ -235,7 +236,7 @@ public class RobotContainer {
         JOYSTICK2_CONTROLLER.povLeft().whileTrue(pivot.pivotToBottomAndHome());
         JOYSTICK2_CONTROLLER.povRight().whileTrue(
             Commands.sequence(
-                pivot.pivotUpToRotations(pivotUpForShotRotations),
+                pivot.pivotUpToRotations(pivotUpForShotRotations, pivotUpForOscillationVolts),
                 Commands.repeatingSequence(
                     pivot.pivotDown().withTimeout(pivotToggleTimeoutSeconds),
                     pivot.pivotUp().withTimeout(pivotToggleTimeoutSeconds)
