@@ -56,6 +56,12 @@ public class Robot extends TimedRobot {
   @Override
   public void robotInit() {
     setLimelightThrottle(LIMELIGHT_IDLE_THROTTLE);
+
+    var poseTable = NetworkTableInstance.getDefault().getTable("Pose");
+    poseXPublisher = poseTable.getDoubleTopic("X").publish();
+    poseYPublisher = poseTable.getDoubleTopic("Y").publish();
+    poseHeadingDegPublisher = poseTable.getDoubleTopic("HeadingDeg").publish();
+
     if (DebugLog.DEBUG) {
       SignalLogger.setPath("logs");
       SignalLogger.start();
@@ -67,11 +73,6 @@ public class Robot extends TimedRobot {
       canTxFullPublisher = debugTable.getIntegerTopic("CAN/TxFullCount").publish();
       canRxErrorPublisher = debugTable.getIntegerTopic("CAN/RxErrorCount").publish();
       canTxErrorPublisher = debugTable.getIntegerTopic("CAN/TxErrorCount").publish();
-
-      var poseTable = NetworkTableInstance.getDefault().getTable("Pose");
-      poseXPublisher = poseTable.getDoubleTopic("X").publish();
-      poseYPublisher = poseTable.getDoubleTopic("Y").publish();
-      poseHeadingDegPublisher = poseTable.getDoubleTopic("HeadingDeg").publish();
 
       CommandScheduler.getInstance().onCommandInitialize(
           command -> DebugLog.debug("[CMD INIT] " + command.getName()));
