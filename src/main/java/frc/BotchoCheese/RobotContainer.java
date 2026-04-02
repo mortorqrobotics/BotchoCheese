@@ -405,9 +405,11 @@ public class RobotContainer {
         boolean isRedAlliance =
             DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Red;
         Pose2d alliancePose = isRedAlliance ? FlippingUtil.flipFieldPose(bluePose) : bluePose;
-        gyro.setYaw(alliancePose.getRotation().getDegrees());
-        drivetrain.resetPose(alliancePose);
-        drivetrain.resetRotation(alliancePose.getRotation());
+        Rotation2d homedRotation = alliancePose.getRotation().plus(Rotation2d.k180deg);
+        Pose2d homedPose = new Pose2d(alliancePose.getTranslation(), homedRotation);
+        gyro.setYaw(homedRotation.getDegrees());
+        drivetrain.resetPose(homedPose);
+        drivetrain.resetRotation(homedRotation);
         DebugLog.info("Driver homed pose at hub front for alliance: " + (isRedAlliance ? "Red" : "Blue"));
     }
 
