@@ -91,7 +91,6 @@ public class RobotContainer {
 
     // Auto selection
     private final SendableChooser<String> autoChooser;
-    private Command activeDriverPathfindCommand;
 
     public RobotContainer() {
         registerNamedCommands();
@@ -347,24 +346,6 @@ public class RobotContainer {
                 "Failed to seed pose from selected auto: " + selectedAutoName,
                 ex.getStackTrace()
             );
-        }
-    }
-
-    private void resetPoseAtHubHome() {
-        cancelActiveDriverPathfind();
-        Pose2d bluePose = PathPlannerSetpoints.HUB_HOME_POSE_BLUE;
-        boolean isRedAlliance =
-            DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Red;
-        Pose2d alliancePose = isRedAlliance ? FlippingUtil.flipFieldPose(bluePose) : bluePose;
-        gyro.setYaw(alliancePose.getRotation().getDegrees());
-        drivetrain.resetPose(alliancePose);
-        drivetrain.resetRotation(alliancePose.getRotation());
-        DebugLog.info("Driver homed pose at hub front for alliance: " + (isRedAlliance ? "Red" : "Blue"));
-    }
-
-    private void cancelActiveDriverPathfind() {
-        if (activeDriverPathfindCommand != null && activeDriverPathfindCommand.isScheduled()) {
-            activeDriverPathfindCommand.cancel();
         }
     }
 
