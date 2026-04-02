@@ -209,62 +209,13 @@ public class RobotContainer {
         );
 
         JOYSTICK1_CONTROLLER.start().onTrue(new InstantCommand(this::resetPoseAtHubHome));
-
-        // Teleop pathfind shot setpoints
-        JOYSTICK1_CONTROLLER.x().onTrue(new InstantCommand(
-            () -> scheduleShotPathIfConfigured(
-                "Left",
-                PathPlannerSetpoints.LEFT_HUB_SHOOTING_POSE_BLUE,
-                PathPlannerSetpoints.TELEOP_LEFT_SHOT_PATHFIND_CONSTRAINTS,
-                true
-            )
-        ));
-        JOYSTICK1_CONTROLLER.x().onFalse(new InstantCommand(this::cancelActiveDriverPathfind));
-
-        JOYSTICK1_CONTROLLER.y().onTrue(new InstantCommand(
-            () -> scheduleShotPathIfConfigured(
-                "Middle",
-                PathPlannerSetpoints.MIDDLE_HUB_SHOOTING_POSE_BLUE,
-                PathPlannerSetpoints.TELEOP_LEFT_SHOT_PATHFIND_CONSTRAINTS,
-                true
-            )
-        ));
-        JOYSTICK1_CONTROLLER.y().onFalse(new InstantCommand(this::cancelActiveDriverPathfind));
-
-        JOYSTICK1_CONTROLLER.b().onTrue(new InstantCommand(
-            () -> scheduleShotPathIfConfigured(
-                "Right",
-                PathPlannerSetpoints.RIGHT_HUB_SHOOTING_POSE_BLUE,
-                PathPlannerSetpoints.TELEOP_LEFT_SHOT_PATHFIND_CONSTRAINTS,
-                true
-            )
-        ));
-        JOYSTICK1_CONTROLLER.b().onFalse(new InstantCommand(this::cancelActiveDriverPathfind));
-
-        JOYSTICK1_CONTROLLER.leftTrigger().whileTrue(new StrafeToTag(drivetrain));
-        JOYSTICK1_CONTROLLER.rightTrigger().whileTrue(new RotateToTag(drivetrain, 0));
-
-        // JOYSTICK1_CONTROLLER.rightTrigger().whileTrue(new MoveToHub(drivetrain, 0, 0.4, 1.0)); Consider implementing MoveToHub for testing.
     }
 
     private void configureOperatorBindings() {
-        final double pivotUpForShotRotations = 6.0;
-        final double pivotToggleTimeoutSeconds = 0.5;
-        final double pivotUpForOscillationVolts = 2.0;
 
         // Pivot controls
         JOYSTICK2_CONTROLLER.povUp().whileTrue(pivot.pivotUp());
         JOYSTICK2_CONTROLLER.povDown().whileTrue(pivot.pivotDown());
-        JOYSTICK2_CONTROLLER.povLeft().whileTrue(pivot.pivotToBottomAndHome());
-        JOYSTICK2_CONTROLLER.povRight().whileTrue(
-            Commands.sequence(
-                pivot.pivotUpToRotations(pivotUpForShotRotations, pivotUpForOscillationVolts),
-                Commands.repeatingSequence(
-                    pivot.pivotDown().withTimeout(pivotToggleTimeoutSeconds),
-                    pivot.pivotUp().withTimeout(pivotToggleTimeoutSeconds)
-                )
-            )
-        );
 
         // Intake balls / anti-jam
         JOYSTICK2_CONTROLLER.leftTrigger().toggleOnTrue(
@@ -409,31 +360,6 @@ public class RobotContainer {
         drivetrain.resetPose(alliancePose);
         drivetrain.resetRotation(alliancePose.getRotation());
         DebugLog.info("Driver homed pose at hub front for alliance: " + (isRedAlliance ? "Red" : "Blue"));
-    }
-
-    private void scheduleShotPathIfConfigured(
-        String name,
-        Pose2d bluePose,
-        PathConstraints constraints,
-        boolean preserveCurrentHeading
-    ) {
-        if (bluePose == null) {
-            DebugLog.warnThrottled(
-                "shot_setpoint_missing_" + name.toLowerCase(),
-                "Shot setpoint missing for " + name
-                    + ". Update src/main/java/frc/BotchoCheese/Constants/PathPlannerSetpoints.java.",
-                2.0
-            );
-            return;
-        }
-
-        cancelActiveDriverPathfind();
-        Pose2d targetPose = preserveCurrentHeading
-            ? new Pose2d(bluePose.getTranslation(), drivetrain.getState().Pose.getRotation())
-            : bluePose;
-        activeDriverPathfindCommand =
-            AutoBuilder.pathfindToPoseFlipped(targetPose, constraints);
-        CommandScheduler.getInstance().schedule(activeDriverPathfindCommand);
     }
 
     private void cancelActiveDriverPathfind() {
