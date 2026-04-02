@@ -23,4 +23,7 @@ public final class PathPlannerSetpoints {
 
     public static final PathConstraints TELEOP_SHOT_PATHFIND_CONSTRAINTS =
         new PathConstraints(2.5, 2.0, 4.0, 6.0);
+
+    public static final PathConstraints TELEOP_LEFT_SHOT_PATHFIND_CONSTRAINTS =
+        new PathConstraints(1.5, 1.25, 2.0, 3.0);
 }

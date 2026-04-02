@@ -21,6 +21,7 @@ import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
+import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.util.FlippingUtil;
 
 import edu.wpi.first.math.MathUtil;
@@ -209,17 +210,32 @@ public class RobotContainer {
 
         // Teleop pathfind shot setpoints
         JOYSTICK1_CONTROLLER.x().onTrue(new InstantCommand(
-            () -> scheduleShotPathIfConfigured("Left", PathPlannerSetpoints.LEFT_HUB_SHOOTING_POSE_BLUE)
+            () -> scheduleShotPathIfConfigured(
+                "Left",
+                PathPlannerSetpoints.LEFT_HUB_SHOOTING_POSE_BLUE,
+                PathPlannerSetpoints.TELEOP_LEFT_SHOT_PATHFIND_CONSTRAINTS,
+                true
+            )
         ));
         JOYSTICK1_CONTROLLER.x().onFalse(new InstantCommand(this::cancelActiveDriverPathfind));
 
         JOYSTICK1_CONTROLLER.y().onTrue(new InstantCommand(
-            () -> scheduleShotPathIfConfigured("Middle", PathPlannerSetpoints.MIDDLE_HUB_SHOOTING_POSE_BLUE)
+            () -> scheduleShotPathIfConfigured(
+                "Middle",
+                PathPlannerSetpoints.MIDDLE_HUB_SHOOTING_POSE_BLUE,
+                PathPlannerSetpoints.TELEOP_LEFT_SHOT_PATHFIND_CONSTRAINTS,
+                true
+            )
         ));
         JOYSTICK1_CONTROLLER.y().onFalse(new InstantCommand(this::cancelActiveDriverPathfind));
 
         JOYSTICK1_CONTROLLER.b().onTrue(new InstantCommand(
-            () -> scheduleShotPathIfConfigured("Right", PathPlannerSetpoints.RIGHT_HUB_SHOOTING_POSE_BLUE)
+            () -> scheduleShotPathIfConfigured(
+                "Right",
+                PathPlannerSetpoints.RIGHT_HUB_SHOOTING_POSE_BLUE,
+                PathPlannerSetpoints.TELEOP_LEFT_SHOT_PATHFIND_CONSTRAINTS,
+                true
+            )
         ));
         JOYSTICK1_CONTROLLER.b().onFalse(new InstantCommand(this::cancelActiveDriverPathfind));
 
@@ -390,7 +406,12 @@ public class RobotContainer {
         DebugLog.info("Driver homed pose at hub front.");
     }
 
-    private void scheduleShotPathIfConfigured(String name, Pose2d bluePose) {
+    private void scheduleShotPathIfConfigured(
+        String name,
+        Pose2d bluePose,
+        PathConstraints constraints,
+        boolean preserveCurrentHeading
+    ) {
         if (bluePose == null) {
             DebugLog.warnThrottled(
                 "shot_setpoint_missing_" + name.toLowerCase(),
@@ -402,8 +423,11 @@ public class RobotContainer {
         }
 
         cancelActiveDriverPathfind();
+        Pose2d targetPose = preserveCurrentHeading
+            ? new Pose2d(bluePose.getTranslation(), drivetrain.getState().Pose.getRotation())
+            : bluePose;
         activeDriverPathfindCommand =
-            AutoBuilder.pathfindToPoseFlipped(bluePose, PathPlannerSetpoints.TELEOP_SHOT_PATHFIND_CONSTRAINTS);
+            AutoBuilder.pathfindToPoseFlipped(targetPose, constraints);
         CommandScheduler.getInstance().schedule(activeDriverPathfindCommand);
     }
 
