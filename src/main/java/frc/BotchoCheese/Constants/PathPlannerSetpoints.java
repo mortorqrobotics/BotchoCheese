@@ -13,7 +13,7 @@ public final class PathPlannerSetpoints {
      * Red-alliance values are derived at runtime via FlippingUtil.
      */
     public static final Pose2d HUB_HOME_POSE_BLUE =
-        new Pose2d(3.5150734953703706, 4.049631148726852, Rotation2d.fromDegrees(180.0));
+        new Pose2d(3.5150734953703706, 4.049631148726852, Rotation2d.fromDegrees(180));
     public static final Pose2d LEFT_HUB_SHOOTING_POSE_BLUE =
         new Pose2d(2.3411698495370374, 4.943574652777778, Rotation2d.fromDegrees(145.57026926200894));
     public static final Pose2d MIDDLE_HUB_SHOOTING_POSE_BLUE =

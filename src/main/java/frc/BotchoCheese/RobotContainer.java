@@ -401,7 +401,9 @@ public class RobotContainer {
         cancelActiveDriverPathfind();
         Pose2d bluePose = PathPlannerSetpoints.HUB_HOME_POSE_BLUE;
         Pose2d alliancePose = AutoBuilder.shouldFlip() ? FlippingUtil.flipFieldPose(bluePose) : bluePose;
+        gyro.setYaw(alliancePose.getRotation().getDegrees());
         drivetrain.resetPose(alliancePose);
+        drivetrain.resetRotation(alliancePose.getRotation());
         drivetrain.seedFieldCentric();
         DebugLog.info("Driver homed pose at hub front.");
     }
