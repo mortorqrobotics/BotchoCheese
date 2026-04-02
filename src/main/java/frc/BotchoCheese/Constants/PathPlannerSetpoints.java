@@ -22,8 +22,8 @@ public final class PathPlannerSetpoints {
         new Pose2d(2.647899088541667, 3.243736979166666, Rotation2d.fromDegrees(-150.49689428205946));
 
     public static final PathConstraints TELEOP_SHOT_PATHFIND_CONSTRAINTS =
-        new PathConstraints(2.5, 2.0, 4.0, 6.0);
+        new PathConstraints(1, 0.75, 1, 1.5);
 
     public static final PathConstraints TELEOP_LEFT_SHOT_PATHFIND_CONSTRAINTS =
-        new PathConstraints(1.5, 1.25, 2.0, 3.0);
+        new PathConstraints(1, 0.75, 1, 1.5);
 }
