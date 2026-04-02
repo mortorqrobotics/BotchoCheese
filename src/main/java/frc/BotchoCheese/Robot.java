@@ -79,8 +79,7 @@ public class Robot extends TimedRobot {
   public void robotPeriodic() {
     CommandScheduler.getInstance().run();
 
-    // SmartDashboard numeric telemetry is temporarily disabled.
-    // publishDashboardData();
+    publishDashboardData();
 
     if (kUseLimelight) {
       LimelightHomography.update(RobotContainer.drivetrain);
@@ -89,6 +88,21 @@ public class Robot extends TimedRobot {
     if (DebugLog.DEBUG) {
       logCanHealthSnapshot();
     }
+  }
+
+  private void publishDashboardData() {
+    SmartDashboard.putNumber(
+        "Swerve/FrontLeft Raw Abs (rot)",
+        RobotContainer.drivetrain.getModule(0).getEncoder().getAbsolutePosition().getValueAsDouble());
+    SmartDashboard.putNumber(
+        "Swerve/FrontRight Raw Abs (rot)",
+        RobotContainer.drivetrain.getModule(1).getEncoder().getAbsolutePosition().getValueAsDouble());
+    SmartDashboard.putNumber(
+        "Swerve/BackLeft Raw Abs (rot)",
+        RobotContainer.drivetrain.getModule(2).getEncoder().getAbsolutePosition().getValueAsDouble());
+    SmartDashboard.putNumber(
+        "Swerve/BackRight Raw Abs (rot)",
+        RobotContainer.drivetrain.getModule(3).getEncoder().getAbsolutePosition().getValueAsDouble());
   }
 
   private void setLimelightThrottle(long throttleValue) {

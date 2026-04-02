@@ -227,7 +227,7 @@ public class RobotContainer {
 
     private void configureOperatorBindings() {
         final double pivotUpForShotRotations = 6.0;
-        final double pivotToggleTimeoutSeconds = 0.1;
+        final double pivotToggleTimeoutSeconds = 0.5;
         final double pivotUpForOscillationVolts = 2.0;
 
         // Pivot controls
@@ -271,7 +271,7 @@ public class RobotContainer {
                     shooter.shootRps(120.0),
                     intake.runIntake(0.75),
                     indexer.runIndexer(0.75),
-                    feeder.runFeeder(0.75)
+                    feeder.runFeeder(0.85)
                 )
             )
         );
@@ -279,12 +279,12 @@ public class RobotContainer {
         // Regular shot
         JOYSTICK2_CONTROLLER.rightBumper().toggleOnTrue(
             Commands.sequence(
-                shooter.shootRps(75.0).withTimeout(0.5),
+                shooter.shootRps(90.0).withTimeout(0.5),
                 Commands.parallel(
-                    shooter.shootRps(75.0),
+                    shooter.shootRps(90.0),
                     intake.runIntake(0.75),
                     indexer.runIndexer(0.85),
-                    feeder.runFeeder(0.75)
+                    feeder.runFeeder(0.85)
                 )
             )
         );
@@ -297,7 +297,7 @@ public class RobotContainer {
                     shooter.shootRps(120.0, 6.0),
                     intake.runIntake(0.75),
                     indexer.runIndexer(0.85),
-                    feeder.runFeeder(0.75)
+                    feeder.runFeeder(0.85)
                 )
             )
         );
@@ -310,7 +310,7 @@ public class RobotContainer {
                     shooter.shootRps(6.0, 120.0),
                     intake.runIntake(0.75),
                     indexer.runIndexer(0.85),
-                    feeder.runFeeder(0.75)
+                    feeder.runFeeder(0.85)
                 )
             )
         );
