@@ -52,14 +52,6 @@ public class Pivot extends SubsystemBase {
         pivotFollower.setNeutralMode(NeutralModeValue.Coast);
     }
 
-    public void zeroPivotEncoder() {
-        pivotLeader.setPosition(0.0);
-    }
-
-    public double getPivotRotations() {
-        return pivotLeader.getPosition().getValueAsDouble();
-    }
-
     public Command pivotUp() {
         // Negative voltage is the direction currently used for upward pivot motion.
         return this.startEnd(
