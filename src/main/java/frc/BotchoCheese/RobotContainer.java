@@ -111,6 +111,7 @@ public class RobotContainer {
 
     private void registerNamedCommands() {
         final double pivotDownSeconds = 0.8; // tune this "X seconds" value
+        final double autoIntakeSecondsAfterPivotDown = 5.0;
 
         // These names must match the event markers referenced by PathPlanner autos.
         NamedCommands.registerCommand(
@@ -133,7 +134,7 @@ public class RobotContainer {
                 indexer.runIndexer(INTAKE_ASSIST_INDEXER_DUTY),
                 feeder.runFeeder(INTAKE_ASSIST_FEEDER_DUTY),
                 shooter.shootRps(0.0, -25.0)
-            )
+            ).withTimeout(autoIntakeSecondsAfterPivotDown)
         );
         NamedCommands.registerCommand("PivotDownAndRun", pivotDownAndRun);
         // Keep legacy name mapped to the new behavior so existing autos still work.

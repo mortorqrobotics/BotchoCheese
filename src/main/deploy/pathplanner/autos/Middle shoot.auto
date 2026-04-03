@@ -41,15 +41,15 @@
                       "data": {
                         "commands": [
                           {
-                            "type": "wait",
-                            "data": {
-                              "waitTime": 2.0
-                            }
-                          },
-                          {
                             "type": "path",
                             "data": {
                               "pathName": "Middle back 1m"
+                            }
+                          },
+                          {
+                            "type": "wait",
+                            "data": {
+                              "waitTime": 5.0
                             }
                           }
                         ]
