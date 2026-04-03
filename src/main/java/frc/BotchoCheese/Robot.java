@@ -6,12 +6,9 @@ package frc.BotchoCheese;
 
 import com.ctre.phoenix6.SignalLogger;
 
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.DoublePublisher;
 import edu.wpi.first.networktables.IntegerPublisher;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
@@ -149,7 +146,7 @@ public void disabledInit() {
   @Override
   public void autonomousInit() {
     m_robotContainer.pivot.enableBrakeMode();
-    applyAllianceHeadingReference();
+    m_robotContainer.seedPoseFromSelectedAuto();
     DebugLog.info("Autonomous init");
 
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
@@ -232,12 +229,4 @@ public void disabledInit() {
     }
   }
 
-  private void applyAllianceHeadingReference() {
-    Alliance alliance = DriverStation.getAlliance().orElse(Alliance.Blue);
-    double headingRad = alliance == Alliance.Blue ? Math.PI : 0.0;
-    double headingDeg = Math.toDegrees(headingRad);
-
-    RobotContainer.gyro.setYaw(headingDeg);
-    RobotContainer.drivetrain.resetRotation(new Rotation2d(headingRad));
-  }
 }

@@ -43,6 +43,7 @@ This README is the current quick-reference for drivers, operators, pit crew, and
 ## Autonomous
 
 - Dashboard chooser key: `Auto Mode`.
+- On autonomous enable, the robot seeds pose from the selected auto's starting pose when one is available.
 - If no auto is selected, the robot runs a no-op command in autonomous.
 - Deploy now deletes old files from the roboRIO deploy directory, which helps prevent stale autos and paths from lingering between events.
 
