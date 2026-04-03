@@ -1,54 +1,62 @@
 {
-  "version": "2025.0",
-  "waypoints": [
-    {
-      "anchor": {
-        "x": 3.5150734953703706,
-        "y": 4.049631148726852
-      },
-      "prevControl": null,
-      "nextControl": {
-        "x": 3.2650734953703706,
-        "y": 4.049631148726852
-      },
-      "isLocked": false,
-      "linkedName": "Hub home"
-    },
-    {
-      "anchor": {
-        "x": 2.16193599877758,
-        "y": 4.05315302318766
-      },
-      "prevControl": {
-        "x": 2.666753182870371,
-        "y": 4.049631148726852
-      },
-      "nextControl": null,
-      "isLocked": false,
-      "linkedName": "Middle shoot"
-    }
-  ],
-  "rotationTargets": [],
-  "constraintZones": [],
-  "pointTowardsZones": [],
-  "eventMarkers": [],
-  "globalConstraints": {
-    "maxVelocity": 0.5,
-    "maxAcceleration": 1.0,
-    "maxAngularVelocity": 540.0,
-    "maxAngularAcceleration": 720.0,
-    "nominalVoltage": 12.0,
-    "unlimited": false
-  },
-  "goalEndState": {
-    "velocity": 0,
-    "rotation": 180.0
-  },
-  "reversed": false,
-  "folder": null,
-  "idealStartingState": {
-    "velocity": 0,
-    "rotation": 180.0
-  },
-  "useDefaultConstraints": true
+    "version":  "2025.0",
+    "waypoints":  [
+                      {
+                          "anchor":  {
+                                         "x":  3.5150734953703706,
+                                         "y":  4.049631148726852
+                                     },
+                          "prevControl":  null,
+                          "nextControl":  {
+                                              "y":  4.0394207658179013,
+                                              "x":  3.0543823302469137
+                                          },
+                          "isLocked":  false,
+                          "linkedName":  "Hub home"
+                      },
+                      {
+                          "anchor":  {
+                                         "x":  2.133,
+                                         "y":  4.019
+                                     },
+                          "prevControl":  {
+                                              "y":  4.0292103829089507,
+                                              "x":  2.5936911651234569
+                                          },
+                          "nextControl":  null,
+                          "isLocked":  false,
+                          "linkedName":  "Middle shoot"
+                      }
+                  ],
+    "rotationTargets":  [
+
+                        ],
+    "constraintZones":  [
+
+                        ],
+    "pointTowardsZones":  [
+
+                          ],
+    "eventMarkers":  [
+
+                     ],
+    "globalConstraints":  {
+                              "maxVelocity":  0.5,
+                              "maxAcceleration":  1.0,
+                              "maxAngularVelocity":  540.0,
+                              "maxAngularAcceleration":  720.0,
+                              "nominalVoltage":  12.0,
+                              "unlimited":  false
+                          },
+    "goalEndState":  {
+                         "velocity":  0,
+                         "rotation":  180
+                     },
+    "reversed":  false,
+    "folder":  null,
+    "idealStartingState":  {
+                               "velocity":  0,
+                               "rotation":  180.0
+                           },
+    "useDefaultConstraints":  true
 }
