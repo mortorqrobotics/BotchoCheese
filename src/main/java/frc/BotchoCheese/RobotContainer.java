@@ -50,8 +50,10 @@ public class RobotContainer {
 
     // Driver input deadband and drivetrain speed caps used by the default drive command.
     private static final double DRIVE_DEADBAND = 0.1;
+    private static final double DRIVER_SLOW_ROTATE_SCALE = 0.2;
     public static double MaxSpeed = 1.0 * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond);
     public static double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond);
+    private static final double DRIVER_SLOW_ROTATE_RATE = MaxAngularRate * DRIVER_SLOW_ROTATE_SCALE;
 
     // USB controller ports: driver on 0, operator on 1.
     private static final CommandXboxController JOYSTICK1_CONTROLLER = new CommandXboxController(0);
@@ -171,6 +173,12 @@ public class RobotContainer {
         );
         JOYSTICK1_CONTROLLER.povRight().whileTrue(drivetrain.applyRequest(() ->
             forwardStraight.withVelocityX(0).withVelocityY(0.5))
+        );
+        JOYSTICK1_CONTROLLER.leftTrigger().whileTrue(drivetrain.applyRequest(() ->
+            forwardStraight.withVelocityX(0).withVelocityY(0).withRotationalRate(-DRIVER_SLOW_ROTATE_RATE))
+        );
+        JOYSTICK1_CONTROLLER.rightTrigger().whileTrue(drivetrain.applyRequest(() ->
+            forwardStraight.withVelocityX(0).withVelocityY(0).withRotationalRate(DRIVER_SLOW_ROTATE_RATE))
         );
 
         // Reset the field-centric heading reference to the robot's current orientation.
