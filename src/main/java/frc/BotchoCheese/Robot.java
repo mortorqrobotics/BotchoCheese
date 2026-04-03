@@ -6,7 +6,9 @@ package frc.BotchoCheese;
 
 import java.util.Locale;
 
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.SignalLogger;
+import com.ctre.phoenix6.hardware.TalonFX;
 
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.DoublePublisher;
@@ -20,6 +22,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.BotchoCheese.Commands.LimelightHomography;
+import frc.BotchoCheese.Constants.RobotMap;
 import frc.BotchoCheese.Utils.DebugLog;
 import frc.BotchoCheese.Utils.LimelightHelpers;
 
@@ -27,6 +30,7 @@ import frc.BotchoCheese.Utils.LimelightHelpers;
 public class Robot extends TimedRobot {
   private static final long LIMELIGHT_IDLE_THROTTLE = 100;
   private static final double SWERVE_OFFSET_PUBLISH_INTERVAL_SECONDS = 0.5;
+  private static final double SWERVE_NEUTRAL_MODE_PUBLISH_INTERVAL_SECONDS = 2.0;
 
   public static LimelightHelpers limelight;
   public static LimelightHelpers limelightTwo;
@@ -34,11 +38,22 @@ public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
 
   private final RobotContainer m_robotContainer;
+  private final TalonFX[] swerveNeutralReportMotors = {
+      new TalonFX(0, RobotMap.CANIVORE_CAN_BUS),
+      new TalonFX(1, RobotMap.CANIVORE_CAN_BUS),
+      new TalonFX(2, RobotMap.CANIVORE_CAN_BUS),
+      new TalonFX(3, RobotMap.CANIVORE_CAN_BUS),
+      new TalonFX(4, RobotMap.CANIVORE_CAN_BUS),
+      new TalonFX(5, RobotMap.CANIVORE_CAN_BUS),
+      new TalonFX(6, RobotMap.CANIVORE_CAN_BUS),
+      new TalonFX(7, RobotMap.CANIVORE_CAN_BUS)
+  };
 
   private final boolean kUseLimelight = false;
   private final Field2d m_field = new Field2d();
   private double lastCanHealthLogSeconds = 0.0;
   private double lastSwerveOffsetPublishSeconds = Double.NEGATIVE_INFINITY;
+  private double lastSwerveNeutralModePublishSeconds = Double.NEGATIVE_INFINITY;
   private DoublePublisher canUtilizationPublisher;
   private IntegerPublisher canBusOffPublisher;
   private IntegerPublisher canTxFullPublisher;
@@ -168,6 +183,27 @@ public class Robot extends TimedRobot {
     SmartDashboard.putString(
         "SwerveCal/Instruction",
         "Point wheels forward, then copy SwerveCal/* OffsetToPaste (rot) into TunerConstants k*EncoderOffset");
+
+    if (now - lastSwerveNeutralModePublishSeconds < SWERVE_NEUTRAL_MODE_PUBLISH_INTERVAL_SECONDS) {
+      return;
+    }
+    lastSwerveNeutralModePublishSeconds = now;
+    SmartDashboard.putString("Swerve/NeutralModes", getSwerveNeutralModeSummary());
+  }
+
+  private String getSwerveNeutralModeSummary() {
+    TalonFXConfiguration config = new TalonFXConfiguration();
+    String[] labels = {"FL_D", "FL_S", "FR_D", "FR_S", "BL_D", "BL_S", "BR_D", "BR_S"};
+    StringBuilder sb = new StringBuilder();
+
+    for (int i = 0; i < swerveNeutralReportMotors.length; i++) {
+      swerveNeutralReportMotors[i].getConfigurator().refresh(config);
+      if (i > 0) {
+        sb.append(" ");
+      }
+      sb.append(labels[i]).append(":").append(config.MotorOutput.NeutralMode);
+    }
+    return sb.toString();
   }
 
   private void publishPoseData() {

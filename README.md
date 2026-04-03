@@ -70,6 +70,7 @@ This README is the current quick-reference for drivers, operators, pit crew, and
 - `SwerveCal/PasteLine *`: per-module ready-to-paste lines for `TunerConstants`.
 - `SwerveCal/PasteBlock`: four-line ready-to-paste block for all module offsets.
 - `SwerveCal/Instruction`: quick reminder of the calibration workflow.
+- `Swerve/NeutralModes`: compact readout of live neutral mode for swerve motors (`FL_D`, `FL_S`, `FR_D`, `FR_S`, `BL_D`, `BL_S`, `BR_D`, `BR_S`), throttled to update every 2 seconds while disabled.
 
 ## Shooter Tuning Knobs
 
