@@ -105,17 +105,18 @@ public class RobotContainer {
         NamedCommands.registerCommand(
             "Shoot",
             Commands.sequence(
-                shooter.shootRps(75.0).withTimeout(0.5),
+                shooter.shootRps(90.0).withTimeout(0.5),
                 Commands.parallel(
-                    shooter.shootRps(75.0),
+                    shooter.shootRps(90.0),
                     intake.runIntake(SHOOT_INTAKE_DUTY),
                     indexer.runIndexer(SHOOT_INDEXER_DUTY),
                     feeder.runFeeder(SHOOT_FEEDER_DUTY)
                 )
-            ).withTimeout(10.0)
+            ).withTimeout(8.0)
         );
 
         NamedCommands.registerCommand("PivotDown", pivot.pivotDown().withTimeout(pivotDownSeconds));
+        
         NamedCommands.registerCommand(
             "Intake",
             Commands.parallel(
