@@ -58,6 +58,7 @@ public class RobotContainer {
     private static final double SHOOT_INTAKE_DUTY = 0.9;
     private static final double SHOOT_INDEXER_DUTY = 0.85;
     private static final double SHOOT_FEEDER_DUTY = 0.85;
+    private static final double SHOOTER_SPINUP_TIMEOUT_SECONDS = 0.5;
 
     // USB controller ports: driver on 0, operator on 1.
     private static final CommandXboxController JOYSTICK1_CONTROLLER = new CommandXboxController(0);
@@ -105,7 +106,7 @@ public class RobotContainer {
         NamedCommands.registerCommand(
             "Shoot",
             Commands.sequence(
-                shooter.shootRps(90.0).withTimeout(0.5),
+                shooter.shootRps(90.0).withTimeout(SHOOTER_SPINUP_TIMEOUT_SECONDS),
                 Commands.parallel(
                     shooter.shootRps(90.0),
                     intake.runIntake(SHOOT_INTAKE_DUTY),
@@ -217,7 +218,7 @@ public class RobotContainer {
         // Big shot
         JOYSTICK2_CONTROLLER.rightTrigger().toggleOnTrue(
             Commands.sequence(
-                shooter.shootRps(120.0).withTimeout(0.5),
+                shooter.shootRps(120.0).withTimeout(SHOOTER_SPINUP_TIMEOUT_SECONDS),
                 Commands.parallel(
                     shooter.shootRps(120.0),
                     intake.runIntake(SHOOT_INTAKE_DUTY),
@@ -230,7 +231,7 @@ public class RobotContainer {
         // Regular shot
         JOYSTICK2_CONTROLLER.rightBumper().toggleOnTrue(
             Commands.sequence(
-                shooter.shootRps(90.0).withTimeout(0.5),
+                shooter.shootRps(90.0).withTimeout(SHOOTER_SPINUP_TIMEOUT_SECONDS),
                 Commands.parallel(
                     shooter.shootRps(90.0),
                     intake.runIntake(SHOOT_INTAKE_DUTY),
@@ -243,7 +244,7 @@ public class RobotContainer {
         // SmartDashboard-programmed X shot
         JOYSTICK2_CONTROLLER.x().toggleOnTrue(
             Commands.sequence(
-                shooter.shootRps(getXShotBackRps(), getXShotFrontRps()).withTimeout(0.5),
+                shooter.shootRps(getXShotBackRps(), getXShotFrontRps()).withTimeout(SHOOTER_SPINUP_TIMEOUT_SECONDS),
                 Commands.parallel(
                     shooter.shootRps(getXShotBackRps(), getXShotFrontRps()),
                     intake.runIntake(SHOOT_INTAKE_DUTY),
@@ -256,7 +257,7 @@ public class RobotContainer {
         // Lob shot (back, front)
         JOYSTICK2_CONTROLLER.y().toggleOnTrue(
             Commands.sequence(
-                shooter.shootRps(120.0, 20).withTimeout(0.5),
+                shooter.shootRps(120.0, 20).withTimeout(SHOOTER_SPINUP_TIMEOUT_SECONDS),
                 Commands.parallel(
                     shooter.shootRps(120.0, 20),
                     intake.runIntake(SHOOT_INTAKE_DUTY),
@@ -269,7 +270,7 @@ public class RobotContainer {
         // Line-drive shot (back, front)
         JOYSTICK2_CONTROLLER.a().toggleOnTrue(
             Commands.sequence(
-                shooter.shootRps(20, 120.0).withTimeout(0.5),
+                shooter.shootRps(20, 120.0).withTimeout(SHOOTER_SPINUP_TIMEOUT_SECONDS),
                 Commands.parallel(
                     shooter.shootRps(20, 120.0),
                     intake.runIntake(SHOOT_INTAKE_DUTY),
