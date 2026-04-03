@@ -234,7 +234,7 @@ public void disabledInit() {
 
   private void applyAllianceHeadingReference() {
     Alliance alliance = DriverStation.getAlliance().orElse(Alliance.Blue);
-    double headingRad = alliance == Alliance.Red ? Math.PI : 0.0;
+    double headingRad = alliance == Alliance.Blue ? Math.PI : 0.0;
     double headingDeg = Math.toDegrees(headingRad);
 
     RobotContainer.gyro.setYaw(headingDeg);
