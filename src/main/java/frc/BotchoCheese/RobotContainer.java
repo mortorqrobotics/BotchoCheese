@@ -110,7 +110,7 @@ public class RobotContainer {
     }
 
     private void registerNamedCommands() {
-        final double pivotDownSeconds = 1.1; // tune this "X seconds" value
+        final double pivotDownSeconds = 1.0; // tune this "X seconds" value
 
         // These names must match the event markers referenced by PathPlanner autos.
         NamedCommands.registerCommand(
