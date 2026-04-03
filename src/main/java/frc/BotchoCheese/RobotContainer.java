@@ -51,6 +51,10 @@ public class RobotContainer {
     private static final String PATHPLANNER_AUTO_FOLDER = "pathplanner/autos";
     private static final String X_SHOT_BACK_RPS_KEY = "Shots/X Back RPS";
     private static final String X_SHOT_FRONT_RPS_KEY = "Shots/X Front RPS";
+    private static final String AUTO_SELECTED_NAME_KEY = "Auto/SelectedName";
+    private static final String AUTO_SELECTED_VALID_KEY = "Auto/SelectedValid";
+    private static final String AUTO_STATUS_KEY = "Auto/Status";
+    private static final String AUTO_START_POSE_SEEDED_KEY = "Auto/StartPoseSeeded";
 
     // Drive tuning
     private static final double DRIVE_DEADBAND = 0.1;
@@ -126,6 +130,10 @@ public class RobotContainer {
         SmartDashboard.putData(AUTO_CHOOSER_KEY, autoChooser);
         SmartDashboard.putNumber(X_SHOT_BACK_RPS_KEY, 75.0);
         SmartDashboard.putNumber(X_SHOT_FRONT_RPS_KEY, 75.0);
+        SmartDashboard.putString(AUTO_SELECTED_NAME_KEY, NO_AUTO_SELECTED);
+        SmartDashboard.putBoolean(AUTO_SELECTED_VALID_KEY, false);
+        SmartDashboard.putString(AUTO_STATUS_KEY, "NO AUTO SELECTED");
+        SmartDashboard.putBoolean(AUTO_START_POSE_SEEDED_KEY, false);
     }
 
     private void configureAutoChooser() {
@@ -295,7 +303,8 @@ public class RobotContainer {
 
     public Command getAutonomousCommand() {
         String selectedAutoName = autoChooser.getSelected();
-        if (selectedAutoName == null || selectedAutoName.equals(NO_AUTO_SELECTED)) {
+        if (!isAutoSelected(selectedAutoName)) {
+            setAutoStatus("NO AUTO SELECTED");
             DebugLog.warnThrottled(
                 "auto.none_selected",
                 "No autonomous selected; running no-op command.",
@@ -303,42 +312,86 @@ public class RobotContainer {
             );
             return Commands.none();
         }
-        DebugLog.info("Auto selected: " + selectedAutoName);
-        return AutoBuilder.buildAuto(selectedAutoName);
+        try {
+            Command autoCommand = AutoBuilder.buildAuto(selectedAutoName);
+            setAutoStatus("AUTO READY: " + selectedAutoName);
+            DebugLog.info("Auto selected: " + selectedAutoName);
+            return autoCommand;
+        } catch (Exception ex) {
+            setAutoStatus("AUTO BUILD FAILED: " + selectedAutoName);
+            DebugLog.error(
+                "Failed to build autonomous command: " + selectedAutoName,
+                ex.getStackTrace()
+            );
+            return Commands.none();
+        }
     }
 
-    public void seedPoseFromSelectedAuto() {
+    public void updateAutoSelectionDashboard() {
         String selectedAutoName = autoChooser.getSelected();
-        if (selectedAutoName == null || selectedAutoName.equals(NO_AUTO_SELECTED)) {
+        boolean autoSelected = isAutoSelected(selectedAutoName);
+
+        SmartDashboard.putString(
+            AUTO_SELECTED_NAME_KEY,
+            autoSelected ? selectedAutoName : NO_AUTO_SELECTED
+        );
+        SmartDashboard.putBoolean(AUTO_SELECTED_VALID_KEY, autoSelected);
+        if (!autoSelected) {
+            setAutoStatus("NO AUTO SELECTED");
+            SmartDashboard.putBoolean(AUTO_START_POSE_SEEDED_KEY, false);
+        }
+    }
+
+    public boolean seedPoseFromSelectedAuto() {
+        String selectedAutoName = autoChooser.getSelected();
+        if (!isAutoSelected(selectedAutoName)) {
+            SmartDashboard.putBoolean(AUTO_START_POSE_SEEDED_KEY, false);
+            setAutoStatus("NO AUTO SELECTED");
             DebugLog.warnThrottled(
                 "pose_seed.no_auto",
                 "No auto selected for pose seeding.",
                 5.0
             );
-            return;
+            return false;
         }
 
         try {
             PathPlannerAuto auto = new PathPlannerAuto(selectedAutoName);
             Pose2d bluePose = auto.getStartingPose();
             if (bluePose == null) {
+                SmartDashboard.putBoolean(AUTO_START_POSE_SEEDED_KEY, false);
+                setAutoStatus("AUTO HAS NO START POSE: " + selectedAutoName);
                 DebugLog.warnThrottled(
                     "pose_seed.no_start_pose",
                     "Selected auto has no path-based starting pose: " + selectedAutoName,
                     5.0
                 );
-                return;
+                return false;
             }
 
             Pose2d alliancePose = AutoBuilder.shouldFlip() ? FlippingUtil.flipFieldPose(bluePose) : bluePose;
             drivetrain.resetPose(alliancePose);
+            SmartDashboard.putBoolean(AUTO_START_POSE_SEEDED_KEY, true);
+            setAutoStatus("START POSE SEEDED: " + selectedAutoName);
             DebugLog.info("Seeded pose from auto: " + selectedAutoName);
+            return true;
         } catch (Exception ex) {
+            SmartDashboard.putBoolean(AUTO_START_POSE_SEEDED_KEY, false);
+            setAutoStatus("POSE SEED FAILED: " + selectedAutoName);
             DebugLog.error(
                 "Failed to seed pose from selected auto: " + selectedAutoName,
                 ex.getStackTrace()
             );
+            return false;
         }
+    }
+
+    private boolean isAutoSelected(String selectedAutoName) {
+        return selectedAutoName != null && !selectedAutoName.equals(NO_AUTO_SELECTED);
+    }
+
+    private void setAutoStatus(String status) {
+        SmartDashboard.putString(AUTO_STATUS_KEY, status);
     }
 
     private double getXShotBackRps() {

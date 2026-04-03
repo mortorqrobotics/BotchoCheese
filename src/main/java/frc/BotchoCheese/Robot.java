@@ -99,6 +99,7 @@ public class Robot extends TimedRobot {
   }
 
   private void publishDashboardData() {
+    m_robotContainer.updateAutoSelectionDashboard();
     SmartDashboard.putNumber(
         "Swerve/FrontLeft Raw Abs (rot)",
         RobotContainer.drivetrain.getModule(0).getEncoder().getAbsolutePosition().getValueAsDouble());

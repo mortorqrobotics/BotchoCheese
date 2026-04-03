@@ -47,9 +47,20 @@ This README is the current quick-reference for drivers, operators, pit crew, and
 - If no auto is selected, the robot runs a no-op command in autonomous.
 - Deploy now deletes old files from the roboRIO deploy directory, which helps prevent stale autos and paths from lingering between events.
 
+### Auto readiness indicators
+
+- `Auto/SelectedValid`: `true` when a real auto is selected, `false` when the chooser is still on `Select Auto`.
+- `Auto/SelectedName`: the currently selected auto name.
+- `Auto/Status`: human-readable autonomous status and failure reason.
+- `Auto/StartPoseSeeded`: `true` once the selected auto's start pose has been seeded successfully.
+
 ## Dashboard Items
 
 - `Auto Mode`: autonomous chooser.
+- `Auto/SelectedValid`: quick validity check for the selected auto.
+- `Auto/SelectedName`: selected auto name.
+- `Auto/Status`: autonomous readiness / failure status.
+- `Auto/StartPoseSeeded`: whether autonomous start pose seeding succeeded.
 - `Shots/X Back RPS`: custom back shooter speed for the `X` shot.
 - `Shots/X Front RPS`: custom front shooter speed for the `X` shot.
 - `Swerve/* Raw Abs (rot)`: raw absolute encoder values for each swerve module.
