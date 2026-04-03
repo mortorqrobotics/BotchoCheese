@@ -4,6 +4,8 @@
 
 package frc.BotchoCheese;
 
+import java.util.Locale;
+
 import com.ctre.phoenix6.SignalLogger;
 
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -140,6 +142,42 @@ public class Robot extends TimedRobot {
     SmartDashboard.putNumber("SwerveCal/FrontRight OffsetToPaste (rot)", frontRightAbsRot);
     SmartDashboard.putNumber("SwerveCal/BackLeft OffsetToPaste (rot)", backLeftAbsRot);
     SmartDashboard.putNumber("SwerveCal/BackRight OffsetToPaste (rot)", backRightAbsRot);
+    SmartDashboard.putString(
+        "SwerveCal/PasteLine FrontLeft",
+        String.format(
+            Locale.US,
+            "private static final Angle kFrontLeftEncoderOffset = Rotations.of(%.12f);",
+            frontLeftAbsRot));
+    SmartDashboard.putString(
+        "SwerveCal/PasteLine FrontRight",
+        String.format(
+            Locale.US,
+            "private static final Angle kFrontRightEncoderOffset = Rotations.of(%.12f);",
+            frontRightAbsRot));
+    SmartDashboard.putString(
+        "SwerveCal/PasteLine BackLeft",
+        String.format(
+            Locale.US,
+            "private static final Angle kBackLeftEncoderOffset = Rotations.of(%.12f);",
+            backLeftAbsRot));
+    SmartDashboard.putString(
+        "SwerveCal/PasteLine BackRight",
+        String.format(
+            Locale.US,
+            "private static final Angle kBackRightEncoderOffset = Rotations.of(%.12f);",
+            backRightAbsRot));
+    SmartDashboard.putString(
+        "SwerveCal/PasteBlock",
+        String.format(
+            Locale.US,
+            "private static final Angle kFrontLeftEncoderOffset = Rotations.of(%.12f);%n"
+                + "private static final Angle kFrontRightEncoderOffset = Rotations.of(%.12f);%n"
+                + "private static final Angle kBackLeftEncoderOffset = Rotations.of(%.12f);%n"
+                + "private static final Angle kBackRightEncoderOffset = Rotations.of(%.12f);",
+            frontLeftAbsRot,
+            frontRightAbsRot,
+            backLeftAbsRot,
+            backRightAbsRot));
     SmartDashboard.putString(
         "SwerveCal/Instruction",
         "Point wheels forward, then copy SwerveCal/* OffsetToPaste (rot) into TunerConstants k*EncoderOffset");
