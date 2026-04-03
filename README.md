@@ -19,6 +19,8 @@ This README is the current quick-reference for drivers, operators, pit crew, and
 - Right stick `X`: rotate robot.
 - Left bumper (hold): swerve brake.
 - D-pad up/down/left/right (hold): robot-centric crawl at fixed speed.
+- Left trigger (hold): slow rotate left (in place).
+- Right trigger (hold): slow rotate right (in place).
 - Start (press): reseed field-centric heading only.
 
 ### Operator Controller (`port 1`)
@@ -64,6 +66,19 @@ This README is the current quick-reference for drivers, operators, pit crew, and
 - `Shots/X Back RPS`: custom back shooter speed for the `X` shot.
 - `Shots/X Front RPS`: custom front shooter speed for the `X` shot.
 - `Swerve/* Raw Abs (rot)`: raw absolute encoder values for each swerve module.
+- `SwerveCal/* OffsetToPaste (rot)`: copy these directly into `TunerConstants` encoder offsets (Option 1 calibration flow).
+- `SwerveCal/PasteLine *`: per-module ready-to-paste lines for `TunerConstants`.
+- `SwerveCal/PasteBlock`: four-line ready-to-paste block for all module offsets.
+- `SwerveCal/Instruction`: quick reminder of the calibration workflow.
+
+## Shooter Tuning Knobs
+
+- Shared shoot conveyor duty cycles and shooter spin-up timeout now live in `RobotContainer`:
+- `SHOOT_INTAKE_DUTY`
+- `SHOOT_INDEXER_DUTY`
+- `SHOOT_FEEDER_DUTY`
+- `SHOOTER_SPINUP_TIMEOUT_SECONDS`
+- These values are used by both operator shoot buttons and the registered PathPlanner `Shoot` named command.
 
 ## Vision Notes
 
