@@ -96,7 +96,7 @@ This README is the current quick-reference for drivers, operators, pit crew, and
 | 18 | Indexer Motor | Indexer | roboRIO CAN | `TalonFXS` + `Minion_JST` | 40 | 30 | Brake | Duty-cycle output command |
 | 20 | Left Pivot Motor (Leader) | Pivot | roboRIO CAN | `TalonFX` | 60 | 40 | Brake by config; switched to Coast in `disabledInit()` | Manual voltage control; follower pair |
 | 21 | Right Pivot Motor (Follower) | Pivot | roboRIO CAN | `TalonFX` follower (Opposed) | 60 | 40 | Brake by config; switched to Coast in `disabledInit()` | Follows ID 20 with `MotorAlignmentValue.Opposed` |
-| 22 | Intake Motor | Intake | roboRIO CAN | `TalonFXS` + `Minion_JST` | 40 | 30 | Brake | Inverted `Clockwise_Positive`; duty-cycle output |
+| 22 | Intake Motor | Intake | roboRIO CAN | `TalonFX` (X44) | 60 | 40 | Brake | Inverted `Clockwise_Positive`; duty-cycle output |
 | 23 | Feeder Motor | Feeder | roboRIO CAN | `TalonFX` | 60 | 40 | Brake | Duty-cycle output |
 | 24 | Back Left Shooter | Shooter | roboRIO CAN | `TalonFX` | 40 | 30 | Brake | Inverted `Clockwise_Positive`; velocity closed-loop |
 | 25 | Back Right Shooter (Follower) | Shooter | roboRIO CAN | `TalonFX` follower (Aligned) | 40 | 30 | Brake | Follows ID 24 with `MotorAlignmentValue.Aligned` |
