@@ -223,7 +223,7 @@ public class RobotContainer {
                 intake.runIntake(INTAKE_ASSIST_INTAKE_DUTY),
                 indexer.runIndexer(INTAKE_ASSIST_INDEXER_DUTY),
                 feeder.runFeeder(INTAKE_ASSIST_FEEDER_DUTY),
-                shooter.shootRps(0.0, -15.0)
+                shooter.shootRps(0.0, -10.0)
             )
         );
 
