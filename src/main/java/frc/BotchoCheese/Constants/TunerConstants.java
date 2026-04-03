@@ -85,9 +85,7 @@ public class TunerConstants {
 
     // CAN bus that the devices are located on;
     // All swerve devices must share the same CAN bus
-    public static final CANBus kCANBus = DebugLog.DEBUG
-        ? new CANBus(RobotMap.CANIVORE_CAN_BUS, getCanivoreLogPath())
-        : new CANBus(RobotMap.CANIVORE_CAN_BUS);
+    public static final CANBus kCANBus = createCanBus();
 
     // Theoretical free speed (m/s) at 12 V applied output;
     // This needs to be tuned to your individual robot
@@ -304,5 +302,13 @@ public class TunerConstants {
     private static String getCanivoreLogPath() {
         Path logDir = Files.isDirectory(USB_LOG_DIR) ? USB_LOG_DIR : LOCAL_LOG_DIR;
         return logDir.resolve("example.hoot").toString();
+    }
+
+    private static CANBus createCanBus() {
+        if (DebugLog.DEBUG) {
+            return new CANBus(RobotMap.CANIVORE_CAN_BUS, getCanivoreLogPath());
+        } else {
+            return new CANBus(RobotMap.CANIVORE_CAN_BUS);
+        }
     }
 }
