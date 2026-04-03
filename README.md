@@ -80,6 +80,36 @@ This README is the current quick-reference for drivers, operators, pit crew, and
 - `SHOOTER_SPINUP_TIMEOUT_SECONDS`
 - These values are used by both operator shoot buttons and the registered PathPlanner `Shoot` named command.
 
+## CAN Motor Map And Config
+
+| CAN ID | Device | Subsystem / Module | Bus | Motor Type / Arrangement | Stator Limit (A) | Supply Limit (A) | Neutral Mode | Key Config Notes |
+|---|---|---|---|---|---:|---:|---|---|
+| 0 | Front Left Drive | Swerve Front Left | CANivore (`1515Canivore`) | `TalonFX_Integrated` drive | Not explicitly set in code | Not explicitly set in code | Coast | Left side drive invert flag `false` |
+| 1 | Front Left Steer | Swerve Front Left | CANivore (`1515Canivore`) | `TalonFX_Integrated` steer | 45 | Not explicitly set in code | Coast | Steer invert `false`, feedback source `FusedCANcoder` |
+| 2 | Front Right Drive | Swerve Front Right | CANivore (`1515Canivore`) | `TalonFX_Integrated` drive | Not explicitly set in code | Not explicitly set in code | Coast | Right side drive invert flag `true` |
+| 3 | Front Right Steer | Swerve Front Right | CANivore (`1515Canivore`) | `TalonFX_Integrated` steer | 45 | Not explicitly set in code | Coast | Steer invert `false`, feedback source `FusedCANcoder` |
+| 4 | Back Left Drive | Swerve Back Left | CANivore (`1515Canivore`) | `TalonFX_Integrated` drive | Not explicitly set in code | Not explicitly set in code | Coast | Left side drive invert flag `false` |
+| 5 | Back Left Steer | Swerve Back Left | CANivore (`1515Canivore`) | `TalonFX_Integrated` steer | 45 | Not explicitly set in code | Coast | Steer invert `false`, feedback source `FusedCANcoder` |
+| 6 | Back Right Drive | Swerve Back Right | CANivore (`1515Canivore`) | `TalonFX_Integrated` drive | Not explicitly set in code | Not explicitly set in code | Coast | Right side drive invert flag `true` |
+| 7 | Back Right Steer | Swerve Back Right | CANivore (`1515Canivore`) | `TalonFX_Integrated` steer | 45 | Not explicitly set in code | Coast | Steer invert `false`, feedback source `FusedCANcoder` |
+| 18 | Indexer Motor | Indexer | roboRIO CAN | `TalonFXS` + `Minion_JST` | 40 | 30 | Brake | Duty-cycle output command |
+| 20 | Left Pivot Motor (Leader) | Pivot | roboRIO CAN | `TalonFX` | 60 | 40 | Brake by config; switched to Coast in `disabledInit()` | Manual voltage control; follower pair |
+| 21 | Right Pivot Motor (Follower) | Pivot | roboRIO CAN | `TalonFX` follower (Opposed) | 60 | 40 | Brake by config; switched to Coast in `disabledInit()` | Follows ID 20 with `MotorAlignmentValue.Opposed` |
+| 22 | Intake Motor | Intake | roboRIO CAN | `TalonFXS` + `Minion_JST` | 40 | 30 | Brake | Inverted `Clockwise_Positive`; duty-cycle output |
+| 23 | Feeder Motor | Feeder | roboRIO CAN | `TalonFX` | 60 | 40 | Brake | Duty-cycle output |
+| 24 | Back Left Shooter | Shooter | roboRIO CAN | `TalonFX` | 40 | 30 | Brake | Inverted `Clockwise_Positive`; velocity closed-loop |
+| 25 | Back Right Shooter (Follower) | Shooter | roboRIO CAN | `TalonFX` follower (Aligned) | 40 | 30 | Brake | Follows ID 24 with `MotorAlignmentValue.Aligned` |
+| 26 | Front Shooter | Shooter | roboRIO CAN | `TalonFX` | 40 | 30 | Brake | Inverted `Clockwise_Positive`; velocity closed-loop |
+
+### Swerve Azimuth Sensors (Not Motors)
+
+| CAN ID | Device | Module | Bus | Notes |
+|---|---|---|---|---|
+| 10 | CANcoder | Front Left | CANivore (`1515Canivore`) | Encoder invert flag `false`; code-side offset in `TunerConstants` |
+| 11 | CANcoder | Front Right | CANivore (`1515Canivore`) | Encoder invert flag `false`; code-side offset in `TunerConstants` |
+| 12 | CANcoder | Back Left | CANivore (`1515Canivore`) | Encoder invert flag `false`; code-side offset in `TunerConstants` |
+| 13 | CANcoder | Back Right | CANivore (`1515Canivore`) | Encoder invert flag `false`; code-side offset in `TunerConstants` |
+
 ## Vision Notes
 
 - `LimelightHomography.update(...)` is currently disabled in `Robot`.
