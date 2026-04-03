@@ -9,19 +9,19 @@
                           "prevControl":  null,
                           "nextControl":  {
                                               "y":  4.0394207658179013,
-                                              "x":  3.1210489969135806
+                                              "x":  3.087715663580247
                                           },
                           "isLocked":  false,
                           "linkedName":  "Hub home"
                       },
                       {
                           "anchor":  {
-                                         "x":  2.333,
+                                         "x":  2.233,
                                          "y":  4.019
                                      },
                           "prevControl":  {
                                               "y":  4.0292103829089507,
-                                              "x":  2.72702449845679
+                                              "x":  2.6603578317901238
                                           },
                           "nextControl":  null,
                           "isLocked":  false,

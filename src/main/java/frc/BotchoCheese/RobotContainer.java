@@ -56,8 +56,15 @@ public class RobotContainer {
     private static final double DRIVER_SLOW_ROTATE_RATE = MaxAngularRate * DRIVER_SLOW_ROTATE_SCALE;
     // Shared duty cycles for all shoot flows (buttons + named commands).
     private static final double SHOOT_INTAKE_DUTY = 0.9;
-    private static final double SHOOT_INDEXER_DUTY = 0.85;
-    private static final double SHOOT_FEEDER_DUTY = 0.85;
+    private static final double SHOOT_INDEXER_DUTY = 0.7;
+    private static final double SHOOT_FEEDER_DUTY = 0.7;
+    // Brownout mitigation for intake-assist/reverse flows: keep intake stronger than feeder/indexer.
+    private static final double INTAKE_ASSIST_INTAKE_DUTY = 0.75;
+    private static final double INTAKE_ASSIST_INDEXER_DUTY = -0.4;
+    private static final double INTAKE_ASSIST_FEEDER_DUTY = -0.55;
+    private static final double REVERSE_INTAKE_DUTY = -0.75;
+    private static final double REVERSE_INDEXER_DUTY = -0.6;
+    private static final double REVERSE_FEEDER_DUTY = -0.4;
     private static final double SHOOTER_SPINUP_TIMEOUT_SECONDS = 0.75;
 
     // USB controller ports: driver on 0, operator on 1.
@@ -116,7 +123,7 @@ public class RobotContainer {
                     indexer.runIndexer(SHOOT_INDEXER_DUTY),
                     feeder.runFeeder(SHOOT_FEEDER_DUTY)
                 )
-            ).withTimeout(8.0)
+            ).withTimeout(4.0)
         );
 
         NamedCommands.registerCommand("PivotDown", pivot.pivotDown().withTimeout(pivotDownSeconds));
@@ -124,9 +131,9 @@ public class RobotContainer {
         NamedCommands.registerCommand(
             "Intake",
             Commands.parallel(
-                intake.runIntake(0.75),
-                indexer.runIndexer(-0.5),
-                feeder.runFeeder(-0.75),
+                intake.runIntake(INTAKE_ASSIST_INTAKE_DUTY),
+                indexer.runIndexer(INTAKE_ASSIST_INDEXER_DUTY),
+                feeder.runFeeder(INTAKE_ASSIST_FEEDER_DUTY),
                 shooter.shootRps(0.0, -25.0)
             )
         );
@@ -202,9 +209,9 @@ public class RobotContainer {
         // Intake balls / anti-jam
         JOYSTICK2_CONTROLLER.leftTrigger().whileTrue(
             Commands.parallel(
-                intake.runIntake(0.75),
-                indexer.runIndexer(-0.5),
-                feeder.runFeeder(-0.75),
+                intake.runIntake(INTAKE_ASSIST_INTAKE_DUTY),
+                indexer.runIndexer(INTAKE_ASSIST_INDEXER_DUTY),
+                feeder.runFeeder(INTAKE_ASSIST_FEEDER_DUTY),
                 shooter.shootRps(0.0, -25.0)
             )
         );
@@ -212,9 +219,9 @@ public class RobotContainer {
         // Reverse all conveyors
         JOYSTICK2_CONTROLLER.b().whileTrue(
             Commands.parallel(
-                intake.runIntake(-0.75),
-                indexer.runIndexer(-0.75),
-                feeder.runFeeder(-0.5)
+                intake.runIntake(REVERSE_INTAKE_DUTY),
+                indexer.runIndexer(REVERSE_INDEXER_DUTY),
+                feeder.runFeeder(REVERSE_FEEDER_DUTY)
             )
         );
 
