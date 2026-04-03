@@ -23,6 +23,7 @@ import frc.BotchoCheese.Utils.LimelightHelpers;
 
 public class Robot extends TimedRobot {
   private static final long LIMELIGHT_IDLE_THROTTLE = 100;
+  private static final double SWERVE_OFFSET_PUBLISH_INTERVAL_SECONDS = 0.5;
 
   public static LimelightHelpers limelight;
   public static LimelightHelpers limelightTwo;
@@ -34,6 +35,7 @@ public class Robot extends TimedRobot {
   private final boolean kUseLimelight = false;
   private final Field2d m_field = new Field2d();
   private double lastCanHealthLogSeconds = 0.0;
+  private double lastSwerveOffsetPublishSeconds = Double.NEGATIVE_INFINITY;
   private DoublePublisher canUtilizationPublisher;
   private IntegerPublisher canBusOffPublisher;
   private IntegerPublisher canTxFullPublisher;
@@ -100,6 +102,16 @@ public class Robot extends TimedRobot {
 
   private void publishDashboardData() {
     m_robotContainer.updateAutoSelectionDashboard();
+    if (!DriverStation.isDisabled()) {
+      return;
+    }
+
+    double now = Timer.getFPGATimestamp();
+    if (now - lastSwerveOffsetPublishSeconds < SWERVE_OFFSET_PUBLISH_INTERVAL_SECONDS) {
+      return;
+    }
+    lastSwerveOffsetPublishSeconds = now;
+
     SmartDashboard.putNumber(
         "Swerve/FrontLeft Raw Abs (rot)",
         RobotContainer.drivetrain.getModule(0).getEncoder().getAbsolutePosition().getValueAsDouble());
