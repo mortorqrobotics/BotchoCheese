@@ -164,7 +164,7 @@ public class RobotContainer {
             drivetrain.applyRequest(() ->
                 drive.withVelocityX(-applyDriveDeadband(JOYSTICK1_CONTROLLER.getLeftY()) * MaxSpeed)
                     .withVelocityY(-applyDriveDeadband(JOYSTICK1_CONTROLLER.getLeftX()) * MaxSpeed)
-                    .withRotationalRate(applyDriveDeadband(JOYSTICK1_CONTROLLER.getRightX()) * MaxAngularRate)
+                    .withRotationalRate(-applyDriveDeadband(JOYSTICK1_CONTROLLER.getRightX()) * MaxAngularRate)
             )
         );
 
@@ -184,10 +184,10 @@ public class RobotContainer {
             robotCentricNudge.withVelocityX(0).withVelocityY(0.5).withRotationalRate(0))
         );
         JOYSTICK1_CONTROLLER.leftTrigger().whileTrue(drivetrain.applyRequest(() ->
-            robotCentricRotate.withVelocityX(0).withVelocityY(0).withRotationalRate(-DRIVER_SLOW_ROTATE_RATE))
+            robotCentricRotate.withVelocityX(0).withVelocityY(0).withRotationalRate(DRIVER_SLOW_ROTATE_RATE))
         );
         JOYSTICK1_CONTROLLER.rightTrigger().whileTrue(drivetrain.applyRequest(() ->
-            robotCentricRotate.withVelocityX(0).withVelocityY(0).withRotationalRate(DRIVER_SLOW_ROTATE_RATE))
+            robotCentricRotate.withVelocityX(0).withVelocityY(0).withRotationalRate(-DRIVER_SLOW_ROTATE_RATE))
         );
 
         // Reset the field-centric heading reference to the robot's current orientation.
