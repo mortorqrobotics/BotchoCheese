@@ -14,9 +14,10 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.BotchoCheese.Constants.RobotMap;
 
 public class Intake extends SubsystemBase {
+    // Minion motor that powers the intake mechanism.
     private final TalonFXS intakeMotor;
 
-    // Control requests
+    // Phoenix request reused for percent-output commands.
     private final DutyCycleOut intakeDuty = new DutyCycleOut(0);
 
     
@@ -42,13 +43,14 @@ public class Intake extends SubsystemBase {
     }
 
 
-public Command runIntake(double percent) {
-    return this.startEnd(
-        () -> intakeMotor.setControl(
-            intakeDuty.withOutput(Math.max(-1.0, Math.min(1.0, percent)))
-        ),
-        () -> intakeMotor.setControl(intakeDuty.withOutput(0.0))
-    );
-}
+    public Command runIntake(double percent) {
+        // Runs until the command ends, then stops the intake motor.
+        return this.startEnd(
+            () -> intakeMotor.setControl(
+                intakeDuty.withOutput(Math.max(-1.0, Math.min(1.0, percent)))
+            ),
+            () -> intakeMotor.setControl(intakeDuty.withOutput(0.0))
+        );
+    }
 
 }

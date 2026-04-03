@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.BotchoCheese.Constants.RobotMap;
 
 public class Pivot extends SubsystemBase {
+    // Fixed manual voltage used by the simple up/down pivot commands.
     private static final double PIVOT_VOLTS = 4.0;
     //private static final double PIVOT_TARGET_ROTATIONS = 8.0;
     //private static final double PIVOT_FEEDFORWARD = 9.0;
@@ -35,15 +36,18 @@ public class Pivot extends SubsystemBase {
 
         pivotLeader.getConfigurator().apply(pivotConfig);
         pivotFollower.getConfigurator().apply(pivotConfig);
+        // The follower mirrors the leader with opposite motor alignment.
         pivotFollower.setControl(new Follower(pivotLeader.getDeviceID(), MotorAlignmentValue.Opposed));
     }
 
     public void enableBrakeMode() {
+        // Brake mode resists motion when the pivot is not being driven.
         pivotLeader.setNeutralMode(NeutralModeValue.Brake);
         pivotFollower.setNeutralMode(NeutralModeValue.Brake);
     }
 
     public void disableBrakeMode() {
+        // Coast mode lets the pivot move more freely when disabled.
         pivotLeader.setNeutralMode(NeutralModeValue.Coast);
         pivotFollower.setNeutralMode(NeutralModeValue.Coast);
     }
@@ -57,6 +61,7 @@ public class Pivot extends SubsystemBase {
     }
 
     public Command pivotUp() {
+        // Negative voltage is the direction currently used for upward pivot motion.
         return this.startEnd(
             () -> pivotLeader.setVoltage(-PIVOT_VOLTS),
             () -> pivotLeader.setVoltage(0.0)
@@ -64,6 +69,7 @@ public class Pivot extends SubsystemBase {
     }
 
     public Command pivotDown() {
+        // Positive voltage is the direction currently used for downward pivot motion.
         return this.startEnd(
             () -> pivotLeader.setVoltage(PIVOT_VOLTS),
             () -> pivotLeader.setVoltage(0.0)

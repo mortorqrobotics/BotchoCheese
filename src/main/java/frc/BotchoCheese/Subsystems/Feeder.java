@@ -11,10 +11,10 @@ import frc.BotchoCheese.Constants.RobotMap;
 
 
 public class Feeder extends SubsystemBase {
-    // Feeder motor
+    // Single motor that feeds notes from the conveyor path into the shooter.
     private final TalonFX feeder;
 
-    // Control request object
+    // Phoenix request reused for percent-output commands.
     private final DutyCycleOut feederDuty  = new DutyCycleOut(0);
 
     public Feeder() {
@@ -34,10 +34,11 @@ public class Feeder extends SubsystemBase {
 
 
     public Command runFeeder(double percent) {
-    return this.startEnd(
-        () -> feeder.setControl(feederDuty.withOutput(Math.max(-1.0, Math.min(1.0, percent)))),
-        () -> feeder.setControl(feederDuty.withOutput(0.0))
-    );
-}
+        // Runs until the command ends, then stops the feeder motor.
+        return this.startEnd(
+            () -> feeder.setControl(feederDuty.withOutput(Math.max(-1.0, Math.min(1.0, percent)))),
+            () -> feeder.setControl(feederDuty.withOutput(0.0))
+        );
+    }
 
 }

@@ -85,6 +85,7 @@ public class TunerConstants {
 
     // CAN bus that the devices are located on;
     // All swerve devices must share the same CAN bus
+    // Keep CANivore hoot logs tied to the same debug flag as the rest of the robot.
     public static final CANBus kCANBus = createCanBus();
 
     // Theoretical free speed (m/s) at 12 V applied output;
@@ -300,14 +301,17 @@ public class TunerConstants {
     }
 
     private static String getCanivoreLogPath() {
+        // Prefer a USB stick when present so debug logs do not consume RIO storage.
         Path logDir = Files.isDirectory(USB_LOG_DIR) ? USB_LOG_DIR : LOCAL_LOG_DIR;
         return logDir.resolve("example.hoot").toString();
     }
 
     private static CANBus createCanBus() {
         if (DebugLog.DEBUG) {
+            // Debug mode: enable hoot logging for CAN diagnostics.
             return new CANBus(RobotMap.CANIVORE_CAN_BUS, getCanivoreLogPath());
         } else {
+            // Normal mode: no hoot log file, which keeps match operation clean.
             return new CANBus(RobotMap.CANIVORE_CAN_BUS);
         }
     }

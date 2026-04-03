@@ -129,6 +129,7 @@ public class MoveToHub extends Command {
         }
 
         int fiducialId = (int) LimelightHelpers.getFiducialID(RobotMap.LIMELIGHT_NAME);
+        // Ignore tags that belong to the opposite alliance so we do not drive at the wrong hub.
         if (!isAllianceHubTag(fiducialId)) {
             validTarget = false;
             return;
@@ -147,6 +148,7 @@ public class MoveToHub extends Command {
 
         forwardErrorMeters = forwardToTagMeters - standoffMeters;
 
+        // As the robot gets farther away, add more sideways offset to approach on an arc instead of straight on.
         double desiredLateralOffsetMeters = arcDirection * arcOffsetPerMeter * Math.abs(forwardErrorMeters);
         lateralErrorMeters = leftToTagMeters - desiredLateralOffsetMeters;
 

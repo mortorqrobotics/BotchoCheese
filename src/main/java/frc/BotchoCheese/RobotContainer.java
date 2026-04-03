@@ -56,32 +56,34 @@ public class RobotContainer {
     private static final String AUTO_STATUS_KEY = "Auto/Status";
     private static final String AUTO_START_POSE_SEEDED_KEY = "Auto/StartPoseSeeded";
 
-    // Drive tuning
+    // Driver input deadband and drivetrain speed caps used by the default drive command.
     private static final double DRIVE_DEADBAND = 0.1;
     public static double MaxSpeed = 1.0 * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond);
     public static double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond);
 
-    // Controllers
+    // USB controller ports: driver on 0, operator on 1.
     private static final CommandXboxController JOYSTICK1_CONTROLLER = new CommandXboxController(0);
     private static final CommandXboxController JOYSTICK2_CONTROLLER = new CommandXboxController(1);
 
-    // Drivetrain + sensors
+    // Shared drivetrain instance plus a standalone pigeon handle using the mapped device ID.
     public static final CommandSwerveDrivetrain drivetrain = createDrivetrain();
     public static Pigeon2 gyro = new Pigeon2(RobotMap.PIGEON_ID);
 
-    // Subsystems
+    // Mechanism subsystems used by button bindings and autos.
     public final Shooter shooter = new Shooter();
     public final Feeder feeder = new Feeder();
     public final Intake intake = new Intake();
     public final Indexer indexer = new Indexer();
     public final Pivot pivot = new Pivot();
 
-    // Drive requests
+    // Default driver request is field-centric open-loop drive.
     public static final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
         .withDeadband(MaxSpeed * DRIVE_DEADBAND)
         .withRotationalDeadband(MaxAngularRate * DRIVE_DEADBAND)
         .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
+    // Brake request locks the swerve modules in place while the button is held.
     private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
+    // Robot-centric request used for the D-pad cardinal-direction nudges.
     private final SwerveRequest.RobotCentric forwardStraight = new SwerveRequest.RobotCentric()
         .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
 
@@ -101,6 +103,7 @@ public class RobotContainer {
     private void registerNamedCommands() {
         final double pivotDownSeconds = 1.0; // tune this "X seconds" value
 
+        // These names must match the event markers referenced by PathPlanner autos.
         NamedCommands.registerCommand(
             "Shoot",
             Commands.sequence(
@@ -127,6 +130,7 @@ public class RobotContainer {
     }
 
     private void configureDashboard() {
+        // Publish all autonomous selection/status values once so the keys always exist on the dashboard.
         SmartDashboard.putData(AUTO_CHOOSER_KEY, autoChooser);
         SmartDashboard.putNumber(X_SHOT_BACK_RPS_KEY, 75.0);
         SmartDashboard.putNumber(X_SHOT_FRONT_RPS_KEY, 75.0);
@@ -139,6 +143,7 @@ public class RobotContainer {
     private void configureAutoChooser() {
         List<String> autoNames = getAutoNamesFromDeploy();
 
+        // Always provide a safe no-auto option even if deploy files are missing.
         autoChooser.setDefaultOption(NO_AUTO_SELECTED, NO_AUTO_SELECTED);
 
         if (autoNames.isEmpty()) {
@@ -156,6 +161,7 @@ public class RobotContainer {
     }
 
     private List<String> getAutoNamesFromDeploy() {
+        // PathPlanner autos are deployed under src/main/deploy/pathplanner/autos.
         Path autoFolder = Filesystem.getDeployDirectory().toPath().resolve(PATHPLANNER_AUTO_FOLDER);
         if (!Files.isDirectory(autoFolder)) {
             return List.of();
@@ -184,6 +190,7 @@ public class RobotContainer {
     }
 
     private void configureDriverBindings() {
+        // Left stick commands translation, right stick commands rotation.
         drivetrain.setDefaultCommand(
             drivetrain.applyRequest(() ->
                 drive.withVelocityX(-applyDriveDeadband(JOYSTICK1_CONTROLLER.getLeftY()) * MaxSpeed)
@@ -194,6 +201,7 @@ public class RobotContainer {
 
         JOYSTICK1_CONTROLLER.leftBumper().whileTrue(drivetrain.applyRequest(() -> brake));
 
+        // D-pad drives fixed robot-centric directions for simple alignment moves.
         JOYSTICK1_CONTROLLER.povUp().whileTrue(drivetrain.applyRequest(() ->
             forwardStraight.withVelocityX(0.5).withVelocityY(0))
         );
@@ -207,6 +215,7 @@ public class RobotContainer {
             forwardStraight.withVelocityX(0).withVelocityY(0.5))
         );
 
+        // Reset the field-centric heading reference to the robot's current orientation.
         JOYSTICK1_CONTROLLER.start().onTrue(new InstantCommand(()->drivetrain.seedFieldCentric()));
     }
 
@@ -313,6 +322,7 @@ public class RobotContainer {
             return Commands.none();
         }
         try {
+            // Build the selected PathPlanner auto at the moment autonomous starts.
             Command autoCommand = AutoBuilder.buildAuto(selectedAutoName);
             setAutoStatus("AUTO READY: " + selectedAutoName);
             DebugLog.info("Auto selected: " + selectedAutoName);
@@ -356,6 +366,7 @@ public class RobotContainer {
         }
 
         try {
+            // Use the auto's declared starting pose so odometry matches the selected routine.
             PathPlannerAuto auto = new PathPlannerAuto(selectedAutoName);
             Pose2d bluePose = auto.getStartingPose();
             if (bluePose == null) {
@@ -369,6 +380,7 @@ public class RobotContainer {
                 return false;
             }
 
+            // PathPlanner start poses are stored from the blue-side perspective and flipped when needed.
             Pose2d alliancePose = AutoBuilder.shouldFlip() ? FlippingUtil.flipFieldPose(bluePose) : bluePose;
             drivetrain.resetPose(alliancePose);
             SmartDashboard.putBoolean(AUTO_START_POSE_SEEDED_KEY, true);
@@ -403,6 +415,7 @@ public class RobotContainer {
     }
 
     public static CommandSwerveDrivetrain createDrivetrain() {
+        // These standard deviations configure how much the drivetrain estimator trusts odometry vs vision.
         return new CommandSwerveDrivetrain(
             TunerConstants.DrivetrainConstants, 0,
             VecBuilder.fill(RobotMap.kPositionStdDevX, RobotMap.kPositionStdDevY, Units.degreesToRadians(RobotMap.kPositionStdDevTheta)),

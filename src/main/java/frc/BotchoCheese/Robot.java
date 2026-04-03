@@ -63,6 +63,8 @@ public class Robot extends TimedRobot {
     poseHeadingDegPublisher = poseTable.getDoubleTopic("HeadingDeg").publish();
 
     if (DebugLog.DEBUG) {
+      // Only enable CTRE file logging during focused debugging.
+      // Leaving this off avoids unnecessary writes during practice/matches.
       SignalLogger.setPath("logs");
       SignalLogger.start();
       DebugLog.info("CTRE SignalLogger enabled (debug mode).");

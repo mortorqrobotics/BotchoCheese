@@ -16,6 +16,7 @@ import com.ctre.phoenix6.controls.VelocityVoltage;
 import frc.BotchoCheese.Constants.RobotMap;
 
 public class Shooter extends SubsystemBase {
+    // Closed-loop gains for Phoenix velocity control on the shooter wheels.
     private static final double SHOOTER_P_VALUE = 0.5;
     private static final double SHOOTER_I_VALUE = 0.0;
     private static final double SHOOTER_D_VALUE = 0.0;
@@ -25,13 +26,10 @@ public class Shooter extends SubsystemBase {
     private static final double SHOOTER_ACCELERATION = 160.0;
     private static final double SHOOTER_JERK = 1600.0;
 
-    // Motor controllers
+    // Two back motors share one target; the right back motor follows the left back motor.
     private final TalonFX backLeftShooter;
     private final TalonFX backRightShooter;
     private final TalonFX frontShooter;
-
-    // Control requests (Phoenix 6 uses request objects instead of passing doubles directly)
-
 
     public Shooter() {
         backLeftShooter = new TalonFX(RobotMap.BACK_LEFT_SHOOTER_MOTOR_ID);
@@ -40,7 +38,7 @@ public class Shooter extends SubsystemBase {
         // Apply basic configuration
         TalonFXConfiguration config = new TalonFXConfiguration();
 
-        // PID Shooter Values
+        // Velocity gains are applied to all shooter motors.
 
         Slot0Configs shooterSlot0 = new Slot0Configs();
         shooterSlot0.kS = SHOOTER_S_VALUE;
@@ -75,25 +73,27 @@ public class Shooter extends SubsystemBase {
     }
 
 
-    // Command to shoot at a specific RPS (revolutions per second)
-private final VelocityVoltage shooterVelocityRequest = new VelocityVoltage(0);
+    private final VelocityVoltage shooterVelocityRequest = new VelocityVoltage(0);
 
-public Command shootRps(double... rpsValues) {
-    return this.runEnd(
-        () -> {
-            double backRps = rpsValues.length > 0 ? rpsValues[0] : 75.0;
-            double frontRps = rpsValues.length > 1 ? rpsValues[1] : backRps;
-            setShooterSpeeds(backRps, frontRps);
-        },
-        () -> {
-            backLeftShooter.stopMotor();
-            frontShooter.stopMotor();
-        }
-    );
-}
+    public Command shootRps(double... rpsValues) {
+        // One argument drives both back and front to the same RPS.
+        // Two arguments let autos/operator code split back and front wheel targets.
+        return this.runEnd(
+            () -> {
+                double backRps = rpsValues.length > 0 ? rpsValues[0] : 75.0;
+                double frontRps = rpsValues.length > 1 ? rpsValues[1] : backRps;
+                setShooterSpeeds(backRps, frontRps);
+            },
+            () -> {
+                backLeftShooter.stopMotor();
+                frontShooter.stopMotor();
+            }
+        );
+    }
 
-private void setShooterSpeeds(double backShooterTargetRps, double frontShooterTargetRps) {
-    backLeftShooter.setControl(shooterVelocityRequest.withVelocity(backShooterTargetRps));
-    frontShooter.setControl(shooterVelocityRequest.withVelocity(frontShooterTargetRps));
-}
+    private void setShooterSpeeds(double backShooterTargetRps, double frontShooterTargetRps) {
+        // backRightShooter follows backLeftShooter, so only two velocity commands are needed here.
+        backLeftShooter.setControl(shooterVelocityRequest.withVelocity(backShooterTargetRps));
+        frontShooter.setControl(shooterVelocityRequest.withVelocity(frontShooterTargetRps));
+    }
 }
