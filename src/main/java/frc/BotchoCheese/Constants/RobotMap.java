@@ -55,7 +55,7 @@ public class RobotMap {
     // Feeder motor controller CAN ID.
     public static final int FEEDER_MOTOR_ID = 23;
 
-    // CANivore bus name and CANdle device ID for LED control.
+    // CANivore bus name for drivetrain hardware and CANdle device ID.
     public static final String CANIVORE_CAN_BUS = "1515Canivore";
     public static final int CANDLE_CAN_ID = 40;
 }
