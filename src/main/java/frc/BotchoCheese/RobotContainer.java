@@ -83,7 +83,10 @@ public class RobotContainer {
     // Brake request locks the swerve modules in place while the button is held.
     private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
     // Robot-centric request used for the D-pad cardinal-direction nudges.
-    private final SwerveRequest.RobotCentric forwardStraight = new SwerveRequest.RobotCentric()
+    private final SwerveRequest.RobotCentric robotCentricNudge = new SwerveRequest.RobotCentric()
+        .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
+    // Separate request used for slow in-place rotation on driver triggers.
+    private final SwerveRequest.RobotCentric robotCentricRotate = new SwerveRequest.RobotCentric()
         .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
 
     // Auto selection
@@ -169,22 +172,22 @@ public class RobotContainer {
 
         // D-pad drives fixed robot-centric directions for simple alignment moves.
         JOYSTICK1_CONTROLLER.povUp().whileTrue(drivetrain.applyRequest(() ->
-            forwardStraight.withVelocityX(-0.5).withVelocityY(0))
+            robotCentricNudge.withVelocityX(-0.5).withVelocityY(0).withRotationalRate(0))
         );
         JOYSTICK1_CONTROLLER.povDown().whileTrue(drivetrain.applyRequest(() ->
-            forwardStraight.withVelocityX(0.5).withVelocityY(0))
+            robotCentricNudge.withVelocityX(0.5).withVelocityY(0).withRotationalRate(0))
         );
         JOYSTICK1_CONTROLLER.povLeft().whileTrue(drivetrain.applyRequest(() ->
-            forwardStraight.withVelocityX(0).withVelocityY(-0.5))
+            robotCentricNudge.withVelocityX(0).withVelocityY(-0.5).withRotationalRate(0))
         );
         JOYSTICK1_CONTROLLER.povRight().whileTrue(drivetrain.applyRequest(() ->
-            forwardStraight.withVelocityX(0).withVelocityY(0.5))
+            robotCentricNudge.withVelocityX(0).withVelocityY(0.5).withRotationalRate(0))
         );
         JOYSTICK1_CONTROLLER.leftTrigger().whileTrue(drivetrain.applyRequest(() ->
-            forwardStraight.withVelocityX(0).withVelocityY(0).withRotationalRate(-DRIVER_SLOW_ROTATE_RATE))
+            robotCentricRotate.withVelocityX(0).withVelocityY(0).withRotationalRate(-DRIVER_SLOW_ROTATE_RATE))
         );
         JOYSTICK1_CONTROLLER.rightTrigger().whileTrue(drivetrain.applyRequest(() ->
-            forwardStraight.withVelocityX(0).withVelocityY(0).withRotationalRate(DRIVER_SLOW_ROTATE_RATE))
+            robotCentricRotate.withVelocityX(0).withVelocityY(0).withRotationalRate(DRIVER_SLOW_ROTATE_RATE))
         );
 
         // Reset the field-centric heading reference to the robot's current orientation.
