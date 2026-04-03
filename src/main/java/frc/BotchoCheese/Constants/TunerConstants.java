@@ -28,10 +28,10 @@ public class TunerConstants {
 
     // Swerve calibration offsets (Option 1):
     // Paste values from SmartDashboard key "SwerveCal/PasteBlock" here.
-    private static final Angle kFrontLeftEncoderOffset = Rotations.of(0.08056640625);
-    private static final Angle kFrontRightEncoderOffset = Rotations.of(0.010498046875);
-    private static final Angle kBackLeftEncoderOffset = Rotations.of(0.208251953125);
-    private static final Angle kBackRightEncoderOffset = Rotations.of(0.341796875);
+    private static final Angle kFrontLeftEncoderOffset = Rotations.of(0.0);
+    private static final Angle kFrontRightEncoderOffset = Rotations.of(0.0);
+    private static final Angle kBackLeftEncoderOffset = Rotations.of(0.0);
+    private static final Angle kBackRightEncoderOffset = Rotations.of(0.0);
 
     // Both sets of gains need to be tuned to your individual robot.
 
@@ -61,7 +61,7 @@ public class TunerConstants {
 
     // The remote sensor feedback type to use for the steer motors;
     // When not Pro-licensed, Fused*/Sync* automatically fall back to Remote*
-    private static final SteerFeedbackType kSteerFeedbackType = SteerFeedbackType.FusedCANcoder;
+    private static final SteerFeedbackType kSteerFeedbackType = SteerFeedbackType.RemoteCANcoder;
 
     // The stator current at which the wheels start to slip;
     // This needs to be tuned to your individual robot
