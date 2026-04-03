@@ -54,6 +54,10 @@ public class RobotContainer {
     public static double MaxSpeed = 1.0 * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond);
     public static double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond);
     private static final double DRIVER_SLOW_ROTATE_RATE = MaxAngularRate * DRIVER_SLOW_ROTATE_SCALE;
+    // Shared duty cycles for all shoot flows (buttons + named commands).
+    private static final double SHOOT_INTAKE_DUTY = 0.9;
+    private static final double SHOOT_INDEXER_DUTY = 0.85;
+    private static final double SHOOT_FEEDER_DUTY = 0.85;
 
     // USB controller ports: driver on 0, operator on 1.
     private static final CommandXboxController JOYSTICK1_CONTROLLER = new CommandXboxController(0);
@@ -104,9 +108,9 @@ public class RobotContainer {
                 shooter.shootRps(75.0).withTimeout(0.5),
                 Commands.parallel(
                     shooter.shootRps(75.0),
-                    intake.runIntake(0.75),
-                    indexer.runIndexer(0.85),
-                    feeder.runFeeder(0.75)
+                    intake.runIntake(SHOOT_INTAKE_DUTY),
+                    indexer.runIndexer(SHOOT_INDEXER_DUTY),
+                    feeder.runFeeder(SHOOT_FEEDER_DUTY)
                 )
             ).withTimeout(10.0)
         );
@@ -186,11 +190,6 @@ public class RobotContainer {
     }
 
     private void configureOperatorBindings() {
-        // Shared duty cycles for all shoot button bindings.
-        final double shootIntakeDuty = 0.9;
-        final double shootIndexerDuty = 0.85;
-        final double shootFeederDuty = 0.85;
-
         // Pivot controls
         JOYSTICK2_CONTROLLER.povUp().whileTrue(pivot.pivotUp());
         JOYSTICK2_CONTROLLER.povDown().whileTrue(pivot.pivotDown());
@@ -220,9 +219,9 @@ public class RobotContainer {
                 shooter.shootRps(120.0).withTimeout(0.5),
                 Commands.parallel(
                     shooter.shootRps(120.0),
-                    intake.runIntake(shootIntakeDuty),
-                    indexer.runIndexer(shootIndexerDuty),
-                    feeder.runFeeder(shootFeederDuty)
+                    intake.runIntake(SHOOT_INTAKE_DUTY),
+                    indexer.runIndexer(SHOOT_INDEXER_DUTY),
+                    feeder.runFeeder(SHOOT_FEEDER_DUTY)
                 )
             )
         );
@@ -233,9 +232,9 @@ public class RobotContainer {
                 shooter.shootRps(90.0).withTimeout(0.5),
                 Commands.parallel(
                     shooter.shootRps(90.0),
-                    intake.runIntake(shootIntakeDuty),
-                    indexer.runIndexer(shootIndexerDuty),
-                    feeder.runFeeder(shootFeederDuty)
+                    intake.runIntake(SHOOT_INTAKE_DUTY),
+                    indexer.runIndexer(SHOOT_INDEXER_DUTY),
+                    feeder.runFeeder(SHOOT_FEEDER_DUTY)
                 )
             )
         );
@@ -246,9 +245,9 @@ public class RobotContainer {
                 shooter.shootRps(getXShotBackRps(), getXShotFrontRps()).withTimeout(0.5),
                 Commands.parallel(
                     shooter.shootRps(getXShotBackRps(), getXShotFrontRps()),
-                    intake.runIntake(shootIntakeDuty),
-                    indexer.runIndexer(shootIndexerDuty),
-                    feeder.runFeeder(shootFeederDuty)
+                    intake.runIntake(SHOOT_INTAKE_DUTY),
+                    indexer.runIndexer(SHOOT_INDEXER_DUTY),
+                    feeder.runFeeder(SHOOT_FEEDER_DUTY)
                 )
             )
         );
@@ -259,9 +258,9 @@ public class RobotContainer {
                 shooter.shootRps(120.0, 20).withTimeout(0.5),
                 Commands.parallel(
                     shooter.shootRps(120.0, 20),
-                    intake.runIntake(shootIntakeDuty),
-                    indexer.runIndexer(shootIndexerDuty),
-                    feeder.runFeeder(shootFeederDuty)
+                    intake.runIntake(SHOOT_INTAKE_DUTY),
+                    indexer.runIndexer(SHOOT_INDEXER_DUTY),
+                    feeder.runFeeder(SHOOT_FEEDER_DUTY)
                 )
             )
         );
@@ -272,9 +271,9 @@ public class RobotContainer {
                 shooter.shootRps(20, 120.0).withTimeout(0.5),
                 Commands.parallel(
                     shooter.shootRps(20, 120.0),
-                    intake.runIntake(shootIntakeDuty),
-                    indexer.runIndexer(shootIndexerDuty),
-                    feeder.runFeeder(shootFeederDuty)
+                    intake.runIntake(SHOOT_INTAKE_DUTY),
+                    indexer.runIndexer(SHOOT_INDEXER_DUTY),
+                    feeder.runFeeder(SHOOT_FEEDER_DUTY)
                 )
             )
         );
