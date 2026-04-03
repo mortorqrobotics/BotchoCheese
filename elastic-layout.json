@@ -1,0 +1,306 @@
+{
+  "version": 1.0,
+  "grid_size": 128,
+  "tabs": [
+    {
+      "name": "Competitoin View",
+      "grid_layout": {
+        "layouts": [
+          {
+            "title": "Auto",
+            "x": 512.0,
+            "y": 0.0,
+            "width": 256.0,
+            "height": 512.0,
+            "type": "List Layout",
+            "properties": {
+              "label_position": "TOP"
+            },
+            "children": [
+              {
+                "title": "SelectedName",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "/SmartDashboard/Auto/SelectedName",
+                  "period": 0.06,
+                  "data_type": "string",
+                  "show_submit_button": true
+                }
+              },
+              {
+                "title": "SelectedValid",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Boolean Box",
+                "properties": {
+                  "topic": "/SmartDashboard/Auto/SelectedValid",
+                  "period": 0.06,
+                  "data_type": "boolean",
+                  "true_color": 4283215696,
+                  "false_color": 4294198070,
+                  "true_icon": "None",
+                  "false_icon": "None"
+                }
+              },
+              {
+                "title": "StartPoseSeeded",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Boolean Box",
+                "properties": {
+                  "topic": "/SmartDashboard/Auto/StartPoseSeeded",
+                  "period": 0.06,
+                  "data_type": "boolean",
+                  "true_color": 4283215696,
+                  "false_color": 4294198070,
+                  "true_icon": "None",
+                  "false_icon": "None"
+                }
+              },
+              {
+                "title": "Status",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "/SmartDashboard/Auto/Status",
+                  "period": 0.06,
+                  "data_type": "string",
+                  "show_submit_button": true
+                }
+              }
+            ]
+          }
+        ],
+        "containers": [
+          {
+            "title": "Auto Mode",
+            "x": 768.0,
+            "y": 0.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "ComboBox Chooser",
+            "properties": {
+              "topic": "/SmartDashboard/Auto Mode",
+              "period": 0.06,
+              "sort_options": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "Swerve Alignment",
+      "grid_layout": {
+        "layouts": [
+          {
+            "title": "Swerve",
+            "x": 1024.0,
+            "y": 0.0,
+            "width": 256.0,
+            "height": 256.0,
+            "type": "List Layout",
+            "properties": {
+              "label_position": "TOP"
+            },
+            "children": [
+              {
+                "title": "NeutralModes",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "/SmartDashboard/Swerve/NeutralModes",
+                  "period": 0.06,
+                  "data_type": "string",
+                  "show_submit_button": true
+                }
+              }
+            ]
+          },
+          {
+            "title": "SwerveCal",
+            "x": 640.0,
+            "y": 0.0,
+            "width": 384.0,
+            "height": 384.0,
+            "type": "List Layout",
+            "properties": {
+              "label_position": "TOP"
+            },
+            "children": [
+              {
+                "title": "BackLeft OffsetToPaste (rot)",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "/SmartDashboard/SwerveCal/BackLeft OffsetToPaste (rot)",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "show_submit_button": true
+                }
+              },
+              {
+                "title": "BackRight OffsetToPaste (rot)",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "/SmartDashboard/SwerveCal/BackRight OffsetToPaste (rot)",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "show_submit_button": true
+                }
+              },
+              {
+                "title": "FrontLeft OffsetToPaste (rot)",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "/SmartDashboard/SwerveCal/FrontLeft OffsetToPaste (rot)",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "show_submit_button": true
+                }
+              },
+              {
+                "title": "FrontRight OffsetToPaste (rot)",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "/SmartDashboard/SwerveCal/FrontRight OffsetToPaste (rot)",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "show_submit_button": true
+                }
+              },
+              {
+                "title": "Instruction",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "/SmartDashboard/SwerveCal/Instruction",
+                  "period": 0.06,
+                  "data_type": "string",
+                  "show_submit_button": true
+                }
+              },
+              {
+                "title": "PasteBlock",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "/SmartDashboard/SwerveCal/PasteBlock",
+                  "period": 0.06,
+                  "data_type": "string",
+                  "show_submit_button": true
+                }
+              },
+              {
+                "title": "PasteLine BackLeft",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "/SmartDashboard/SwerveCal/PasteLine BackLeft",
+                  "period": 0.06,
+                  "data_type": "string",
+                  "show_submit_button": true
+                }
+              },
+              {
+                "title": "PasteLine FrontLeft",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "/SmartDashboard/SwerveCal/PasteLine FrontLeft",
+                  "period": 0.06,
+                  "data_type": "string",
+                  "show_submit_button": true
+                }
+              },
+              {
+                "title": "PasteLine FrontRight",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "/SmartDashboard/SwerveCal/PasteLine FrontRight",
+                  "period": 0.06,
+                  "data_type": "string",
+                  "show_submit_button": true
+                }
+              },
+              {
+                "title": "PasteLine BackRight",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "/SmartDashboard/SwerveCal/PasteLine BackRight",
+                  "period": 0.06,
+                  "data_type": "string",
+                  "show_submit_button": true
+                }
+              }
+            ]
+          }
+        ],
+        "containers": [
+          {
+            "title": "NeutralModes",
+            "x": 384.0,
+            "y": 256.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/SmartDashboard/Swerve/NeutralModes",
+              "period": 0.06,
+              "data_type": "string",
+              "show_submit_button": true
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
