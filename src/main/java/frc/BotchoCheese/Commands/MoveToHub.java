@@ -139,6 +139,7 @@ public class MoveToHub extends Command {
             validTarget = false;
             return;
         }
+        var tagPose = tagPoseOpt.get();
 
         var targetPoseRobotSpace = LimelightHelpers.getTargetPose3d_RobotSpace(RobotMap.LIMELIGHT_NAME);
         double forwardToTagMeters = targetPoseRobotSpace.getX();
@@ -150,7 +151,7 @@ public class MoveToHub extends Command {
         lateralErrorMeters = leftToTagMeters - desiredLateralOffsetMeters;
 
         double targetAngle =
-            tagPoseOpt.get().getRotation().toRotation2d().getRadians() + Math.PI + ANGLE_OFFSET_RADIANS;
+            tagPose.getRotation().toRotation2d().getRadians() + Math.PI + ANGLE_OFFSET_RADIANS;
         angleController.setSetpoint(targetAngle);
 
         double currentAngle = drivetrainSubsystem.getState().Pose.getRotation().getRadians();
@@ -162,8 +163,9 @@ public class MoveToHub extends Command {
         if (alliance.isEmpty()) {
             return false;
         }
+        var allianceColor = alliance.get();
 
-        return alliance.get() == DriverStation.Alliance.Red
+        return allianceColor == DriverStation.Alliance.Red
             ? RED_HUB_TAG_IDS.contains(fiducialId)
             : BLUE_HUB_TAG_IDS.contains(fiducialId);
     }
