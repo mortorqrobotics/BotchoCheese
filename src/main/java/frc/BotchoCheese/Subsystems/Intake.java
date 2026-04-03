@@ -32,12 +32,8 @@ public class Intake extends SubsystemBase {
     public Command runIntake(double percent) {
         // Runs until the command ends, then stops the intake motor.
         return this.startEnd(
-            () -> intakeMotor.setControl(intakeDuty.withOutput(clamp(percent))),
+            () -> intakeMotor.setControl(intakeDuty.withOutput(Math.max(-1.0, Math.min(1.0, percent)))),
             () -> intakeMotor.setControl(intakeDuty.withOutput(0.0))
         );
-    }
-
-    private static double clamp(double percent) {
-        return Math.max(-1.0, Math.min(1.0, percent));
     }
 }
