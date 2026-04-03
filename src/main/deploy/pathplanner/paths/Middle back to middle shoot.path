@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 2.233,
-        "y": 4.019
+        "x": 0.790285951967593,
+        "y": 5.980155454282408
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.9187619839891978,
-        "y": 4.672718484760803
+        "x": 1.2711906346450622,
+        "y": 5.326436969521605
       },
       "isLocked": false,
-      "linkedName": "Middle shoot"
+      "linkedName": null
     },
     {
       "anchor": {
-        "x": 1.290285951967593,
-        "y": 5.980155454282408
+        "x": 2.233,
+        "y": 4.019
       },
       "prevControl": {
-        "x": 1.6045239679783956,
-        "y": 5.326436969521605
+        "x": 1.752095317322531,
+        "y": 4.672718484760803
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "Alliance balls"
+      "linkedName": "Middle shoot"
     }
   ],
   "rotationTargets": [],
@@ -33,7 +33,7 @@
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 1.75,
+    "maxVelocity": 1.0,
     "maxAcceleration": 1.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,

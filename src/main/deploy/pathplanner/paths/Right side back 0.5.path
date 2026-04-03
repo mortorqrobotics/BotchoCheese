@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 2.233,
-        "y": 4.019
+        "x": 3.2414555691958338,
+        "y": 2.0635961805555585
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.9187619839891978,
-        "y": 4.672718484760803
+        "x": 2.9914555691958338,
+        "y": 2.0635961805555585
       },
       "isLocked": false,
-      "linkedName": "Middle shoot"
+      "linkedName": "Right shoot"
     },
     {
       "anchor": {
-        "x": 1.290285951967593,
-        "y": 5.980155454282408
+        "x": 2.7414555691958338,
+        "y": 2.0635961805555585
       },
       "prevControl": {
-        "x": 1.6045239679783956,
-        "y": 5.326436969521605
+        "x": 2.9914555691958338,
+        "y": 2.0635961805555585
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "Alliance balls"
+      "linkedName": null
     }
   ],
   "rotationTargets": [],
@@ -42,13 +42,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 180.0
+    "rotation": -125.43719300000001
   },
   "reversed": false,
   "folder": null,
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 180.0
+    "rotation": -125.43719300000001
   },
   "useDefaultConstraints": true
 }
