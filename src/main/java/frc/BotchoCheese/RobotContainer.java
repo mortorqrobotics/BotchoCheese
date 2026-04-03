@@ -257,9 +257,9 @@ public class RobotContainer {
         // Lob shot (back, front)
         JOYSTICK2_CONTROLLER.y().toggleOnTrue(
             Commands.sequence(
-                shooter.shootRps(120.0, 20).withTimeout(SHOOTER_SPINUP_TIMEOUT_SECONDS),
+                shooter.shootRps(120.0, 40).withTimeout(SHOOTER_SPINUP_TIMEOUT_SECONDS),
                 Commands.parallel(
-                    shooter.shootRps(120.0, 20),
+                    shooter.shootRps(120.0, 40),
                     intake.runIntake(SHOOT_INTAKE_DUTY),
                     indexer.runIndexer(SHOOT_INDEXER_DUTY),
                     feeder.runFeeder(SHOOT_FEEDER_DUTY)
@@ -270,9 +270,9 @@ public class RobotContainer {
         // Line-drive shot (back, front)
         JOYSTICK2_CONTROLLER.a().toggleOnTrue(
             Commands.sequence(
-                shooter.shootRps(20, 120.0).withTimeout(SHOOTER_SPINUP_TIMEOUT_SECONDS),
+                shooter.shootRps(40, 120.0).withTimeout(SHOOTER_SPINUP_TIMEOUT_SECONDS),
                 Commands.parallel(
-                    shooter.shootRps(20, 120.0),
+                    shooter.shootRps(40, 120.0),
                     intake.runIntake(SHOOT_INTAKE_DUTY),
                     indexer.runIndexer(SHOOT_INDEXER_DUTY),
                     feeder.runFeeder(SHOOT_FEEDER_DUTY)
