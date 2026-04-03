@@ -311,6 +311,7 @@ public class RobotContainer {
 
     public boolean seedPoseFromSelectedAuto() {
         Command selectedAuto = autoChooser.getSelected();
+        String selectedAutoName = getSelectedAutoName(selectedAuto);
         if (!isAutoSelected(selectedAuto)) {
             SmartDashboard.putBoolean(AUTO_START_POSE_SEEDED_KEY, false);
             setAutoStatus("NO AUTO SELECTED");
@@ -325,7 +326,6 @@ public class RobotContainer {
         try {
             // Use the auto's declared starting pose so odometry matches the selected routine.
             PathPlannerAuto auto = (PathPlannerAuto) selectedAuto;
-            String selectedAutoName = getSelectedAutoName(selectedAuto);
             Pose2d bluePose = auto.getStartingPose();
             if (bluePose == null) {
                 SmartDashboard.putBoolean(AUTO_START_POSE_SEEDED_KEY, false);
