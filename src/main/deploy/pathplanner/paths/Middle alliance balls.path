@@ -3,13 +3,13 @@
     "waypoints":  [
                       {
                           "anchor":  {
-                                         "x":  2.133,
+                                         "x":  2.333,
                                          "y":  4.019
                                      },
                           "prevControl":  null,
                           "nextControl":  {
                                               "y":  4.6727184847608028,
-                                              "x":  1.852095317322531
+                                              "x":  1.9854286506558645
                                           },
                           "isLocked":  false,
                           "linkedName":  "Middle shoot"
@@ -21,7 +21,7 @@
                                      },
                           "prevControl":  {
                                               "y":  5.3264369695216054,
-                                              "x":  1.5711906346450619
+                                              "x":  1.6378573013117288
                                           },
                           "nextControl":  null,
                           "isLocked":  false,
