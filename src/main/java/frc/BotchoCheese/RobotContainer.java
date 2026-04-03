@@ -8,13 +8,6 @@ import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.Comparator;
-import java.util.List;
-import java.util.stream.Collectors;
-
 import com.ctre.phoenix6.hardware.Pigeon2;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
@@ -27,7 +20,6 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -49,7 +41,6 @@ public class RobotContainer {
     private static final String NO_AUTO_SELECTED = "Select Auto";
     private static final String AUTO_CHOOSER_KEY = "Auto Chooser";
     private static final String LEGACY_AUTO_CHOOSER_KEY = "Auto Mode";
-    private static final String PATHPLANNER_AUTO_FOLDER = "pathplanner/autos";
     private static final String X_SHOT_BACK_RPS_KEY = "Shots/X Back RPS";
     private static final String X_SHOT_FRONT_RPS_KEY = "Shots/X Front RPS";
     private static final String AUTO_SELECTED_NAME_KEY = "Auto/SelectedName";
@@ -89,12 +80,12 @@ public class RobotContainer {
         .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
 
     // Auto selection
-    private final SendableChooser<String> autoChooser;
+    private final SendableChooser<Command> autoChooser;
 
     public RobotContainer() {
         registerNamedCommands();
 
-        autoChooser = new SendableChooser<>();
+        autoChooser = AutoBuilder.buildAutoChooser();
         configureAutoChooser();
         configureDashboard();
 
@@ -144,43 +135,7 @@ public class RobotContainer {
     }
 
     private void configureAutoChooser() {
-        List<String> autoNames = getAutoNamesFromDeploy();
-
-        // Always provide a safe no-auto option even if deploy files are missing.
-        autoChooser.setDefaultOption(NO_AUTO_SELECTED, NO_AUTO_SELECTED);
-
-        if (autoNames.isEmpty()) {
-            DebugLog.warnThrottled(
-                "autos.none_found",
-                "No PathPlanner autos found in deploy/pathplanner/autos",
-                10.0
-            );
-            return;
-        }
-
-        for (String autoName : autoNames) {
-            autoChooser.addOption(autoName, autoName);
-        }
-    }
-
-    private List<String> getAutoNamesFromDeploy() {
-        // PathPlanner autos are deployed under src/main/deploy/pathplanner/autos.
-        Path autoFolder = Filesystem.getDeployDirectory().toPath().resolve(PATHPLANNER_AUTO_FOLDER);
-        if (!Files.isDirectory(autoFolder)) {
-            return List.of();
-        }
-
-        try (var files = Files.list(autoFolder)) {
-            List<String> autoNames = files
-                .filter(path -> path.toString().endsWith(".auto"))
-                .map(path -> path.getFileName().toString().replaceFirst("\\.auto$", ""))
-                .sorted(Comparator.naturalOrder())
-                .collect(Collectors.toList());
-            return autoNames;
-        } catch (IOException e) {
-            DebugLog.error("Failed to read PathPlanner autos: " + e.getMessage(), e.getStackTrace());
-            return List.of();
-        }
+        // Use PathPlanner's built-in chooser so dashboards see the standard auto chooser shape.
     }
 
     private static double applyDriveDeadband(double value) {
@@ -314,8 +269,8 @@ public class RobotContainer {
     }
 
     public Command getAutonomousCommand() {
-        String selectedAutoName = autoChooser.getSelected();
-        if (!isAutoSelected(selectedAutoName)) {
+        Command selectedAuto = autoChooser.getSelected();
+        if (!isAutoSelected(selectedAuto)) {
             setAutoStatus("NO AUTO SELECTED");
             DebugLog.warnThrottled(
                 "auto.none_selected",
@@ -325,15 +280,14 @@ public class RobotContainer {
             return Commands.none();
         }
         try {
-            // Build the selected PathPlanner auto at the moment autonomous starts.
-            Command autoCommand = AutoBuilder.buildAuto(selectedAutoName);
+            String selectedAutoName = getSelectedAutoName(selectedAuto);
             setAutoStatus("AUTO READY: " + selectedAutoName);
             DebugLog.info("Auto selected: " + selectedAutoName);
-            return autoCommand;
+            return selectedAuto;
         } catch (Exception ex) {
-            setAutoStatus("AUTO BUILD FAILED: " + selectedAutoName);
+            setAutoStatus("AUTO BUILD FAILED");
             DebugLog.error(
-                "Failed to build autonomous command: " + selectedAutoName,
+                "Failed to get selected autonomous command.",
                 ex.getStackTrace()
             );
             return Commands.none();
@@ -341,12 +295,12 @@ public class RobotContainer {
     }
 
     public void updateAutoSelectionDashboard() {
-        String selectedAutoName = autoChooser.getSelected();
-        boolean autoSelected = isAutoSelected(selectedAutoName);
+        Command selectedAuto = autoChooser.getSelected();
+        boolean autoSelected = isAutoSelected(selectedAuto);
 
         SmartDashboard.putString(
             AUTO_SELECTED_NAME_KEY,
-            autoSelected ? selectedAutoName : NO_AUTO_SELECTED
+            autoSelected ? getSelectedAutoName(selectedAuto) : NO_AUTO_SELECTED
         );
         SmartDashboard.putBoolean(AUTO_SELECTED_VALID_KEY, autoSelected);
         if (!autoSelected) {
@@ -356,8 +310,8 @@ public class RobotContainer {
     }
 
     public boolean seedPoseFromSelectedAuto() {
-        String selectedAutoName = autoChooser.getSelected();
-        if (!isAutoSelected(selectedAutoName)) {
+        Command selectedAuto = autoChooser.getSelected();
+        if (!isAutoSelected(selectedAuto)) {
             SmartDashboard.putBoolean(AUTO_START_POSE_SEEDED_KEY, false);
             setAutoStatus("NO AUTO SELECTED");
             DebugLog.warnThrottled(
@@ -370,7 +324,8 @@ public class RobotContainer {
 
         try {
             // Use the auto's declared starting pose so odometry matches the selected routine.
-            PathPlannerAuto auto = new PathPlannerAuto(selectedAutoName);
+            PathPlannerAuto auto = (PathPlannerAuto) selectedAuto;
+            String selectedAutoName = getSelectedAutoName(selectedAuto);
             Pose2d bluePose = auto.getStartingPose();
             if (bluePose == null) {
                 SmartDashboard.putBoolean(AUTO_START_POSE_SEEDED_KEY, false);
@@ -401,8 +356,12 @@ public class RobotContainer {
         }
     }
 
-    private boolean isAutoSelected(String selectedAutoName) {
-        return selectedAutoName != null && !selectedAutoName.equals(NO_AUTO_SELECTED);
+    private boolean isAutoSelected(Command selectedAuto) {
+        return selectedAuto instanceof PathPlannerAuto;
+    }
+
+    private String getSelectedAutoName(Command selectedAuto) {
+        return selectedAuto != null ? selectedAuto.getName() : NO_AUTO_SELECTED;
     }
 
     private void setAutoStatus(String status) {
