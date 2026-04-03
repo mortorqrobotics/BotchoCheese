@@ -115,18 +115,34 @@ public class Robot extends TimedRobot {
     }
     lastSwerveOffsetPublishSeconds = now;
 
+    // Option 1 calibration flow (code-side offsets):
+    // Keep CANcoder magnet offsets at zero and copy these values directly into
+    // TunerConstants k*EncoderOffset as Rotations.of(<value>).
+    double frontLeftAbsRot = RobotContainer.drivetrain.getModule(0).getEncoder().getAbsolutePosition().refresh().getValueAsDouble();
+    double frontRightAbsRot = RobotContainer.drivetrain.getModule(1).getEncoder().getAbsolutePosition().refresh().getValueAsDouble();
+    double backLeftAbsRot = RobotContainer.drivetrain.getModule(2).getEncoder().getAbsolutePosition().refresh().getValueAsDouble();
+    double backRightAbsRot = RobotContainer.drivetrain.getModule(3).getEncoder().getAbsolutePosition().refresh().getValueAsDouble();
+
     SmartDashboard.putNumber(
         "Swerve/FrontLeft Raw Abs (rot)",
-        RobotContainer.drivetrain.getModule(0).getEncoder().getAbsolutePosition().getValueAsDouble());
+        frontLeftAbsRot);
     SmartDashboard.putNumber(
         "Swerve/FrontRight Raw Abs (rot)",
-        RobotContainer.drivetrain.getModule(1).getEncoder().getAbsolutePosition().getValueAsDouble());
+        frontRightAbsRot);
     SmartDashboard.putNumber(
         "Swerve/BackLeft Raw Abs (rot)",
-        RobotContainer.drivetrain.getModule(2).getEncoder().getAbsolutePosition().getValueAsDouble());
+        backLeftAbsRot);
     SmartDashboard.putNumber(
         "Swerve/BackRight Raw Abs (rot)",
-        RobotContainer.drivetrain.getModule(3).getEncoder().getAbsolutePosition().getValueAsDouble());
+        backRightAbsRot);
+
+    SmartDashboard.putNumber("SwerveCal/FrontLeft OffsetToPaste (rot)", frontLeftAbsRot);
+    SmartDashboard.putNumber("SwerveCal/FrontRight OffsetToPaste (rot)", frontRightAbsRot);
+    SmartDashboard.putNumber("SwerveCal/BackLeft OffsetToPaste (rot)", backLeftAbsRot);
+    SmartDashboard.putNumber("SwerveCal/BackRight OffsetToPaste (rot)", backRightAbsRot);
+    SmartDashboard.putString(
+        "SwerveCal/Instruction",
+        "Point wheels forward, then copy SwerveCal/* OffsetToPaste (rot) into TunerConstants k*EncoderOffset");
   }
 
   private void publishPoseData() {
