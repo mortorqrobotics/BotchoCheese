@@ -55,16 +55,16 @@ public class RobotContainer {
     public static double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond);
     private static final double DRIVER_SLOW_ROTATE_RATE = MaxAngularRate * DRIVER_SLOW_ROTATE_SCALE;
     // Shared duty cycles for all shoot flows (buttons + named commands).
-    private static final double SHOOT_INTAKE_DUTY = 0.7;
+    private static final double SHOOT_INTAKE_DUTY = 0.6;
     private static final double SHOOT_INDEXER_DUTY = 0.5;
     private static final double SHOOT_FEEDER_DUTY = 0.7;
     // Brownout mitigation for intake-assist/reverse flows: keep intake stronger than feeder/indexer.
-    private static final double INTAKE_ASSIST_INTAKE_DUTY = 0.95;
-    private static final double INTAKE_ASSIST_INDEXER_DUTY = -0.2;
-    private static final double INTAKE_ASSIST_FEEDER_DUTY = -0.2;
-    private static final double REVERSE_INTAKE_DUTY = -0.7;
-    private static final double REVERSE_INDEXER_DUTY = -0.6;
-    private static final double REVERSE_FEEDER_DUTY = -0.2;
+    private static final double INTAKE_ASSIST_INTAKE_DUTY = 0.75;
+    private static final double INTAKE_ASSIST_INDEXER_DUTY = -0.1;
+    private static final double INTAKE_ASSIST_FEEDER_DUTY = -0.1;
+    private static final double REVERSE_INTAKE_DUTY = -0.6;
+    private static final double REVERSE_INDEXER_DUTY = -0.5;
+    private static final double REVERSE_FEEDER_DUTY = -0.1;
     private static final double SHOOTER_SPINUP_TIMEOUT_SECONDS = 0.8;
 
     // USB controller ports: driver on 0, operator on 1.
