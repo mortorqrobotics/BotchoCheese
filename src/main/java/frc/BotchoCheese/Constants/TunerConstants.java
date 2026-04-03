@@ -26,6 +26,13 @@ public class TunerConstants {
     private static final Path USB_LOG_DIR = Path.of("/U/logs");
     private static final Path LOCAL_LOG_DIR = Path.of("./logs");
 
+    // Swerve calibration offsets (Option 1):
+    // Paste values from SmartDashboard key "SwerveCal/PasteBlock" here.
+    private static final Angle kFrontLeftEncoderOffset = Rotations.of(0.08056640625);
+    private static final Angle kFrontRightEncoderOffset = Rotations.of(0.010498046875);
+    private static final Angle kBackLeftEncoderOffset = Rotations.of(0.208251953125);
+    private static final Angle kBackRightEncoderOffset = Rotations.of(0.341796875);
+
     // Both sets of gains need to be tuned to your individual robot.
 
     // The steer motor uses any SwerveModule.SteerRequestType control request with the
@@ -145,7 +152,6 @@ public class TunerConstants {
     private static final int kFrontLeftDriveMotorId = 0;
     private static final int kFrontLeftSteerMotorId = 1;
     private static final int kFrontLeftEncoderId = 10;
-    private static final Angle kFrontLeftEncoderOffset = Rotations.of(0.08056640625);
     private static final boolean kFrontLeftSteerMotorInverted = false;
     private static final boolean kFrontLeftEncoderInverted = false;
 
@@ -156,7 +162,6 @@ public class TunerConstants {
     private static final int kFrontRightDriveMotorId = 2;
     private static final int kFrontRightSteerMotorId = 3;
     private static final int kFrontRightEncoderId = 11;
-    private static final Angle kFrontRightEncoderOffset = Rotations.of(0.010498046875);
     private static final boolean kFrontRightSteerMotorInverted = false;
     private static final boolean kFrontRightEncoderInverted = false;
 
@@ -167,7 +172,6 @@ public class TunerConstants {
     private static final int kBackLeftDriveMotorId = 4;
     private static final int kBackLeftSteerMotorId = 5;
     private static final int kBackLeftEncoderId = 12;
-    private static final Angle kBackLeftEncoderOffset = Rotations.of(0.208251953125);
     private static final boolean kBackLeftSteerMotorInverted = false;
     private static final boolean kBackLeftEncoderInverted = false;
 
@@ -178,7 +182,6 @@ public class TunerConstants {
     private static final int kBackRightDriveMotorId = 6;
     private static final int kBackRightSteerMotorId = 7;
     private static final int kBackRightEncoderId = 13;
-    private static final Angle kBackRightEncoderOffset = Rotations.of(0.341796875);
     private static final boolean kBackRightSteerMotorInverted = false;
     private static final boolean kBackRightEncoderInverted = false;
 

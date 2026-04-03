@@ -125,19 +125,6 @@ public class Robot extends TimedRobot {
     double backLeftAbsRot = RobotContainer.drivetrain.getModule(2).getEncoder().getAbsolutePosition().refresh().getValueAsDouble();
     double backRightAbsRot = RobotContainer.drivetrain.getModule(3).getEncoder().getAbsolutePosition().refresh().getValueAsDouble();
 
-    SmartDashboard.putNumber(
-        "Swerve/FrontLeft Raw Abs (rot)",
-        frontLeftAbsRot);
-    SmartDashboard.putNumber(
-        "Swerve/FrontRight Raw Abs (rot)",
-        frontRightAbsRot);
-    SmartDashboard.putNumber(
-        "Swerve/BackLeft Raw Abs (rot)",
-        backLeftAbsRot);
-    SmartDashboard.putNumber(
-        "Swerve/BackRight Raw Abs (rot)",
-        backRightAbsRot);
-
     SmartDashboard.putNumber("SwerveCal/FrontLeft OffsetToPaste (rot)", frontLeftAbsRot);
     SmartDashboard.putNumber("SwerveCal/FrontRight OffsetToPaste (rot)", frontRightAbsRot);
     SmartDashboard.putNumber("SwerveCal/BackLeft OffsetToPaste (rot)", backLeftAbsRot);
