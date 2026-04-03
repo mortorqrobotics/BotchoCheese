@@ -162,7 +162,7 @@ public class RobotContainer {
         // Left stick commands translation, right stick commands rotation.
         drivetrain.setDefaultCommand(
             drivetrain.applyRequest(() ->
-                drive.withVelocityX(applyDriveDeadband(JOYSTICK1_CONTROLLER.getLeftY()) * MaxSpeed)
+                drive.withVelocityX(-applyDriveDeadband(JOYSTICK1_CONTROLLER.getLeftY()) * MaxSpeed)
                     .withVelocityY(-applyDriveDeadband(JOYSTICK1_CONTROLLER.getLeftX()) * MaxSpeed)
                     .withRotationalRate(applyDriveDeadband(JOYSTICK1_CONTROLLER.getRightX()) * MaxAngularRate)
             )
