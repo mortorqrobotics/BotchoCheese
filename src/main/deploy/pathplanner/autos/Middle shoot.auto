@@ -21,9 +21,22 @@
                 }
               },
               {
-                "type": "path",
+                "type": "race",
                 "data": {
-                  "pathName": "Middle alliance balls"
+                  "commands": [
+                    {
+                      "type": "path",
+                      "data": {
+                        "pathName": "Middle alliance balls"
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "PivotDownOnly"
+                      }
+                    }
+                  ]
                 }
               },
               {
@@ -33,7 +46,7 @@
                     {
                       "type": "named",
                       "data": {
-                        "name": "PivotDownAndRun"
+                        "name": "Intake"
                       }
                     },
                     {
@@ -41,15 +54,15 @@
                       "data": {
                         "commands": [
                           {
-                            "type": "path",
-                            "data": {
-                              "pathName": "Middle back 1m"
-                            }
-                          },
-                          {
                             "type": "wait",
                             "data": {
                               "waitTime": 4.0
+                            }
+                          },
+                          {
+                            "type": "path",
+                            "data": {
+                              "pathName": "Middle back 1m"
                             }
                           }
                         ]

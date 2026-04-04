@@ -137,6 +137,7 @@ public class RobotContainer {
             ).withTimeout(autoIntakeSecondsAfterPivotDown)
         );
         NamedCommands.registerCommand("PivotDownAndRun", pivotDownAndRun);
+        NamedCommands.registerCommand("PivotDownOnly", pivot.pivotDown().withTimeout(pivotDownSeconds));
         // Keep legacy name mapped to the new behavior so existing autos still work.
         NamedCommands.registerCommand("PivotDown", pivotDownAndRun);
         
