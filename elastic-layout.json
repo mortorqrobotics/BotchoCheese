@@ -9,9 +9,9 @@
           {
             "title": "Match",
             "x": 0.0,
-            "y": 256.0,
-            "width": 384.0,
-            "height": 384.0,
+            "y": 384.0,
+            "width": 256.0,
+            "height": 128.0,
             "type": "List Layout",
             "properties": {
               "label_position": "TOP"
@@ -133,10 +133,10 @@
           },
           {
             "title": "Auto",
-            "x": 384.0,
-            "y": 384.0,
-            "width": 384.0,
-            "height": 256.0,
+            "x": 768.0,
+            "y": 128.0,
+            "width": 256.0,
+            "height": 384.0,
             "type": "List Layout",
             "properties": {
               "label_position": "TOP"
@@ -191,10 +191,10 @@
           },
           {
             "title": "Quicklook",
-            "x": 768.0,
+            "x": 256.0,
             "y": 384.0,
             "width": 256.0,
-            "height": 256.0,
+            "height": 128.0,
             "type": "List Layout",
             "properties": {
               "label_position": "TOP"
@@ -264,7 +264,7 @@
             "title": "Match Time",
             "x": 0.0,
             "y": 0.0,
-            "width": 384.0,
+            "width": 256.0,
             "height": 256.0,
             "type": "Text Display",
             "properties": {
@@ -276,9 +276,9 @@
           },
           {
             "title": "Rebuilt Shift",
-            "x": 384.0,
+            "x": 256.0,
             "y": 0.0,
-            "width": 384.0,
+            "width": 256.0,
             "height": 128.0,
             "type": "Text Display",
             "properties": {
@@ -290,9 +290,9 @@
           },
           {
             "title": "Active For Us",
-            "x": 384.0,
+            "x": 256.0,
             "y": 128.0,
-            "width": 384.0,
+            "width": 256.0,
             "height": 128.0,
             "type": "Boolean Box",
             "properties": {
@@ -307,8 +307,8 @@
           },
           {
             "title": "Shift Time Left",
-            "x": 768.0,
-            "y": 0.0,
+            "x": 512.0,
+            "y": 128.0,
             "width": 256.0,
             "height": 128.0,
             "type": "Text Display",
@@ -321,8 +321,8 @@
           },
           {
             "title": "Next Shift",
-            "x": 768.0,
-            "y": 256.0,
+            "x": 512.0,
+            "y": 0.0,
             "width": 256.0,
             "height": 128.0,
             "type": "Text Display",
@@ -335,9 +335,9 @@
           },
           {
             "title": "Coach Summary",
-            "x": 768.0,
-            "y": 128.0,
-            "width": 256.0,
+            "x": 0.0,
+            "y": 256.0,
+            "width": 512.0,
             "height": 128.0,
             "type": "Text Display",
             "properties": {
@@ -349,9 +349,9 @@
           },
           {
             "title": "Auto Chooser",
-            "x": 384.0,
-            "y": 256.0,
-            "width": 384.0,
+            "x": 768.0,
+            "y": 0.0,
+            "width": 256.0,
             "height": 128.0,
             "type": "ComboBox Chooser",
             "properties": {
