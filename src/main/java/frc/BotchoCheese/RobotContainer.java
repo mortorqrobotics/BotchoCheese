@@ -188,7 +188,7 @@ public class RobotContainer {
             )
         );
 
-        JOYSTICK1_CONTROLLER.leftBumper().whileTrue(drivetrain.applyRequest(() -> brake));
+        JOYSTICK1_CONTROLLER.x().whileTrue(drivetrain.applyRequest(() -> brake));
 
         // D-pad drives fixed robot-centric directions for simple alignment moves.
         JOYSTICK1_CONTROLLER.povUp().whileTrue(drivetrain.applyRequest(() ->
