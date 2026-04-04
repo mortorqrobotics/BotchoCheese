@@ -40,7 +40,6 @@ public class RobotContainer {
     // Auto chooser/dashboard
     private static final String NO_AUTO_SELECTED = "Select Auto";
     private static final String AUTO_CHOOSER_KEY = "Auto Chooser";
-    private static final String LEGACY_AUTO_CHOOSER_KEY = "Auto Mode";
     private static final String X_SHOT_BACK_RPS_KEY = "Shots/X Back RPS";
     private static final String X_SHOT_FRONT_RPS_KEY = "Shots/X Front RPS";
     private static final String AUTO_SELECTED_NAME_KEY = "Auto/SelectedName";
@@ -155,8 +154,6 @@ public class RobotContainer {
     private void configureDashboard() {
         // Publish all autonomous selection/status values once so the keys always exist on the dashboard.
         SmartDashboard.putData(AUTO_CHOOSER_KEY, autoChooser);
-        // Keep the legacy key alive so older dashboard layouts still see the same chooser.
-        SmartDashboard.putData(LEGACY_AUTO_CHOOSER_KEY, autoChooser);
         SmartDashboard.putNumber(X_SHOT_BACK_RPS_KEY, 75.0);
         SmartDashboard.putNumber(X_SHOT_FRONT_RPS_KEY, 75.0);
         SmartDashboard.putString(AUTO_SELECTED_NAME_KEY, NO_AUTO_SELECTED);

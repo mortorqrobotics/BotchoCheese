@@ -3,15 +3,185 @@
   "grid_size": 128,
   "tabs": [
     {
-      "name": "Competitoin View",
+      "name": "Game Day",
       "grid_layout": {
         "layouts": [
           {
-            "title": "Auto",
-            "x": 512.0,
+            "title": "Match",
+            "x": 0.0,
             "y": 0.0,
-            "width": 256.0,
-            "height": 512.0,
+            "width": 384.0,
+            "height": 640.0,
+            "type": "List Layout",
+            "properties": {
+              "label_position": "TOP"
+            },
+            "children": [
+              {
+                "title": "Mode",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "/SmartDashboard/Match/Mode",
+                  "period": 0.06,
+                  "data_type": "string",
+                  "show_submit_button": true
+                }
+              },
+              {
+                "title": "TimeSeconds",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "/SmartDashboard/Match/TimeSeconds",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "show_submit_button": true
+                }
+              },
+              {
+                "title": "Alliance",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "/SmartDashboard/Match/Alliance",
+                  "period": 0.06,
+                  "data_type": "string",
+                  "show_submit_button": true
+                }
+              },
+              {
+                "title": "Station",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "/SmartDashboard/Match/Station",
+                  "period": 0.06,
+                  "data_type": "string",
+                  "show_submit_button": true
+                }
+              },
+              {
+                "title": "Type",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "/SmartDashboard/Match/Type",
+                  "period": 0.06,
+                  "data_type": "string",
+                  "show_submit_button": true
+                }
+              },
+              {
+                "title": "Number",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "/SmartDashboard/Match/Number",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "show_submit_button": true
+                }
+              },
+              {
+                "title": "Replay",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "/SmartDashboard/Match/Replay",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "show_submit_button": true
+                }
+              },
+              {
+                "title": "EventName",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "/SmartDashboard/Match/EventName",
+                  "period": 0.06,
+                  "data_type": "string",
+                  "show_submit_button": true
+                }
+              },
+              {
+                "title": "GameData",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "/SmartDashboard/Match/GameData",
+                  "period": 0.06,
+                  "data_type": "string",
+                  "show_submit_button": true
+                }
+              },
+              {
+                "title": "RebuiltShift",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "/SmartDashboard/Match/RebuiltShift",
+                  "period": 0.06,
+                  "data_type": "string",
+                  "show_submit_button": true
+                }
+              },
+              {
+                "title": "ActiveForUs",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Boolean Box",
+                "properties": {
+                  "topic": "/SmartDashboard/Match/RebuiltActiveForUs",
+                  "period": 0.06,
+                  "data_type": "boolean",
+                  "true_color": 4283215696,
+                  "false_color": 4294198070,
+                  "true_icon": "None",
+                  "false_icon": "None"
+                }
+              }
+            ]
+          },
+          {
+            "title": "Auto",
+            "x": 384.0,
+            "y": 0.0,
+            "width": 384.0,
+            "height": 384.0,
             "type": "List Layout",
             "properties": {
               "label_position": "TOP"
@@ -80,35 +250,68 @@
                 }
               }
             ]
-          }
-        ],
-        "containers": [
+          },
           {
-            "title": "Auto Mode",
+            "title": "Pose",
             "x": 768.0,
             "y": 0.0,
             "width": 256.0,
-            "height": 128.0,
-            "type": "ComboBox Chooser",
+            "height": 256.0,
+            "type": "List Layout",
             "properties": {
-              "topic": "/SmartDashboard/Auto Mode",
-              "period": 0.06,
-              "sort_options": false
-            }
-          }
-        ]
-      }
-    },
-    {
-      "name": "Swerve Alignment",
-      "grid_layout": {
-        "layouts": [
+              "label_position": "TOP"
+            },
+            "children": [
+              {
+                "title": "X",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "/Pose/X",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "show_submit_button": true
+                }
+              },
+              {
+                "title": "Y",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "/Pose/Y",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "show_submit_button": true
+                }
+              },
+              {
+                "title": "HeadingDeg",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "/Pose/HeadingDeg",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "show_submit_button": true
+                }
+              }
+            ]
+          },
           {
             "title": "Swerve",
             "x": 1024.0,
             "y": 0.0,
             "width": 256.0,
-            "height": 256.0,
+            "height": 128.0,
             "type": "List Layout",
             "properties": {
               "label_position": "TOP"
@@ -131,44 +334,121 @@
             ]
           },
           {
-            "title": "SwerveCal",
-            "x": 640.0,
-            "y": 0.0,
-            "width": 384.0,
-            "height": 384.0,
+            "title": "CAN",
+            "x": 768.0,
+            "y": 256.0,
+            "width": 512.0,
+            "height": 256.0,
             "type": "List Layout",
             "properties": {
               "label_position": "TOP"
             },
             "children": [
               {
-                "title": "BackLeft OffsetToPaste (rot)",
+                "title": "UtilizationPct",
                 "x": 0.0,
                 "y": 0.0,
                 "width": 128.0,
                 "height": 128.0,
                 "type": "Text Display",
                 "properties": {
-                  "topic": "/SmartDashboard/SwerveCal/BackLeft OffsetToPaste (rot)",
+                  "topic": "/Debug/CAN/UtilizationPct",
                   "period": 0.06,
                   "data_type": "double",
                   "show_submit_button": true
                 }
               },
               {
-                "title": "BackRight OffsetToPaste (rot)",
+                "title": "BusOffCount",
                 "x": 0.0,
                 "y": 0.0,
                 "width": 128.0,
                 "height": 128.0,
                 "type": "Text Display",
                 "properties": {
-                  "topic": "/SmartDashboard/SwerveCal/BackRight OffsetToPaste (rot)",
+                  "topic": "/Debug/CAN/BusOffCount",
                   "period": 0.06,
-                  "data_type": "double",
+                  "data_type": "int",
                   "show_submit_button": true
                 }
               },
+              {
+                "title": "TxFullCount",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "/Debug/CAN/TxFullCount",
+                  "period": 0.06,
+                  "data_type": "int",
+                  "show_submit_button": true
+                }
+              },
+              {
+                "title": "RxErrorCount",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "/Debug/CAN/RxErrorCount",
+                  "period": 0.06,
+                  "data_type": "int",
+                  "show_submit_button": true
+                }
+              },
+              {
+                "title": "TxErrorCount",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "/Debug/CAN/TxErrorCount",
+                  "period": 0.06,
+                  "data_type": "int",
+                  "show_submit_button": true
+                }
+              }
+            ]
+          }
+        ],
+        "containers": [
+          {
+            "title": "Auto Chooser",
+            "x": 384.0,
+            "y": 384.0,
+            "width": 384.0,
+            "height": 128.0,
+            "type": "ComboBox Chooser",
+            "properties": {
+              "topic": "/SmartDashboard/Auto Chooser",
+              "period": 0.06,
+              "sort_options": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "Swerve Alignment",
+      "grid_layout": {
+        "layouts": [
+          {
+            "title": "SwerveCal",
+            "x": 0.0,
+            "y": 0.0,
+            "width": 640.0,
+            "height": 640.0,
+            "type": "List Layout",
+            "properties": {
+              "label_position": "TOP"
+            },
+            "children": [
               {
                 "title": "FrontLeft OffsetToPaste (rot)",
                 "x": 0.0,
@@ -192,6 +472,34 @@
                 "type": "Text Display",
                 "properties": {
                   "topic": "/SmartDashboard/SwerveCal/FrontRight OffsetToPaste (rot)",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "show_submit_button": true
+                }
+              },
+              {
+                "title": "BackLeft OffsetToPaste (rot)",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "/SmartDashboard/SwerveCal/BackLeft OffsetToPaste (rot)",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "show_submit_button": true
+                }
+              },
+              {
+                "title": "BackRight OffsetToPaste (rot)",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "/SmartDashboard/SwerveCal/BackRight OffsetToPaste (rot)",
                   "period": 0.06,
                   "data_type": "double",
                   "show_submit_button": true
@@ -224,62 +532,6 @@
                   "data_type": "string",
                   "show_submit_button": true
                 }
-              },
-              {
-                "title": "PasteLine BackLeft",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 128.0,
-                "height": 128.0,
-                "type": "Text Display",
-                "properties": {
-                  "topic": "/SmartDashboard/SwerveCal/PasteLine BackLeft",
-                  "period": 0.06,
-                  "data_type": "string",
-                  "show_submit_button": true
-                }
-              },
-              {
-                "title": "PasteLine FrontLeft",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 128.0,
-                "height": 128.0,
-                "type": "Text Display",
-                "properties": {
-                  "topic": "/SmartDashboard/SwerveCal/PasteLine FrontLeft",
-                  "period": 0.06,
-                  "data_type": "string",
-                  "show_submit_button": true
-                }
-              },
-              {
-                "title": "PasteLine FrontRight",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 128.0,
-                "height": 128.0,
-                "type": "Text Display",
-                "properties": {
-                  "topic": "/SmartDashboard/SwerveCal/PasteLine FrontRight",
-                  "period": 0.06,
-                  "data_type": "string",
-                  "show_submit_button": true
-                }
-              },
-              {
-                "title": "PasteLine BackRight",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 128.0,
-                "height": 128.0,
-                "type": "Text Display",
-                "properties": {
-                  "topic": "/SmartDashboard/SwerveCal/PasteLine BackRight",
-                  "period": 0.06,
-                  "data_type": "string",
-                  "show_submit_button": true
-                }
               }
             ]
           }
@@ -287,9 +539,9 @@
         "containers": [
           {
             "title": "NeutralModes",
-            "x": 384.0,
-            "y": 256.0,
-            "width": 128.0,
+            "x": 640.0,
+            "y": 0.0,
+            "width": 384.0,
             "height": 128.0,
             "type": "Text Display",
             "properties": {

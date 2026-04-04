@@ -44,7 +44,7 @@ This README is the current quick-reference for drivers, operators, pit crew, and
 
 ## Autonomous
 
-- Dashboard chooser key: `Auto Mode`.
+- Dashboard chooser key: `Auto Chooser`.
 - On autonomous enable, the robot seeds pose from the selected auto's starting pose when one is available.
 - If no auto is selected, the robot runs a no-op command in autonomous.
 - Deploy now deletes old files from the roboRIO deploy directory, which helps prevent stale autos and paths from lingering between events.
@@ -58,11 +58,19 @@ This README is the current quick-reference for drivers, operators, pit crew, and
 
 ## Dashboard Items
 
-- `Auto Mode`: autonomous chooser.
+- `Auto Chooser`: autonomous chooser.
 - `Auto/SelectedValid`: quick validity check for the selected auto.
 - `Auto/SelectedName`: selected auto name.
 - `Auto/Status`: autonomous readiness / failure status.
 - `Auto/StartPoseSeeded`: whether autonomous start pose seeding succeeded.
+- `Match/TimeSeconds`: current match time from DS/FMS.
+- `Match/Mode`: one of `DISABLED`, `AUTO`, `TELEOP`, `TEST`, `E-STOP`.
+- `Match/Alliance`: alliance color (`Red`, `Blue`, or `Unknown`).
+- `Match/Station`: station number (`1`-`3`, or `Unknown`).
+- `Match/Type`, `Match/Number`, `Match/Replay`, `Match/EventName`: match metadata from DS/FMS.
+- `Match/GameData`: raw game data character from FMS (`R` or `B` for REBUILT).
+- `Match/RebuiltShift`: active REBUILT phase (`SHIFT_1`..`SHIFT_4`, `TRANSITION`, `ENDGAME`, plus non-teleop mode labels).
+- `Match/RebuiltActiveForUs`: `true` when your alliance is active in the current REBUILT shift logic.
 - `Shots/X Back RPS`: custom back shooter speed for the `X` shot.
 - `Shots/X Front RPS`: custom front shooter speed for the `X` shot.
 - `Swerve/* Raw Abs (rot)`: raw absolute encoder values for each swerve module.
