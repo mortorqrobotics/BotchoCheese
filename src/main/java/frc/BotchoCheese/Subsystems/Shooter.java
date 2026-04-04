@@ -63,9 +63,9 @@ public class Shooter extends SubsystemBase {
         config.MotionMagic.MotionMagicJerk = SHOOTER_JERK;
     
         CurrentLimitsConfigs currentLimits = new CurrentLimitsConfigs();
-        currentLimits.StatorCurrentLimit = 80.0; // Raise headroom so high-RPS shots are not current-starved
+        currentLimits.StatorCurrentLimit = 40.0;
         currentLimits.StatorCurrentLimitEnable = true;
-        currentLimits.SupplyCurrentLimit = 50.0; 
+        currentLimits.SupplyCurrentLimit = 30.0; 
         currentLimits.SupplyCurrentLimitEnable = true;
 
         config.CurrentLimits = currentLimits;
