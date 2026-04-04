@@ -6,15 +6,16 @@ package frc.BotchoCheese;
 
 import java.util.Locale;
 
-import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
+import edu.wpi.first.net.WebServer;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.DoublePublisher;
 import edu.wpi.first.networktables.IntegerPublisher;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
@@ -31,7 +32,6 @@ import frc.BotchoCheese.Utils.LimelightHelpers;
 public class Robot extends TimedRobot {
   private static final long LIMELIGHT_IDLE_THROTTLE = 100;
   private static final double SWERVE_OFFSET_PUBLISH_INTERVAL_SECONDS = 0.5;
-  private static final double SWERVE_NEUTRAL_MODE_PUBLISH_INTERVAL_SECONDS = 2.0;
   private static final double MATCH_PUBLISH_INTERVAL_SECONDS = 0.1;
   private static final String MATCH_TIME_SECONDS_KEY = "Match/TimeSeconds";
   private static final String MATCH_MODE_KEY = "Match/Mode";
@@ -43,7 +43,10 @@ public class Robot extends TimedRobot {
   private static final String MATCH_EVENT_NAME_KEY = "Match/EventName";
   private static final String MATCH_GAME_DATA_KEY = "Match/GameData";
   private static final String MATCH_REBUILT_SHIFT_KEY = "Match/RebuiltShift";
+  private static final String MATCH_REBUILT_NEXT_SHIFT_KEY = "Match/RebuiltNextShift";
   private static final String MATCH_REBUILT_ACTIVE_FOR_US_KEY = "Match/RebuiltActiveForUs";
+  private static final String MATCH_REBUILT_SHIFT_TIME_LEFT_KEY = "Match/RebuiltShiftTimeLeftSeconds";
+  private static final String MATCH_COACH_SUMMARY_KEY = "Match/CoachSummary";
 
   public static LimelightHelpers limelight;
   public static LimelightHelpers limelightTwo;
@@ -66,7 +69,6 @@ public class Robot extends TimedRobot {
   private final Field2d m_field = new Field2d();
   private double lastCanHealthLogSeconds = 0.0;
   private double lastSwerveOffsetPublishSeconds = Double.NEGATIVE_INFINITY;
-  private double lastSwerveNeutralModePublishSeconds = Double.NEGATIVE_INFINITY;
   private double lastMatchPublishSeconds = Double.NEGATIVE_INFINITY;
   private DoublePublisher canUtilizationPublisher;
   private IntegerPublisher canBusOffPublisher;
@@ -86,6 +88,8 @@ public class Robot extends TimedRobot {
 
   @Override
   public void robotInit() {
+    // Host dashboard layout files from /home/lvuser/deploy so Elastic can load them directly from the robot.
+    WebServer.start(5800, Filesystem.getDeployDirectory().getPath());
     setLimelightThrottle(LIMELIGHT_IDLE_THROTTLE);
 
     var poseTable = NetworkTableInstance.getDefault().getTable("Pose");
@@ -199,11 +203,6 @@ public class Robot extends TimedRobot {
         "SwerveCal/Instruction",
         "Point wheels forward, then copy SwerveCal/* OffsetToPaste (rot) into TunerConstants k*EncoderOffset");
 
-    if (now - lastSwerveNeutralModePublishSeconds < SWERVE_NEUTRAL_MODE_PUBLISH_INTERVAL_SECONDS) {
-      return;
-    }
-    lastSwerveNeutralModePublishSeconds = now;
-    SmartDashboard.putString("Swerve/NeutralModes", getSwerveNeutralModeSummary());
   }
 
   private void publishMatchData() {
@@ -231,8 +230,24 @@ public class Robot extends TimedRobot {
     SmartDashboard.putNumber(MATCH_REPLAY_NUMBER_KEY, DriverStation.getReplayNumber());
     SmartDashboard.putString(MATCH_EVENT_NAME_KEY, DriverStation.getEventName());
     SmartDashboard.putString(MATCH_GAME_DATA_KEY, gameData);
-    SmartDashboard.putString(MATCH_REBUILT_SHIFT_KEY, getRebuiltShiftLabel(matchTime));
-    SmartDashboard.putBoolean(MATCH_REBUILT_ACTIVE_FOR_US_KEY, isRebuiltShiftActiveForOurAlliance(matchTime, gameData));
+    String shiftLabel = getRebuiltShiftLabel(matchTime);
+    String nextShiftLabel = getRebuiltNextShiftLabel(matchTime);
+    boolean activeForUs = isRebuiltShiftActiveForOurAlliance(matchTime, gameData);
+    double shiftTimeLeftSeconds = getRebuiltShiftTimeLeftSeconds(matchTime);
+
+    SmartDashboard.putString(MATCH_REBUILT_SHIFT_KEY, shiftLabel);
+    SmartDashboard.putString(MATCH_REBUILT_NEXT_SHIFT_KEY, nextShiftLabel);
+    SmartDashboard.putBoolean(MATCH_REBUILT_ACTIVE_FOR_US_KEY, activeForUs);
+    SmartDashboard.putNumber(MATCH_REBUILT_SHIFT_TIME_LEFT_KEY, shiftTimeLeftSeconds);
+    SmartDashboard.putString(
+        MATCH_COACH_SUMMARY_KEY,
+        String.format(
+            Locale.US,
+            "%s -> %s | %s | %.1fs left",
+            shiftLabel,
+            nextShiftLabel,
+            activeForUs ? "ACTIVE" : "INACTIVE",
+            shiftTimeLeftSeconds));
   }
 
   private String getRobotModeSummary() {
@@ -316,19 +331,60 @@ public class Robot extends TimedRobot {
     return oddShift ? shift1ActiveForUs : !shift1ActiveForUs;
   }
 
-  private String getSwerveNeutralModeSummary() {
-    TalonFXConfiguration config = new TalonFXConfiguration();
-    String[] labels = {"FL_D", "FL_S", "FR_D", "FR_S", "BL_D", "BL_S", "BR_D", "BR_S"};
-    StringBuilder sb = new StringBuilder();
-
-    for (int i = 0; i < swerveNeutralReportMotors.length; i++) {
-      swerveNeutralReportMotors[i].getConfigurator().refresh(config);
-      if (i > 0) {
-        sb.append(" ");
-      }
-      sb.append(labels[i]).append(":").append(config.MotorOutput.NeutralMode);
+  private String getRebuiltNextShiftLabel(double matchTime) {
+    if (DriverStation.isEStopped() || DriverStation.isDisabled()) {
+      return "N/A";
     }
-    return sb.toString();
+    if (DriverStation.isAutonomous()) {
+      return "SHIFT_1";
+    }
+    if (!DriverStation.isTeleop()) {
+      return "UNKNOWN";
+    }
+    if (matchTime > 130.0) {
+      return "SHIFT_1";
+    }
+    if (matchTime > 105.0) {
+      return "SHIFT_2";
+    }
+    if (matchTime > 80.0) {
+      return "SHIFT_3";
+    }
+    if (matchTime > 55.0) {
+      return "SHIFT_4";
+    }
+    if (matchTime > 30.0) {
+      return "ENDGAME";
+    }
+    return "MATCH_END";
+  }
+
+  private double getRebuiltShiftTimeLeftSeconds(double matchTime) {
+    if (DriverStation.isDisabled() || DriverStation.isEStopped()) {
+      return 0.0;
+    }
+    if (DriverStation.isAutonomous()) {
+      return Math.max(0.0, matchTime - 130.0);
+    }
+    if (!DriverStation.isTeleop()) {
+      return 0.0;
+    }
+    if (matchTime > 130.0) {
+      return matchTime - 130.0;
+    }
+    if (matchTime > 105.0) {
+      return matchTime - 105.0;
+    }
+    if (matchTime > 80.0) {
+      return matchTime - 80.0;
+    }
+    if (matchTime > 55.0) {
+      return matchTime - 55.0;
+    }
+    if (matchTime > 30.0) {
+      return matchTime - 30.0;
+    }
+    return Math.max(0.0, matchTime);
   }
 
   private void publishPoseData() {

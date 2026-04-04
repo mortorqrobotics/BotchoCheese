@@ -70,7 +70,10 @@ This README is the current quick-reference for drivers, operators, pit crew, and
 - `Match/Type`, `Match/Number`, `Match/Replay`, `Match/EventName`: match metadata from DS/FMS.
 - `Match/GameData`: raw game data character from FMS (`R` or `B` for REBUILT).
 - `Match/RebuiltShift`: active REBUILT phase (`SHIFT_1`..`SHIFT_4`, `TRANSITION`, `ENDGAME`, plus non-teleop mode labels).
+- `Match/RebuiltNextShift`: next REBUILT phase (`SHIFT_1`..`SHIFT_4`, `ENDGAME`, `MATCH_END`).
 - `Match/RebuiltActiveForUs`: `true` when your alliance is active in the current REBUILT shift logic.
+- `Match/RebuiltShiftTimeLeftSeconds`: countdown in seconds until the next REBUILT phase boundary.
+- `Match/CoachSummary`: compact drive-coach summary string (`<shift> -> <next> | ACTIVE/INACTIVE | <seconds> left`).
 - `Shots/X Back RPS`: custom back shooter speed for the `X` shot.
 - `Shots/X Front RPS`: custom front shooter speed for the `X` shot.
 - `Swerve/* Raw Abs (rot)`: raw absolute encoder values for each swerve module.
@@ -78,7 +81,13 @@ This README is the current quick-reference for drivers, operators, pit crew, and
 - `SwerveCal/PasteLine *`: per-module ready-to-paste lines for `TunerConstants`.
 - `SwerveCal/PasteBlock`: four-line ready-to-paste block for all module offsets.
 - `SwerveCal/Instruction`: quick reminder of the calibration workflow.
-- `Swerve/NeutralModes`: compact readout of live neutral mode for swerve motors (`FL_D`, `FL_S`, `FR_D`, `FR_S`, `BL_D`, `BL_S`, `BR_D`, `BR_S`), throttled to update every 2 seconds while disabled.
+
+## Elastic Layout From Robot
+
+- The robot hosts deploy files on port `5800` (`WebServer.start(5800, Filesystem.getDeployDirectory().getPath())`).
+- `elastic-layout.json` is deployed at `src/main/deploy/elastic-layout.json`, so drive team can load directly from robot.
+- In Elastic, use `File -> Load Layout From Robot`.
+- Direct URL fallback: `http://roborio-<team>-frc.local:5800/elastic-layout.json` (replace `<team>` with your team number).
 
 ## Shooter Tuning Knobs
 
