@@ -279,17 +279,9 @@ public class RobotContainer {
             )
         );
 
-        // SmartDashboard-programmed X shot
+        // SmartDashboard-programmed X shooter test (shooter only).
         JOYSTICK2_CONTROLLER.x().toggleOnTrue(
-            Commands.sequence(
-                shooter.shootRps(getXShotBackRps(), getXShotFrontRps()).withTimeout(SHOOTER_SPINUP_TIMEOUT_SECONDS),
-                Commands.parallel(
-                    shooter.shootRps(getXShotBackRps(), getXShotFrontRps()),
-                    intake.runIntake(SHOOT_INTAKE_DUTY),
-                    indexer.runIndexer(SHOOT_INDEXER_DUTY),
-                    feeder.runFeeder(SHOOT_FEEDER_DUTY)
-                )
-            )
+            shooter.shootRps(getXShotBackRps(), getXShotFrontRps())
         );
 
         // Lob shot (back, front)
