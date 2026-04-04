@@ -281,7 +281,7 @@ public class RobotContainer {
 
         // SmartDashboard-programmed X shooter test (shooter only).
         JOYSTICK2_CONTROLLER.x().toggleOnTrue(
-            shooter.shootRps(getXShotBackRps(), getXShotFrontRps())
+            shooter.shootRps(this::getXShotBackRps, this::getXShotFrontRps)
         );
 
         // Lob shot (back, front)
