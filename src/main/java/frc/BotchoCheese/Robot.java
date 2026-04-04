@@ -9,6 +9,7 @@ import java.util.Locale;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.DoublePublisher;
@@ -221,9 +222,16 @@ public class Robot extends TimedRobot {
     NetworkTableInstance.getDefault().getTable("limelight").getEntry("throttle_set").setNumber(throttleValue);
   }
 
+  private void setSwerveNeutralMode(NeutralModeValue neutralMode) {
+    for (TalonFX motor : swerveNeutralReportMotors) {
+      motor.setNeutralMode(neutralMode);
+    }
+  }
+
 
 @Override
 public void disabledInit() {
+  setSwerveNeutralMode(NeutralModeValue.Coast);
   m_robotContainer.pivot.disableBrakeMode();
   setLimelightThrottle(LIMELIGHT_IDLE_THROTTLE);
 }
@@ -238,6 +246,7 @@ public void disabledInit() {
 
   @Override
   public void autonomousInit() {
+    setSwerveNeutralMode(NeutralModeValue.Brake);
     m_robotContainer.pivot.enableBrakeMode();
     m_robotContainer.seedPoseFromSelectedAuto();
     DebugLog.info("Autonomous init");
@@ -258,6 +267,7 @@ public void disabledInit() {
 
   @Override
   public void teleopInit() {
+    setSwerveNeutralMode(NeutralModeValue.Brake);
     m_robotContainer.pivot.enableBrakeMode();
     DebugLog.info("Teleop init");
     if (m_autonomousCommand != null) {
@@ -275,6 +285,7 @@ public void disabledInit() {
 
   @Override
   public void testInit() {
+    setSwerveNeutralMode(NeutralModeValue.Brake);
     m_robotContainer.pivot.enableBrakeMode();
     CommandScheduler.getInstance().cancelAll();
   }
