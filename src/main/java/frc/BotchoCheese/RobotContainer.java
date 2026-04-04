@@ -161,7 +161,7 @@ public class RobotContainer {
         NamedCommands.registerCommand(
             "Intake",
             Commands.parallel(
-                intake.runIntake(INTAKE_ASSIST_INTAKE_DUTY),
+                intake.runIntake(0.85), //increase intake speed during auto
                 indexer.runIndexer(INTAKE_ASSIST_INDEXER_DUTY),
                 feeder.runFeeder(INTAKE_ASSIST_FEEDER_DUTY),
                 shooter.shootRps(0.0, -25.0)
