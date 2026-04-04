@@ -109,7 +109,9 @@ public class RobotContainer {
     }
 
     private void registerNamedCommands() {
-        final double pivotDownSeconds = 0.8; // tune this "X seconds" value
+        final double pivotDownSeconds = 0.6; // tune this "X seconds" value
+        final double firstShotPivotDownSeconds = 0.3;
+        final double travelPivotDownSeconds = 0.6;
         final double autoIntakeSecondsAfterPivotDown = 5.0;
 
         // These names must match the event markers referenced by PathPlanner autos.
@@ -125,6 +127,21 @@ public class RobotContainer {
                 )
             ).withTimeout(3.0)
         );
+        NamedCommands.registerCommand(
+            "ShootFirstWithPivotDown",
+            Commands.deadline(
+                Commands.sequence(
+                    shooter.shootRps(90.0).withTimeout(SHOOTER_SPINUP_TIMEOUT_SECONDS),
+                    Commands.parallel(
+                        shooter.shootRps(90.0),
+                        intake.runIntake(SHOOT_INTAKE_DUTY),
+                        indexer.runIndexer(SHOOT_INDEXER_DUTY),
+                        feeder.runFeeder(SHOOT_FEEDER_DUTY)
+                    )
+                ).withTimeout(3.0),
+                pivot.pivotDown().withTimeout(firstShotPivotDownSeconds)
+            )
+        );
 
         Command pivotDownAndRun = Commands.sequence(
             pivot.pivotDown().withTimeout(pivotDownSeconds),
@@ -137,6 +154,7 @@ public class RobotContainer {
         );
         NamedCommands.registerCommand("PivotDownAndRun", pivotDownAndRun);
         NamedCommands.registerCommand("PivotDownOnly", pivot.pivotDown().withTimeout(pivotDownSeconds));
+        NamedCommands.registerCommand("PivotDownOnlyShort", pivot.pivotDown().withTimeout(travelPivotDownSeconds));
         // Keep legacy name mapped to the new behavior so existing autos still work.
         NamedCommands.registerCommand("PivotDown", pivotDownAndRun);
         
