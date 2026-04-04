@@ -21,22 +21,15 @@
                 }
               },
               {
-                "type": "race",
+                "type": "path",
                 "data": {
-                  "commands": [
-                    {
-                      "type": "path",
-                      "data": {
-                        "pathName": "Left side alliance balls"
-                      }
-                    },
-                    {
-                      "type": "named",
-                      "data": {
-                        "name": "PivotDownOnlyShort"
-                      }
-                    }
-                  ]
+                  "pathName": "Left side alliance balls"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "PivotDownOnlyShort"
                 }
               },
               {
