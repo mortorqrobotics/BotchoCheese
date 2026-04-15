@@ -12,9 +12,9 @@ public class RobotMap {
 
     // Pose estimator tuning for vision measurements.
     // Larger values tell the estimator to trust external global updates less.
-    public static final double kVisionStdDevX = 1;
-    public static final double kVisionStdDevY = 1;
-    public static final double kVisionStdDevTheta = 99999;
+    public static final double kVisionStdDevX = 2.5;
+    public static final double kVisionStdDevY = 2.5;
+    public static final double kVisionStdDevTheta = 180.0;
 
     // Single Limelight instance used for drivetrain pose updates.
     public static final String LIMELIGHT_NAME = "limelight-1515-1";

@@ -350,6 +350,9 @@ public class Robot extends TimedRobot {
     poseXPublisher.set(pose.getX());
     poseYPublisher.set(pose.getY());
     poseHeadingDegPublisher.set(pose.getRotation().getDegrees());
+    SmartDashboard.putNumber("Pose/OdomX", pose.getX());
+    SmartDashboard.putNumber("Pose/OdomY", pose.getY());
+    SmartDashboard.putNumber("Pose/OdomHeadingDeg", pose.getRotation().getDegrees());
   }
 
   private void setLimelightThrottle(long throttleValue) {
