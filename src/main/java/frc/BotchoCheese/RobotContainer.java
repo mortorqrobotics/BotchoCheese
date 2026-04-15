@@ -37,7 +37,7 @@ import frc.BotchoCheese.Subsystems.Shooter;
 
 public class RobotContainer {
     // Auto chooser
-    private static final String NO_AUTO_SELECTED = "Select Auto";
+    private static final String AUTO_CHOOSER_KEY = "Auto Chooser";
 
     // Driver input deadband and drivetrain speed caps used by the default drive command.
     private static final double DRIVE_DEADBAND = 0.1;
@@ -161,7 +161,8 @@ public class RobotContainer {
     }
 
     private void configureAutoChooser() {
-        // Use PathPlanner's built-in chooser so dashboards see the standard auto chooser shape.
+        // Publish chooser so SmartDashboard/Elastic can select the autonomous routine.
+        SmartDashboard.putData(AUTO_CHOOSER_KEY, autoChooser);
     }
 
     private static double applyDriveDeadband(double value) {
@@ -327,10 +328,6 @@ public class RobotContainer {
 
     private boolean isAutoSelected(Command selectedAuto) {
         return selectedAuto instanceof PathPlannerAuto;
-    }
-
-    private String getSelectedAutoName(Command selectedAuto) {
-        return selectedAuto != null ? selectedAuto.getName() : NO_AUTO_SELECTED;
     }
 
     public static CommandSwerveDrivetrain createDrivetrain() {

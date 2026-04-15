@@ -26,6 +26,7 @@ import frc.BotchoCheese.Constants.RobotMap;
 
 public class Robot extends TimedRobot {
   private static final long LIMELIGHT_DISABLED_THROTTLE = 100;
+  private static final long LIMELIGHT_ENABLED_THROTTLE = 0;
   private static final double SWERVE_OFFSET_PUBLISH_INTERVAL_SECONDS = 0.5;
   private static final CANBus CANIVORE_BUS = new CANBus(RobotMap.CANIVORE_CAN_BUS);
 
@@ -102,30 +103,6 @@ public class Robot extends TimedRobot {
     SmartDashboard.putNumber("SwerveCal/BackLeft OffsetToPaste (rot)", backLeftAbsRot);
     SmartDashboard.putNumber("SwerveCal/BackRight OffsetToPaste (rot)", backRightAbsRot);
     SmartDashboard.putString(
-        "SwerveCal/PasteLine FrontLeft",
-        String.format(
-            Locale.US,
-            "private static final Angle kFrontLeftEncoderOffset = Rotations.of(%.12f);",
-            frontLeftAbsRot));
-    SmartDashboard.putString(
-        "SwerveCal/PasteLine FrontRight",
-        String.format(
-            Locale.US,
-            "private static final Angle kFrontRightEncoderOffset = Rotations.of(%.12f);",
-            frontRightAbsRot));
-    SmartDashboard.putString(
-        "SwerveCal/PasteLine BackLeft",
-        String.format(
-            Locale.US,
-            "private static final Angle kBackLeftEncoderOffset = Rotations.of(%.12f);",
-            backLeftAbsRot));
-    SmartDashboard.putString(
-        "SwerveCal/PasteLine BackRight",
-        String.format(
-            Locale.US,
-            "private static final Angle kBackRightEncoderOffset = Rotations.of(%.12f);",
-            backRightAbsRot));
-    SmartDashboard.putString(
         "SwerveCal/PasteBlock",
         String.format(
             Locale.US,
@@ -189,6 +166,7 @@ public void disabledInit() {
   public void autonomousInit() {
     setSwerveNeutralMode(NeutralModeValue.Brake);
     m_robotContainer.pivot.enableBrakeMode();
+    setLimelightThrottle(LIMELIGHT_ENABLED_THROTTLE);
     m_robotContainer.seedPoseFromSelectedAuto();
 
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
@@ -209,6 +187,7 @@ public void disabledInit() {
   public void teleopInit() {
     setSwerveNeutralMode(NeutralModeValue.Brake);
     m_robotContainer.pivot.enableBrakeMode();
+    setLimelightThrottle(LIMELIGHT_ENABLED_THROTTLE);
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
@@ -226,6 +205,7 @@ public void disabledInit() {
   public void testInit() {
     setSwerveNeutralMode(NeutralModeValue.Brake);
     m_robotContainer.pivot.enableBrakeMode();
+    setLimelightThrottle(LIMELIGHT_ENABLED_THROTTLE);
     CommandScheduler.getInstance().cancelAll();
   }
 
