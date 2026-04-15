@@ -259,11 +259,6 @@ public class RobotContainer {
             )
         );
 
-        // SmartDashboard-programmed X shooter test (shooter only).
-        JOYSTICK2_CONTROLLER.x().toggleOnTrue(
-            shooter.shootRps(getXShotBackRps(), getXShotFrontRps())
-        );
-
         // Lob shot (back, front)
         JOYSTICK2_CONTROLLER.y().toggleOnTrue(
             Commands.sequence(
@@ -336,14 +331,6 @@ public class RobotContainer {
 
     private String getSelectedAutoName(Command selectedAuto) {
         return selectedAuto != null ? selectedAuto.getName() : NO_AUTO_SELECTED;
-    }
-
-    private double getXShotBackRps() {
-        return SmartDashboard.getNumber("Shots/X Back RPS", 75.0);
-    }
-
-    private double getXShotFrontRps() {
-        return SmartDashboard.getNumber("Shots/X Front RPS", 75.0);
     }
 
     public static CommandSwerveDrivetrain createDrivetrain() {
