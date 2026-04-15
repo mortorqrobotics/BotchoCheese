@@ -36,15 +36,8 @@ import frc.BotchoCheese.Subsystems.Pivot;
 import frc.BotchoCheese.Subsystems.Shooter;
 
 public class RobotContainer {
-    // Auto chooser/dashboard
+    // Auto chooser
     private static final String NO_AUTO_SELECTED = "Select Auto";
-    private static final String AUTO_CHOOSER_KEY = "Auto Chooser";
-    private static final String X_SHOT_BACK_RPS_KEY = "Shots/X Back RPS";
-    private static final String X_SHOT_FRONT_RPS_KEY = "Shots/X Front RPS";
-    private static final String AUTO_SELECTED_NAME_KEY = "Auto/SelectedName";
-    private static final String AUTO_SELECTED_VALID_KEY = "Auto/SelectedValid";
-    private static final String AUTO_STATUS_KEY = "Auto/Status";
-    private static final String AUTO_START_POSE_SEEDED_KEY = "Auto/StartPoseSeeded";
 
     // Driver input deadband and drivetrain speed caps used by the default drive command.
     private static final double DRIVE_DEADBAND = 0.1;
@@ -102,7 +95,6 @@ public class RobotContainer {
 
         autoChooser = AutoBuilder.buildAutoChooser();
         configureAutoChooser();
-        configureDashboard();
 
         configureBindings();
     }
@@ -166,17 +158,6 @@ public class RobotContainer {
                 shooter.shootRps(0.0, -25.0)
             )
         );
-    }
-
-    private void configureDashboard() {
-        // Publish all autonomous selection/status values once so the keys always exist on the dashboard.
-        SmartDashboard.putData(AUTO_CHOOSER_KEY, autoChooser);
-        SmartDashboard.putNumber(X_SHOT_BACK_RPS_KEY, 75.0);
-        SmartDashboard.putNumber(X_SHOT_FRONT_RPS_KEY, 75.0);
-        SmartDashboard.putString(AUTO_SELECTED_NAME_KEY, NO_AUTO_SELECTED);
-        SmartDashboard.putBoolean(AUTO_SELECTED_VALID_KEY, false);
-        SmartDashboard.putString(AUTO_STATUS_KEY, "NO AUTO SELECTED");
-        SmartDashboard.putBoolean(AUTO_START_POSE_SEEDED_KEY, false);
     }
 
     private void configureAutoChooser() {
@@ -313,40 +294,22 @@ public class RobotContainer {
     public Command getAutonomousCommand() {
         Command selectedAuto = autoChooser.getSelected();
         if (!isAutoSelected(selectedAuto)) {
-            setAutoStatus("NO AUTO SELECTED");
             return Commands.none();
         }
         try {
-            String selectedAutoName = getSelectedAutoName(selectedAuto);
-            setAutoStatus("AUTO READY: " + selectedAutoName);
             return selectedAuto;
         } catch (Exception ex) {
-            setAutoStatus("AUTO BUILD FAILED");
             return Commands.none();
         }
     }
 
     public void updateAutoSelectionDashboard() {
-        Command selectedAuto = autoChooser.getSelected();
-        boolean autoSelected = isAutoSelected(selectedAuto);
-
-        SmartDashboard.putString(
-            AUTO_SELECTED_NAME_KEY,
-            autoSelected ? getSelectedAutoName(selectedAuto) : NO_AUTO_SELECTED
-        );
-        SmartDashboard.putBoolean(AUTO_SELECTED_VALID_KEY, autoSelected);
-        if (!autoSelected) {
-            setAutoStatus("NO AUTO SELECTED");
-            SmartDashboard.putBoolean(AUTO_START_POSE_SEEDED_KEY, false);
-        }
+        // Intentionally left blank.
     }
 
     public boolean seedPoseFromSelectedAuto() {
         Command selectedAuto = autoChooser.getSelected();
-        String selectedAutoName = getSelectedAutoName(selectedAuto);
         if (!isAutoSelected(selectedAuto)) {
-            SmartDashboard.putBoolean(AUTO_START_POSE_SEEDED_KEY, false);
-            setAutoStatus("NO AUTO SELECTED");
             return false;
         }
 
@@ -355,20 +318,14 @@ public class RobotContainer {
             PathPlannerAuto auto = (PathPlannerAuto) selectedAuto;
             Pose2d bluePose = auto.getStartingPose();
             if (bluePose == null) {
-                SmartDashboard.putBoolean(AUTO_START_POSE_SEEDED_KEY, false);
-                setAutoStatus("AUTO HAS NO START POSE: " + selectedAutoName);
                 return false;
             }
 
             // PathPlanner start poses are stored from the blue-side perspective and flipped when needed.
             Pose2d alliancePose = AutoBuilder.shouldFlip() ? FlippingUtil.flipFieldPose(bluePose) : bluePose;
             drivetrain.resetPose(alliancePose);
-            SmartDashboard.putBoolean(AUTO_START_POSE_SEEDED_KEY, true);
-            setAutoStatus("START POSE SEEDED: " + selectedAutoName);
             return true;
         } catch (Exception ex) {
-            SmartDashboard.putBoolean(AUTO_START_POSE_SEEDED_KEY, false);
-            setAutoStatus("POSE SEED FAILED: " + selectedAutoName);
             return false;
         }
     }
@@ -381,16 +338,12 @@ public class RobotContainer {
         return selectedAuto != null ? selectedAuto.getName() : NO_AUTO_SELECTED;
     }
 
-    private void setAutoStatus(String status) {
-        SmartDashboard.putString(AUTO_STATUS_KEY, status);
-    }
-
     private double getXShotBackRps() {
-        return SmartDashboard.getNumber(X_SHOT_BACK_RPS_KEY, 75.0);
+        return SmartDashboard.getNumber("Shots/X Back RPS", 75.0);
     }
 
     private double getXShotFrontRps() {
-        return SmartDashboard.getNumber(X_SHOT_FRONT_RPS_KEY, 75.0);
+        return SmartDashboard.getNumber("Shots/X Front RPS", 75.0);
     }
 
     public static CommandSwerveDrivetrain createDrivetrain() {

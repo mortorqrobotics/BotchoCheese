@@ -11,7 +11,6 @@ import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.controls.VelocityVoltage;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import frc.BotchoCheese.Constants.RobotMap;
 
@@ -25,10 +24,6 @@ public class Shooter extends SubsystemBase {
     private static final double SHOOTER_A_VALUE = 0.01;
     private static final double SHOOTER_ACCELERATION = 160.0;
     private static final double SHOOTER_JERK = 1600.0;
-
-    // Two back motors share one target; the right back motor follows the left back motor.
-    private static final String SHOOTER_BACK_RPS_KEY = "Shooter/Back Actual RPS";
-    private static final String SHOOTER_FRONT_RPS_KEY = "Shooter/Front Actual RPS";
 
     private final TalonFX backLeftShooter;
     private final TalonFX backRightShooter;
@@ -98,12 +93,5 @@ public class Shooter extends SubsystemBase {
         // backRightShooter follows backLeftShooter, so only two velocity commands are needed here.
         backLeftShooter.setControl(shooterVelocityRequest.withVelocity(backShooterTargetRps));
         frontShooter.setControl(shooterVelocityRequest.withVelocity(frontShooterTargetRps));
-    }
-
-    @Override
-    public void periodic() {
-        // Phoenix velocity units are rotations per second (RPS).
-        SmartDashboard.putNumber(SHOOTER_BACK_RPS_KEY, backLeftShooter.getVelocity().getValueAsDouble());
-        SmartDashboard.putNumber(SHOOTER_FRONT_RPS_KEY, frontShooter.getVelocity().getValueAsDouble());
     }
 }
