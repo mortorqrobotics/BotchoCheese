@@ -6,6 +6,7 @@ package frc.BotchoCheese;
 
 import java.util.Locale;
 
+import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
@@ -41,19 +42,20 @@ public class Robot extends TimedRobot {
   private static final String MATCH_REBUILT_ACTIVE_FOR_US_KEY = "Match/RebuiltActiveForUs";
   private static final String MATCH_REBUILT_SHIFT_TIME_LEFT_KEY = "Match/RebuiltShiftTimeLeftSeconds";
   private static final String MATCH_COACH_SUMMARY_KEY = "Match/CoachSummary";
+  private static final CANBus CANIVORE_BUS = new CANBus(RobotMap.CANIVORE_CAN_BUS);
 
   private Command m_autonomousCommand;
 
   private final RobotContainer m_robotContainer;
   private final TalonFX[] swerveNeutralReportMotors = {
-      new TalonFX(0, RobotMap.CANIVORE_CAN_BUS),
-      new TalonFX(1, RobotMap.CANIVORE_CAN_BUS),
-      new TalonFX(2, RobotMap.CANIVORE_CAN_BUS),
-      new TalonFX(3, RobotMap.CANIVORE_CAN_BUS),
-      new TalonFX(4, RobotMap.CANIVORE_CAN_BUS),
-      new TalonFX(5, RobotMap.CANIVORE_CAN_BUS),
-      new TalonFX(6, RobotMap.CANIVORE_CAN_BUS),
-      new TalonFX(7, RobotMap.CANIVORE_CAN_BUS)
+      new TalonFX(0, CANIVORE_BUS),
+      new TalonFX(1, CANIVORE_BUS),
+      new TalonFX(2, CANIVORE_BUS),
+      new TalonFX(3, CANIVORE_BUS),
+      new TalonFX(4, CANIVORE_BUS),
+      new TalonFX(5, CANIVORE_BUS),
+      new TalonFX(6, CANIVORE_BUS),
+      new TalonFX(7, CANIVORE_BUS)
   };
 
   private final Field2d m_field = new Field2d();
