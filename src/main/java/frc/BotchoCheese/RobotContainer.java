@@ -34,7 +34,6 @@ import frc.BotchoCheese.Subsystems.Indexer;
 import frc.BotchoCheese.Subsystems.Intake;
 import frc.BotchoCheese.Subsystems.Pivot;
 import frc.BotchoCheese.Subsystems.Shooter;
-import frc.BotchoCheese.Utils.DebugLog;
 
 public class RobotContainer {
     // Auto chooser/dashboard
@@ -315,24 +314,14 @@ public class RobotContainer {
         Command selectedAuto = autoChooser.getSelected();
         if (!isAutoSelected(selectedAuto)) {
             setAutoStatus("NO AUTO SELECTED");
-            DebugLog.warnThrottled(
-                "auto.none_selected",
-                "No autonomous selected; running no-op command.",
-                5.0
-            );
             return Commands.none();
         }
         try {
             String selectedAutoName = getSelectedAutoName(selectedAuto);
             setAutoStatus("AUTO READY: " + selectedAutoName);
-            DebugLog.info("Auto selected: " + selectedAutoName);
             return selectedAuto;
         } catch (Exception ex) {
             setAutoStatus("AUTO BUILD FAILED");
-            DebugLog.error(
-                "Failed to get selected autonomous command.",
-                ex.getStackTrace()
-            );
             return Commands.none();
         }
     }
@@ -358,11 +347,6 @@ public class RobotContainer {
         if (!isAutoSelected(selectedAuto)) {
             SmartDashboard.putBoolean(AUTO_START_POSE_SEEDED_KEY, false);
             setAutoStatus("NO AUTO SELECTED");
-            DebugLog.warnThrottled(
-                "pose_seed.no_auto",
-                "No auto selected for pose seeding.",
-                5.0
-            );
             return false;
         }
 
@@ -373,11 +357,6 @@ public class RobotContainer {
             if (bluePose == null) {
                 SmartDashboard.putBoolean(AUTO_START_POSE_SEEDED_KEY, false);
                 setAutoStatus("AUTO HAS NO START POSE: " + selectedAutoName);
-                DebugLog.warnThrottled(
-                    "pose_seed.no_start_pose",
-                    "Selected auto has no path-based starting pose: " + selectedAutoName,
-                    5.0
-                );
                 return false;
             }
 
@@ -386,15 +365,10 @@ public class RobotContainer {
             drivetrain.resetPose(alliancePose);
             SmartDashboard.putBoolean(AUTO_START_POSE_SEEDED_KEY, true);
             setAutoStatus("START POSE SEEDED: " + selectedAutoName);
-            DebugLog.info("Seeded pose from auto: " + selectedAutoName);
             return true;
         } catch (Exception ex) {
             SmartDashboard.putBoolean(AUTO_START_POSE_SEEDED_KEY, false);
             setAutoStatus("POSE SEED FAILED: " + selectedAutoName);
-            DebugLog.error(
-                "Failed to seed pose from selected auto: " + selectedAutoName,
-                ex.getStackTrace()
-            );
             return false;
         }
     }

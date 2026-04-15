@@ -13,7 +13,6 @@ import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-// import frc.BotchoCheese.Utils.LimelightHelpers;
 import frc.BotchoCheese.Constants.RobotMap;
 
 public class Shooter extends SubsystemBase {

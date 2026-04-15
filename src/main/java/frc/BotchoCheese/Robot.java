@@ -6,31 +6,25 @@ package frc.BotchoCheese;
 
 import java.util.Locale;
 
-import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.net.WebServer;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.DoublePublisher;
-import edu.wpi.first.networktables.IntegerPublisher;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
-import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import frc.BotchoCheese.Commands.LimelightHomography;
 import frc.BotchoCheese.Constants.RobotMap;
-import frc.BotchoCheese.Utils.DebugLog;
-import frc.BotchoCheese.Utils.LimelightHelpers;
 
 
 public class Robot extends TimedRobot {
-  private static final long LIMELIGHT_IDLE_THROTTLE = 100;
+  private static final long LIMELIGHT_DISABLED_THROTTLE = 100;
   private static final double SWERVE_OFFSET_PUBLISH_INTERVAL_SECONDS = 0.5;
   private static final double MATCH_PUBLISH_INTERVAL_SECONDS = 0.1;
   private static final String MATCH_TIME_SECONDS_KEY = "Match/TimeSeconds";
@@ -48,9 +42,6 @@ public class Robot extends TimedRobot {
   private static final String MATCH_REBUILT_SHIFT_TIME_LEFT_KEY = "Match/RebuiltShiftTimeLeftSeconds";
   private static final String MATCH_COACH_SUMMARY_KEY = "Match/CoachSummary";
 
-  public static LimelightHelpers limelight;
-  public static LimelightHelpers limelightTwo;
-
   private Command m_autonomousCommand;
 
   private final RobotContainer m_robotContainer;
@@ -65,16 +56,9 @@ public class Robot extends TimedRobot {
       new TalonFX(7, RobotMap.CANIVORE_CAN_BUS)
   };
 
-  private final boolean kUseLimelight = false;
   private final Field2d m_field = new Field2d();
-  private double lastCanHealthLogSeconds = 0.0;
   private double lastSwerveOffsetPublishSeconds = Double.NEGATIVE_INFINITY;
   private double lastMatchPublishSeconds = Double.NEGATIVE_INFINITY;
-  private DoublePublisher canUtilizationPublisher;
-  private IntegerPublisher canBusOffPublisher;
-  private IntegerPublisher canTxFullPublisher;
-  private IntegerPublisher canRxErrorPublisher;
-  private IntegerPublisher canTxErrorPublisher;
   private DoublePublisher poseXPublisher;
   private DoublePublisher poseYPublisher;
   private DoublePublisher poseHeadingDegPublisher;
@@ -83,42 +67,19 @@ public class Robot extends TimedRobot {
     m_robotContainer = new RobotContainer();
 
     SmartDashboard.putData("Field", m_field);
-    m_field.setRobotPose(RobotContainer.drivetrain.getState().Pose);
+    m_field.setRobotPose(RobotContainer.drivetrain.getPose());
   }
 
   @Override
   public void robotInit() {
     // Host dashboard layout files from /home/lvuser/deploy so Elastic can load them directly from the robot.
     WebServer.start(5800, Filesystem.getDeployDirectory().getPath());
-    setLimelightThrottle(LIMELIGHT_IDLE_THROTTLE);
+    setLimelightThrottle(LIMELIGHT_DISABLED_THROTTLE);
 
     var poseTable = NetworkTableInstance.getDefault().getTable("Pose");
     poseXPublisher = poseTable.getDoubleTopic("X").publish();
     poseYPublisher = poseTable.getDoubleTopic("Y").publish();
     poseHeadingDegPublisher = poseTable.getDoubleTopic("HeadingDeg").publish();
-
-    if (DebugLog.DEBUG) {
-      // Only enable CTRE file logging during focused debugging.
-      // Leaving this off avoids unnecessary writes during practice/matches.
-      SignalLogger.setPath("logs");
-      SignalLogger.start();
-      DebugLog.info("CTRE SignalLogger enabled (debug mode).");
-
-      var debugTable = NetworkTableInstance.getDefault().getTable("Debug");
-      canUtilizationPublisher = debugTable.getDoubleTopic("CAN/UtilizationPct").publish();
-      canBusOffPublisher = debugTable.getIntegerTopic("CAN/BusOffCount").publish();
-      canTxFullPublisher = debugTable.getIntegerTopic("CAN/TxFullCount").publish();
-      canRxErrorPublisher = debugTable.getIntegerTopic("CAN/RxErrorCount").publish();
-      canTxErrorPublisher = debugTable.getIntegerTopic("CAN/TxErrorCount").publish();
-
-      CommandScheduler.getInstance().onCommandInitialize(
-          command -> DebugLog.debug("[CMD INIT] " + command.getName()));
-      CommandScheduler.getInstance().onCommandFinish(
-          command -> DebugLog.debug("[CMD END] " + command.getName()));
-      CommandScheduler.getInstance().onCommandInterrupt(
-          command -> DebugLog.debug("[CMD INTERRUPT] " + command.getName()));
-    }
-    DebugLog.info("Startup complete (vision processing disabled, minimal telemetry mode).");
   }
 
   @Override
@@ -127,16 +88,9 @@ public class Robot extends TimedRobot {
 
     publishMatchData();
     publishDashboardData();
-
-    if (kUseLimelight) {
-      LimelightHomography.update(RobotContainer.drivetrain);
-    }
+    RobotContainer.drivetrain.visionUpdateFromLimelight();
 
     publishPoseData();
-
-    if (DebugLog.DEBUG) {
-      logCanHealthSnapshot();
-    }
   }
 
   private void publishDashboardData() {
@@ -392,14 +346,17 @@ public class Robot extends TimedRobot {
       return;
     }
 
-    var pose = RobotContainer.drivetrain.getState().Pose;
+    var pose = RobotContainer.drivetrain.getPose();
     poseXPublisher.set(pose.getX());
     poseYPublisher.set(pose.getY());
     poseHeadingDegPublisher.set(pose.getRotation().getDegrees());
   }
 
   private void setLimelightThrottle(long throttleValue) {
-    NetworkTableInstance.getDefault().getTable("limelight").getEntry("throttle_set").setNumber(throttleValue);
+    NetworkTableInstance.getDefault()
+        .getTable(RobotMap.LIMELIGHT_NAME)
+        .getEntry("throttle_set")
+        .setNumber(throttleValue);
   }
 
   private void setSwerveNeutralMode(NeutralModeValue neutralMode) {
@@ -413,7 +370,7 @@ public class Robot extends TimedRobot {
 public void disabledInit() {
   setSwerveNeutralMode(NeutralModeValue.Coast);
   m_robotContainer.pivot.disableBrakeMode();
-  setLimelightThrottle(LIMELIGHT_IDLE_THROTTLE);
+  setLimelightThrottle(LIMELIGHT_DISABLED_THROTTLE);
 }
 
 
@@ -429,7 +386,6 @@ public void disabledInit() {
     setSwerveNeutralMode(NeutralModeValue.Brake);
     m_robotContainer.pivot.enableBrakeMode();
     m_robotContainer.seedPoseFromSelectedAuto();
-    DebugLog.info("Autonomous init");
 
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
@@ -449,7 +405,6 @@ public void disabledInit() {
   public void teleopInit() {
     setSwerveNeutralMode(NeutralModeValue.Brake);
     m_robotContainer.pivot.enableBrakeMode();
-    DebugLog.info("Teleop init");
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
@@ -478,39 +433,5 @@ public void disabledInit() {
 
   @Override
   public void simulationPeriodic() {}
-
-  private void logCanHealthSnapshot() {
-    double now = Timer.getFPGATimestamp();
-    if (now - lastCanHealthLogSeconds < 1.0) {
-      return;
-    }
-    lastCanHealthLogSeconds = now;
-
-    var canStatus = RobotController.getCANStatus();
-    DebugLog.debug(
-        String.format(
-            "[CAN] util=%.1f%% busOff=%d txFull=%d rxErr=%d txErr=%d",
-            canStatus.percentBusUtilization * 100.0,
-            canStatus.busOffCount,
-            canStatus.txFullCount,
-            canStatus.receiveErrorCount,
-            canStatus.transmitErrorCount));
-
-    if (canUtilizationPublisher != null) {
-      canUtilizationPublisher.set(canStatus.percentBusUtilization * 100.0);
-    }
-    if (canBusOffPublisher != null) {
-      canBusOffPublisher.set(canStatus.busOffCount);
-    }
-    if (canTxFullPublisher != null) {
-      canTxFullPublisher.set(canStatus.txFullCount);
-    }
-    if (canRxErrorPublisher != null) {
-      canRxErrorPublisher.set(canStatus.receiveErrorCount);
-    }
-    if (canTxErrorPublisher != null) {
-      canTxErrorPublisher.set(canStatus.transmitErrorCount);
-    }
-  }
 
 }

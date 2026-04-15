@@ -11,16 +11,17 @@ public class RobotMap {
     public static final double kPositionStdDevTheta = 10;
 
     // Pose estimator tuning for vision measurements.
-    // Larger values tell the estimator to trust Limelight-based global updates less.
+    // Larger values tell the estimator to trust external global updates less.
     public static final double kVisionStdDevX = 1;
     public static final double kVisionStdDevY = 1;
     public static final double kVisionStdDevTheta = 99999;
 
-    // NetworkTables names for the two Limelights this code expects to exist.
-    public static final String LIMELIGHT_NAME = "limelight";
-    public static final String LIMELIGHT_2_NAME = "limelight-two";
-    // Threshold used by vision code when comparing two normalized values.
-    public static final double DIFFERENCE_CUTOFF_THRESHOLD = 0.15; // Normalized from 1.5 for scale consistency
+    // Single Limelight instance used for drivetrain pose updates.
+    public static final String LIMELIGHT_NAME = "limelight-1515-1";
+
+    // AprilTag field map used to bound/validate global pose estimates.
+    public static final AprilTagFieldLayout APRILTAG_FIELD_LAYOUT =
+        AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltWelded);
     // AprilTag heights indexed by tag ID minus 1.
     public static final double[] TAG_HEIGHTS = {
     1.4859, 1.4859, /*ID: 1 - 2*/
@@ -31,8 +32,6 @@ public class RobotMap {
     1.8679160000000001, 1.8679160000000001, /*ID: 14 - 15*/
     1.30175, /*ID: 16*/
     0.308102, 0.308102, 0.308102, 0.308102, 0.308102, 0.308102 /*ID: 17 - 22*/};
-
-    public static final AprilTagFieldLayout WELDED_FIELD2026 = AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltWelded);
 
     // Device ID for the pigeon used by the drivetrain.
     public static final int PIGEON_ID = 30;

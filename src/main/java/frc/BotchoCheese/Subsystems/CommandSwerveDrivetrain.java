@@ -2,7 +2,6 @@ package frc.BotchoCheese.Subsystems;
 
 import java.util.function.Supplier;
 
-// import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.swerve.SwerveDrivetrainConstants;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
@@ -13,6 +12,7 @@ import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 
 import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
@@ -25,7 +25,10 @@ import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 // import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.BotchoCheese.Constants.RobotMap;
 import frc.BotchoCheese.Constants.TunerConstants.TunerSwerveDrivetrain;
+import frc.BotchoCheese.Utils.LimelightHelpers;
+import frc.BotchoCheese.Utils.LimelightHelpers.PoseEstimate;
 
 /**
  * Class that extends the Phoenix 6 SwerveDrivetrain class and implements
@@ -61,8 +64,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     //         null,        // Use default ramp rate (1 V/s)
     //         Volts.of(4), // Reduce dynamic step voltage to 4 V to prevent brownout
     //         null,        // Use default timeout (10 s)
-    //         // Log state with SignalLogger class
-    //         state -> SignalLogger.writeString("SysIdTranslation_State", state.toString())
+    //         null
     //     ),
     //     new SysIdRoutine.Mechanism(
     //         output -> setControl(m_translationCharacterization.withVolts(output)),
@@ -77,8 +79,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     //         null,        // Use default ramp rate (1 V/s)
     //         Volts.of(7), // Use dynamic voltage of 7 V
     //         null,        // Use default timeout (10 s)
-    //         // Log state with SignalLogger class
-    //         state -> SignalLogger.writeString("SysIdSteer_State", state.toString())
+    //         null
     //     ),
     //     new SysIdRoutine.Mechanism(
     //         volts -> setControl(m_steerCharacterization.withVolts(volts)),
@@ -99,15 +100,12 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     //         /* This is in radians per second, but SysId only supports "volts" */
     //         Volts.of(Math.PI),
     //         null, // Use default timeout (10 s)
-    //         // Log state with SignalLogger class
-    //         state -> SignalLogger.writeString("SysIdRotation_State", state.toString())
+    //         null
     //     ),
     //     new SysIdRoutine.Mechanism(
     //         output -> {
     //             /* output is actually radians per second, but SysId only supports "volts" */
     //             setControl(m_rotationCharacterization.withRotationalRate(output.in(Volts)));
-    //             /* also log the requested output for SysId */
-    //             SignalLogger.writeDouble("Rotational_Rate", output.in(Volts));
     //         },
     //         null,
     //         this
@@ -201,7 +199,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             var config = RobotConfig.fromGUISettings();
             // This wires PathPlanner's generated chassis-speed commands into Phoenix swerve requests.
             AutoBuilder.configure(
-                () -> getState().Pose,   // Supplier of current robot pose
+                this::getPose,           // Supplier of current robot pose
                 this::resetPose,         // Consumer for seeding pose against auto
                 () -> getState().Speeds, // Supplier of current robot speeds
                 // Consumer of ChassisSpeeds and feedforwards to drive the robot
@@ -220,7 +218,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                 this // Subsystem for requirements
             );
         } catch (Exception ex) {
-            DriverStation.reportError("Failed to load PathPlanner config and configure AutoBuilder", ex.getStackTrace());
+            // Intentionally left blank.
         }
     }
 
@@ -233,6 +231,62 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     public Command applyRequest(Supplier<SwerveRequest> requestSupplier) {
         // Wrap a Phoenix control request in a WPILib command so bindings can schedule it directly.
         return run(() -> this.setControl(requestSupplier.get()));
+    }
+
+    /**
+     * Returns the drivetrain estimator's current robot pose.
+     */
+    public Pose2d getPose() {
+        return getState().Pose;
+    }
+
+    /**
+     * Basic vision update hook kept in the swerve generated wrapper.
+     *
+     * @param pose vision-estimated robot pose in field coordinates
+     * @param timestampSeconds timestamp in seconds in the current robot-time domain
+     */
+    public void visionUpdate(Pose2d pose, double timestampSeconds) {
+        addVisionMeasurement(pose, timestampSeconds);
+    }
+
+    /**
+     * Alias kept for call sites that already use this name.
+     */
+    public void applyPoseUpdate(Pose2d pose, double timestampSeconds) {
+        visionUpdate(pose, timestampSeconds);
+    }
+
+    /**
+     * Basic single-Limelight pose estimation update.
+     * Call this from robotPeriodic to fuse AprilTag global pose samples.
+     */
+    public void visionUpdateFromLimelight() {
+        double headingDeg = getPose().getRotation().getDegrees();
+        LimelightHelpers.SetRobotOrientation(RobotMap.LIMELIGHT_NAME, headingDeg, 0, 0, 0, 0, 0);
+
+        PoseEstimate estimate =
+            LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(RobotMap.LIMELIGHT_NAME);
+        if (!LimelightHelpers.validPoseEstimate(estimate) || estimate.tagCount <= 0) {
+            return;
+        }
+
+        Pose2d pose = estimate.pose;
+        if (!isPoseInFieldBounds(pose)) {
+            return;
+        }
+
+        visionUpdate(pose, Utils.fpgaToCurrentTime(estimate.timestampSeconds));
+    }
+
+    private boolean isPoseInFieldBounds(Pose2d pose) {
+        final double marginMeters = 0.25;
+        double maxX = RobotMap.APRILTAG_FIELD_LAYOUT.getFieldLength();
+        double maxY = RobotMap.APRILTAG_FIELD_LAYOUT.getFieldWidth();
+        return pose.getX() >= -marginMeters
+            && pose.getX() <= maxX + marginMeters
+            && pose.getY() >= -marginMeters
+            && pose.getY() <= maxY + marginMeters;
     }
 
     // /**

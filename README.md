@@ -8,7 +8,8 @@ This README is the current quick-reference for drivers, operators, pit crew, and
 - Autonomous modes are loaded from `src/main/deploy/pathplanner/autos/`.
 - Teleop no longer resets pose from the selected auto when enabled.
 - Pivot is manual only. There is no working auto-home routine in the current code.
-- Limelight pose fusion is present in code but currently disabled.
+- No camera-based pose fusion is currently wired in.
+- Single-camera AprilTag pose fusion is wired from Limelight `limelight-1515-1`.
 
 ## Current Controller Bindings
 
@@ -130,8 +131,10 @@ This README is the current quick-reference for drivers, operators, pit crew, and
 
 ## Vision Notes
 
-- `LimelightHomography.update(...)` is currently disabled in `Robot`.
-- The codebase still contains some vision alignment commands, but they are not currently bound to the driver controller.
+- `Robot.robotPeriodic()` calls `CommandSwerveDrivetrain.visionUpdateFromLimelight()`.
+- Camera name is `limelight-1515-1` (`RobotMap.LIMELIGHT_NAME`).
+- AprilTag field map is `RobotMap.APRILTAG_FIELD_LAYOUT` (`k2026RebuiltWelded`) and is used to bound accepted poses.
+- `CommandSwerveDrivetrain.visionUpdate(...)` remains the base estimator update hook.
 
 ## Important Files
 

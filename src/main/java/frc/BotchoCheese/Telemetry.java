@@ -29,7 +29,6 @@ public class Telemetry {
      */
     public Telemetry(double maxSpeed) {
         MaxSpeed = maxSpeed;
-        //SignalLogger.start();
     }
 
     /* What to publish over networktables for telemetry */
@@ -80,7 +79,7 @@ public class Telemetry {
     private final double[] m_moduleStatesArray = new double[8];
     private final double[] m_moduleTargetsArray = new double[8];
 
-    /** Accept the swerve drive state and telemeterize it to SmartDashboard and SignalLogger. */
+    /** Accept the swerve drive state and telemeterize it to SmartDashboard. */
     public void telemeterize(SwerveDriveState state) {
         /* Telemeterize the swerve drive state */
         drivePose.set(state.Pose);
@@ -91,7 +90,6 @@ public class Telemetry {
         driveTimestamp.set(state.Timestamp);
         driveOdometryFrequency.set(1.0 / state.OdometryPeriod);
 
-        /* Also write to log file */
         m_poseArray[0] = state.Pose.getX();
         m_poseArray[1] = state.Pose.getY();
         m_poseArray[2] = state.Pose.getRotation().getDegrees();
@@ -101,11 +99,6 @@ public class Telemetry {
             m_moduleTargetsArray[i*2 + 0] = state.ModuleTargets[i].angle.getRadians();
             m_moduleTargetsArray[i*2 + 1] = state.ModuleTargets[i].speedMetersPerSecond;
         }
-
-        // SignalLogger.writeDoubleArray("DriveState/Pose", m_poseArray);
-        // SignalLogger.writeDoubleArray("DriveState/ModuleStates", m_moduleStatesArray);
-        // SignalLogger.writeDoubleArray("DriveState/ModuleTargets", m_moduleTargetsArray);
-        // SignalLogger.writeDouble("DriveState/OdometryPeriod", state.OdometryPeriod, "seconds");
 
         /* Telemeterize the pose to a Field2d */
         fieldTypePub.set("Field2d");
