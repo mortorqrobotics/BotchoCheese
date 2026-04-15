@@ -11,8 +11,8 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.net.WebServer;
-import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.DoublePublisher;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.TimedRobot;
@@ -125,6 +125,7 @@ public class Robot extends TimedRobot {
     }
 
     var pose = RobotContainer.drivetrain.getPose();
+    m_field.setRobotPose(pose);
     poseXPublisher.set(pose.getX());
     poseYPublisher.set(pose.getY());
     poseHeadingDegPublisher.set(pose.getRotation().getDegrees());
