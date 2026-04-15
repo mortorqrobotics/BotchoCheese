@@ -1,5 +1,6 @@
 package frc.BotchoCheese.Subsystems;
 
+import java.util.Set;
 import java.util.function.Supplier;
 
 import com.ctre.phoenix6.Utils;
@@ -35,6 +36,7 @@ import frc.BotchoCheese.Utils.LimelightHelpers.PoseEstimate;
  * Subsystem so it can easily be used in command-based projects.
  */
 public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Subsystem {
+    private static final Set<Integer> kAllowedVisionTagIds = Set.of(25, 26);
     private static final double kSimLoopPeriod = 0.005; // 5 ms
     private Notifier m_simNotifier = null;
     private double m_lastSimTime;
@@ -270,6 +272,9 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         if (!LimelightHelpers.validPoseEstimate(estimate) || estimate.tagCount <= 0) {
             return;
         }
+        if (!containsAllowedVisionTag(estimate)) {
+            return;
+        }
 
         Pose2d pose = estimate.pose;
         if (!isPoseInFieldBounds(pose)) {
@@ -287,6 +292,18 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             && pose.getX() <= maxX + marginMeters
             && pose.getY() >= -marginMeters
             && pose.getY() <= maxY + marginMeters;
+    }
+
+    private boolean containsAllowedVisionTag(PoseEstimate estimate) {
+        if (estimate.rawFiducials == null || estimate.rawFiducials.length == 0) {
+            return false;
+        }
+        for (LimelightHelpers.RawFiducial fiducial : estimate.rawFiducials) {
+            if (kAllowedVisionTagIds.contains(fiducial.id)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     // /**
