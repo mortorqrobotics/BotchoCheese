@@ -58,7 +58,7 @@ public class RobotContainer {
     private static final double REVERSE_FEEDER_DUTY = -0.1;
     private static final double SHOOTER_SPINUP_TIMEOUT_SECONDS = 1;
 
-    // USB controller ports: driver on 0, operator on 1.
+    // USB controller ports.
     private static final CommandXboxController JOYSTICK1_CONTROLLER = new CommandXboxController(0);
     private static final CommandXboxController JOYSTICK2_CONTROLLER = new CommandXboxController(1);
 

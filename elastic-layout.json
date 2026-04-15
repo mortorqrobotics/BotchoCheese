@@ -359,6 +359,18 @@
               "period": 0.06,
               "sort_options": false
             }
+          },
+          {
+            "title": "Field",
+            "x": 1024.0,
+            "y": 0.0,
+            "width": 512.0,
+            "height": 512.0,
+            "type": "Field2d",
+            "properties": {
+              "topic": "/SmartDashboard/Field",
+              "period": 0.06
+            }
           }
         ]
       }
