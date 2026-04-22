@@ -129,6 +129,7 @@ public class MoveToHub extends Command {
         }
 
         int fiducialId = (int) LimelightHelpers.getFiducialID(RobotMap.LIMELIGHT_NAME);
+        // Ignore tags that belong to the opposite alliance so we do not drive at the wrong hub.
         if (!isAllianceHubTag(fiducialId)) {
             validTarget = false;
             return;
@@ -139,6 +140,7 @@ public class MoveToHub extends Command {
             validTarget = false;
             return;
         }
+        var tagPose = tagPoseOpt.get();
 
         var targetPoseRobotSpace = LimelightHelpers.getTargetPose3d_RobotSpace(RobotMap.LIMELIGHT_NAME);
         double forwardToTagMeters = targetPoseRobotSpace.getX();
@@ -146,11 +148,12 @@ public class MoveToHub extends Command {
 
         forwardErrorMeters = forwardToTagMeters - standoffMeters;
 
+        // As the robot gets farther away, add more sideways offset to approach on an arc instead of straight on.
         double desiredLateralOffsetMeters = arcDirection * arcOffsetPerMeter * Math.abs(forwardErrorMeters);
         lateralErrorMeters = leftToTagMeters - desiredLateralOffsetMeters;
 
         double targetAngle =
-            tagPoseOpt.get().getRotation().toRotation2d().getRadians() + Math.PI + ANGLE_OFFSET_RADIANS;
+            tagPose.getRotation().toRotation2d().getRadians() + Math.PI + ANGLE_OFFSET_RADIANS;
         angleController.setSetpoint(targetAngle);
 
         double currentAngle = drivetrainSubsystem.getState().Pose.getRotation().getRadians();
@@ -162,8 +165,9 @@ public class MoveToHub extends Command {
         if (alliance.isEmpty()) {
             return false;
         }
+        var allianceColor = alliance.get();
 
-        return alliance.get() == DriverStation.Alliance.Red
+        return allianceColor == DriverStation.Alliance.Red
             ? RED_HUB_TAG_IDS.contains(fiducialId)
             : BLUE_HUB_TAG_IDS.contains(fiducialId);
     }

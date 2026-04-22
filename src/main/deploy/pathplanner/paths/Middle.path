@@ -8,20 +8,20 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.2650734953703706,
-        "y": 4.049631148726852
+        "x": 3.087715663580247,
+        "y": 4.039420765817901
       },
       "isLocked": false,
       "linkedName": "Hub home"
     },
     {
       "anchor": {
-        "x": 2.416753182870371,
-        "y": 4.049631148726852
+        "x": 2.233,
+        "y": 4.019
       },
       "prevControl": {
-        "x": 2.666753182870371,
-        "y": 4.049631148726852
+        "x": 2.6603578317901238,
+        "y": 4.029210382908951
       },
       "nextControl": null,
       "isLocked": false,
@@ -33,8 +33,8 @@
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 0.5,
-    "maxAcceleration": 1.0,
+    "maxVelocity": 1.75,
+    "maxAcceleration": 1.5,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
     "nominalVoltage": 12.0,

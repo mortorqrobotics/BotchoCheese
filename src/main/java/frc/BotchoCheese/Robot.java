@@ -4,14 +4,18 @@
 
 package frc.BotchoCheese;
 
-import com.ctre.phoenix6.SignalLogger;
+import java.util.Locale;
 
-import edu.wpi.first.math.geometry.Rotation2d;
+import com.ctre.phoenix6.SignalLogger;
+import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.NeutralModeValue;
+
+import edu.wpi.first.net.WebServer;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.DoublePublisher;
 import edu.wpi.first.networktables.IntegerPublisher;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
@@ -20,12 +24,29 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.BotchoCheese.Commands.LimelightHomography;
+import frc.BotchoCheese.Constants.RobotMap;
 import frc.BotchoCheese.Utils.DebugLog;
 import frc.BotchoCheese.Utils.LimelightHelpers;
 
 
 public class Robot extends TimedRobot {
   private static final long LIMELIGHT_IDLE_THROTTLE = 100;
+  private static final double SWERVE_OFFSET_PUBLISH_INTERVAL_SECONDS = 0.5;
+  private static final double MATCH_PUBLISH_INTERVAL_SECONDS = 0.1;
+  private static final String MATCH_TIME_SECONDS_KEY = "Match/TimeSeconds";
+  private static final String MATCH_MODE_KEY = "Match/Mode";
+  private static final String MATCH_ALLIANCE_KEY = "Match/Alliance";
+  private static final String MATCH_STATION_KEY = "Match/Station";
+  private static final String MATCH_TYPE_KEY = "Match/Type";
+  private static final String MATCH_NUMBER_KEY = "Match/Number";
+  private static final String MATCH_REPLAY_NUMBER_KEY = "Match/Replay";
+  private static final String MATCH_EVENT_NAME_KEY = "Match/EventName";
+  private static final String MATCH_GAME_DATA_KEY = "Match/GameData";
+  private static final String MATCH_REBUILT_SHIFT_KEY = "Match/RebuiltShift";
+  private static final String MATCH_REBUILT_NEXT_SHIFT_KEY = "Match/RebuiltNextShift";
+  private static final String MATCH_REBUILT_ACTIVE_FOR_US_KEY = "Match/RebuiltActiveForUs";
+  private static final String MATCH_REBUILT_SHIFT_TIME_LEFT_KEY = "Match/RebuiltShiftTimeLeftSeconds";
+  private static final String MATCH_COACH_SUMMARY_KEY = "Match/CoachSummary";
 
   public static LimelightHelpers limelight;
   public static LimelightHelpers limelightTwo;
@@ -33,10 +54,22 @@ public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
 
   private final RobotContainer m_robotContainer;
+  private final TalonFX[] swerveNeutralReportMotors = {
+      new TalonFX(0, RobotMap.CANIVORE_CAN_BUS),
+      new TalonFX(1, RobotMap.CANIVORE_CAN_BUS),
+      new TalonFX(2, RobotMap.CANIVORE_CAN_BUS),
+      new TalonFX(3, RobotMap.CANIVORE_CAN_BUS),
+      new TalonFX(4, RobotMap.CANIVORE_CAN_BUS),
+      new TalonFX(5, RobotMap.CANIVORE_CAN_BUS),
+      new TalonFX(6, RobotMap.CANIVORE_CAN_BUS),
+      new TalonFX(7, RobotMap.CANIVORE_CAN_BUS)
+  };
 
   private final boolean kUseLimelight = false;
   private final Field2d m_field = new Field2d();
   private double lastCanHealthLogSeconds = 0.0;
+  private double lastSwerveOffsetPublishSeconds = Double.NEGATIVE_INFINITY;
+  private double lastMatchPublishSeconds = Double.NEGATIVE_INFINITY;
   private DoublePublisher canUtilizationPublisher;
   private IntegerPublisher canBusOffPublisher;
   private IntegerPublisher canTxFullPublisher;
@@ -55,6 +88,8 @@ public class Robot extends TimedRobot {
 
   @Override
   public void robotInit() {
+    // Host dashboard layout files from /home/lvuser/deploy so Elastic can load them directly from the robot.
+    WebServer.start(5800, Filesystem.getDeployDirectory().getPath());
     setLimelightThrottle(LIMELIGHT_IDLE_THROTTLE);
 
     var poseTable = NetworkTableInstance.getDefault().getTable("Pose");
@@ -63,6 +98,8 @@ public class Robot extends TimedRobot {
     poseHeadingDegPublisher = poseTable.getDoubleTopic("HeadingDeg").publish();
 
     if (DebugLog.DEBUG) {
+      // Only enable CTRE file logging during focused debugging.
+      // Leaving this off avoids unnecessary writes during practice/matches.
       SignalLogger.setPath("logs");
       SignalLogger.start();
       DebugLog.info("CTRE SignalLogger enabled (debug mode).");
@@ -88,6 +125,7 @@ public class Robot extends TimedRobot {
   public void robotPeriodic() {
     CommandScheduler.getInstance().run();
 
+    publishMatchData();
     publishDashboardData();
 
     if (kUseLimelight) {
@@ -102,18 +140,251 @@ public class Robot extends TimedRobot {
   }
 
   private void publishDashboardData() {
-    SmartDashboard.putNumber(
-        "Swerve/FrontLeft Raw Abs (rot)",
-        RobotContainer.drivetrain.getModule(0).getEncoder().getAbsolutePosition().getValueAsDouble());
-    SmartDashboard.putNumber(
-        "Swerve/FrontRight Raw Abs (rot)",
-        RobotContainer.drivetrain.getModule(1).getEncoder().getAbsolutePosition().getValueAsDouble());
-    SmartDashboard.putNumber(
-        "Swerve/BackLeft Raw Abs (rot)",
-        RobotContainer.drivetrain.getModule(2).getEncoder().getAbsolutePosition().getValueAsDouble());
-    SmartDashboard.putNumber(
-        "Swerve/BackRight Raw Abs (rot)",
-        RobotContainer.drivetrain.getModule(3).getEncoder().getAbsolutePosition().getValueAsDouble());
+    m_robotContainer.updateAutoSelectionDashboard();
+    if (!DriverStation.isDisabled()) {
+      return;
+    }
+
+    double now = Timer.getFPGATimestamp();
+    if (now - lastSwerveOffsetPublishSeconds < SWERVE_OFFSET_PUBLISH_INTERVAL_SECONDS) {
+      return;
+    }
+    lastSwerveOffsetPublishSeconds = now;
+
+    // Option 1 calibration flow (code-side offsets):
+    // Keep CANcoder magnet offsets at zero and copy these values directly into
+    // TunerConstants k*EncoderOffset as Rotations.of(<value>).
+    double frontLeftAbsRot = RobotContainer.drivetrain.getModule(0).getEncoder().getAbsolutePosition().refresh().getValueAsDouble();
+    double frontRightAbsRot = RobotContainer.drivetrain.getModule(1).getEncoder().getAbsolutePosition().refresh().getValueAsDouble();
+    double backLeftAbsRot = RobotContainer.drivetrain.getModule(2).getEncoder().getAbsolutePosition().refresh().getValueAsDouble();
+    double backRightAbsRot = RobotContainer.drivetrain.getModule(3).getEncoder().getAbsolutePosition().refresh().getValueAsDouble();
+
+    SmartDashboard.putNumber("SwerveCal/FrontLeft OffsetToPaste (rot)", frontLeftAbsRot);
+    SmartDashboard.putNumber("SwerveCal/FrontRight OffsetToPaste (rot)", frontRightAbsRot);
+    SmartDashboard.putNumber("SwerveCal/BackLeft OffsetToPaste (rot)", backLeftAbsRot);
+    SmartDashboard.putNumber("SwerveCal/BackRight OffsetToPaste (rot)", backRightAbsRot);
+    SmartDashboard.putString(
+        "SwerveCal/PasteLine FrontLeft",
+        String.format(
+            Locale.US,
+            "private static final Angle kFrontLeftEncoderOffset = Rotations.of(%.12f);",
+            frontLeftAbsRot));
+    SmartDashboard.putString(
+        "SwerveCal/PasteLine FrontRight",
+        String.format(
+            Locale.US,
+            "private static final Angle kFrontRightEncoderOffset = Rotations.of(%.12f);",
+            frontRightAbsRot));
+    SmartDashboard.putString(
+        "SwerveCal/PasteLine BackLeft",
+        String.format(
+            Locale.US,
+            "private static final Angle kBackLeftEncoderOffset = Rotations.of(%.12f);",
+            backLeftAbsRot));
+    SmartDashboard.putString(
+        "SwerveCal/PasteLine BackRight",
+        String.format(
+            Locale.US,
+            "private static final Angle kBackRightEncoderOffset = Rotations.of(%.12f);",
+            backRightAbsRot));
+    SmartDashboard.putString(
+        "SwerveCal/PasteBlock",
+        String.format(
+            Locale.US,
+            "private static final Angle kFrontLeftEncoderOffset = Rotations.of(%.12f);%n"
+                + "private static final Angle kFrontRightEncoderOffset = Rotations.of(%.12f);%n"
+                + "private static final Angle kBackLeftEncoderOffset = Rotations.of(%.12f);%n"
+                + "private static final Angle kBackRightEncoderOffset = Rotations.of(%.12f);",
+            frontLeftAbsRot,
+            frontRightAbsRot,
+            backLeftAbsRot,
+            backRightAbsRot));
+    SmartDashboard.putString(
+        "SwerveCal/Instruction",
+        "Point wheels forward, then copy SwerveCal/* OffsetToPaste (rot) into TunerConstants k*EncoderOffset");
+
+  }
+
+  private void publishMatchData() {
+    double now = Timer.getFPGATimestamp();
+    if (now - lastMatchPublishSeconds < MATCH_PUBLISH_INTERVAL_SECONDS) {
+      return;
+    }
+    lastMatchPublishSeconds = now;
+
+    double matchTime = DriverStation.getMatchTime();
+    String gameData = DriverStation.getGameSpecificMessage();
+
+    SmartDashboard.putNumber(MATCH_TIME_SECONDS_KEY, matchTime);
+    SmartDashboard.putString(MATCH_MODE_KEY, getRobotModeSummary());
+    SmartDashboard.putString(
+        MATCH_ALLIANCE_KEY,
+        DriverStation.getAlliance().map(alliance -> alliance.name()).orElse("Unknown"));
+    SmartDashboard.putString(
+        MATCH_STATION_KEY,
+        DriverStation.getLocation().isPresent()
+            ? Integer.toString(DriverStation.getLocation().getAsInt())
+            : "Unknown");
+    SmartDashboard.putString(MATCH_TYPE_KEY, DriverStation.getMatchType().name());
+    SmartDashboard.putNumber(MATCH_NUMBER_KEY, DriverStation.getMatchNumber());
+    SmartDashboard.putNumber(MATCH_REPLAY_NUMBER_KEY, DriverStation.getReplayNumber());
+    SmartDashboard.putString(MATCH_EVENT_NAME_KEY, DriverStation.getEventName());
+    SmartDashboard.putString(MATCH_GAME_DATA_KEY, gameData);
+    String shiftLabel = getRebuiltShiftLabel(matchTime);
+    String nextShiftLabel = getRebuiltNextShiftLabel(matchTime);
+    boolean activeForUs = isRebuiltShiftActiveForOurAlliance(matchTime, gameData);
+    double shiftTimeLeftSeconds = getRebuiltShiftTimeLeftSeconds(matchTime);
+
+    SmartDashboard.putString(MATCH_REBUILT_SHIFT_KEY, shiftLabel);
+    SmartDashboard.putString(MATCH_REBUILT_NEXT_SHIFT_KEY, nextShiftLabel);
+    SmartDashboard.putBoolean(MATCH_REBUILT_ACTIVE_FOR_US_KEY, activeForUs);
+    SmartDashboard.putNumber(MATCH_REBUILT_SHIFT_TIME_LEFT_KEY, shiftTimeLeftSeconds);
+    SmartDashboard.putString(
+        MATCH_COACH_SUMMARY_KEY,
+        String.format(
+            Locale.US,
+            "%s -> %s | %s | %.1fs left",
+            shiftLabel,
+            nextShiftLabel,
+            activeForUs ? "ACTIVE" : "INACTIVE",
+            shiftTimeLeftSeconds));
+  }
+
+  private String getRobotModeSummary() {
+    if (DriverStation.isEStopped()) {
+      return "E-STOP";
+    }
+    if (DriverStation.isDisabled()) {
+      return "DISABLED";
+    }
+    if (DriverStation.isAutonomous()) {
+      return "AUTO";
+    }
+    if (DriverStation.isTeleop()) {
+      return "TELEOP";
+    }
+    if (DriverStation.isTest()) {
+      return "TEST";
+    }
+    return "UNKNOWN";
+  }
+
+  private String getRebuiltShiftLabel(double matchTime) {
+    if (DriverStation.isEStopped()) {
+      return "E-STOP";
+    }
+    if (DriverStation.isDisabled()) {
+      return "DISABLED";
+    }
+    if (DriverStation.isAutonomous()) {
+      return "AUTO";
+    }
+    if (!DriverStation.isTeleop()) {
+      return "UNKNOWN";
+    }
+    if (matchTime > 130.0) {
+      return "TRANSITION";
+    }
+    if (matchTime > 105.0) {
+      return "SHIFT_1";
+    }
+    if (matchTime > 80.0) {
+      return "SHIFT_2";
+    }
+    if (matchTime > 55.0) {
+      return "SHIFT_3";
+    }
+    if (matchTime > 30.0) {
+      return "SHIFT_4";
+    }
+    return "ENDGAME";
+  }
+
+  private boolean isRebuiltShiftActiveForOurAlliance(double matchTime, String gameData) {
+    if (DriverStation.isAutonomousEnabled()) {
+      return true;
+    }
+    if (!DriverStation.isTeleopEnabled()) {
+      return false;
+    }
+    if (matchTime > 130.0 || matchTime <= 30.0) {
+      return true;
+    }
+    if (gameData.isEmpty() || DriverStation.getAlliance().isEmpty()) {
+      return true;
+    }
+
+    boolean redInactiveFirst;
+    char marker = gameData.charAt(0);
+    if (marker == 'R') {
+      redInactiveFirst = true;
+    } else if (marker == 'B') {
+      redInactiveFirst = false;
+    } else {
+      return true;
+    }
+
+    boolean shift1ActiveForUs = DriverStation.getAlliance().get() == DriverStation.Alliance.Red
+        ? !redInactiveFirst
+        : redInactiveFirst;
+    boolean oddShift = matchTime > 105.0 || (matchTime > 55.0 && matchTime <= 80.0);
+    return oddShift ? shift1ActiveForUs : !shift1ActiveForUs;
+  }
+
+  private String getRebuiltNextShiftLabel(double matchTime) {
+    if (DriverStation.isEStopped() || DriverStation.isDisabled()) {
+      return "N/A";
+    }
+    if (DriverStation.isAutonomous()) {
+      return "SHIFT_1";
+    }
+    if (!DriverStation.isTeleop()) {
+      return "UNKNOWN";
+    }
+    if (matchTime > 130.0) {
+      return "SHIFT_1";
+    }
+    if (matchTime > 105.0) {
+      return "SHIFT_2";
+    }
+    if (matchTime > 80.0) {
+      return "SHIFT_3";
+    }
+    if (matchTime > 55.0) {
+      return "SHIFT_4";
+    }
+    if (matchTime > 30.0) {
+      return "ENDGAME";
+    }
+    return "MATCH_END";
+  }
+
+  private double getRebuiltShiftTimeLeftSeconds(double matchTime) {
+    if (DriverStation.isDisabled() || DriverStation.isEStopped()) {
+      return 0.0;
+    }
+    if (DriverStation.isAutonomous()) {
+      return Math.max(0.0, matchTime - 130.0);
+    }
+    if (!DriverStation.isTeleop()) {
+      return 0.0;
+    }
+    if (matchTime > 130.0) {
+      return matchTime - 130.0;
+    }
+    if (matchTime > 105.0) {
+      return matchTime - 105.0;
+    }
+    if (matchTime > 80.0) {
+      return matchTime - 80.0;
+    }
+    if (matchTime > 55.0) {
+      return matchTime - 55.0;
+    }
+    if (matchTime > 30.0) {
+      return matchTime - 30.0;
+    }
+    return Math.max(0.0, matchTime);
   }
 
   private void publishPoseData() {
@@ -131,9 +402,16 @@ public class Robot extends TimedRobot {
     NetworkTableInstance.getDefault().getTable("limelight").getEntry("throttle_set").setNumber(throttleValue);
   }
 
+  private void setSwerveNeutralMode(NeutralModeValue neutralMode) {
+    for (TalonFX motor : swerveNeutralReportMotors) {
+      motor.setNeutralMode(neutralMode);
+    }
+  }
+
 
 @Override
 public void disabledInit() {
+  setSwerveNeutralMode(NeutralModeValue.Coast);
   m_robotContainer.pivot.disableBrakeMode();
   setLimelightThrottle(LIMELIGHT_IDLE_THROTTLE);
 }
@@ -148,8 +426,9 @@ public void disabledInit() {
 
   @Override
   public void autonomousInit() {
+    setSwerveNeutralMode(NeutralModeValue.Brake);
     m_robotContainer.pivot.enableBrakeMode();
-    applyAllianceHeadingReference();
+    m_robotContainer.seedPoseFromSelectedAuto();
     DebugLog.info("Autonomous init");
 
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
@@ -168,8 +447,8 @@ public void disabledInit() {
 
   @Override
   public void teleopInit() {
+    setSwerveNeutralMode(NeutralModeValue.Brake);
     m_robotContainer.pivot.enableBrakeMode();
-    m_robotContainer.seedPoseFromSelectedAuto();
     DebugLog.info("Teleop init");
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
@@ -186,6 +465,7 @@ public void disabledInit() {
 
   @Override
   public void testInit() {
+    setSwerveNeutralMode(NeutralModeValue.Brake);
     m_robotContainer.pivot.enableBrakeMode();
     CommandScheduler.getInstance().cancelAll();
   }
@@ -233,12 +513,4 @@ public void disabledInit() {
     }
   }
 
-  private void applyAllianceHeadingReference() {
-    Alliance alliance = DriverStation.getAlliance().orElse(Alliance.Blue);
-    double headingRad = alliance == Alliance.Red ? Math.PI : 0.0;
-    double headingDeg = Math.toDegrees(headingRad);
-
-    RobotContainer.gyro.setYaw(headingDeg);
-    RobotContainer.drivetrain.resetRotation(new Rotation2d(headingRad));
-  }
 }

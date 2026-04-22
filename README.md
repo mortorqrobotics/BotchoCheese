@@ -1,94 +1,147 @@
 # Team 1515 Mortorq - 2026 Rebuilt Robot Code
 
-This README is for drivers, programmers, and pit crew to understand how the robot behaves right now.
+This README is the current quick-reference for drivers, operators, pit crew, and programmers.
 
-## Robot Behavior Summary
+## Robot Summary
 
 - Drivetrain is CTRE Phoenix 6 swerve with field-centric default driving.
-- Driver has teleop shot alignment buttons (`X`, `Y`, `B`) that pathfind to fixed shooting poses.
-- Driver has a homing/reset button (`Start`) to reset pose estimate at the hub-front reference spot.
-- Autonomous options are loaded from `src/main/deploy/pathplanner/autos/*.auto`.
-- Alliance flipping is automatic for both auto and teleop shot pathfinding.
+- Autonomous modes are loaded from `src/main/deploy/pathplanner/autos/`.
+- Teleop no longer resets pose from the selected auto when enabled.
+- Pivot is manual only. There is no working auto-home routine in the current code.
+- Limelight pose fusion is present in code but currently disabled.
 
 ## Current Controller Bindings
 
 ### Driver Controller (`port 0`)
 
-- Left stick `Y/X`: field-centric translation.
-- Right stick `X`: field-centric rotation.
+- Left stick `Y`: drive forward and backward.
+- Left stick `X`: strafe left and right.
+- Right stick `X`: rotate robot.
 - Left bumper (hold): swerve brake.
 - D-pad up/down/left/right (hold): robot-centric crawl at fixed speed.
-- Start (press): reset pose to hub-home reference and reseed field-centric.
-- X (press): pathfind to left shot setpoint.
-- Y (press): pathfind to middle shot setpoint.
-- B (press): pathfind to right shot setpoint.
-- X/Y/B (release): cancel active driver pathfind command.
-- Left trigger (hold): `StrafeToTag`.
-- Right trigger (hold): `RotateToTag`.
+- Left trigger (hold): slow rotate left (in place).
+- Right trigger (hold): slow rotate right (in place).
+- Start (press): reseed field-centric heading only.
 
 ### Operator Controller (`port 1`)
 
 - D-pad up (hold): pivot up.
 - D-pad down (hold): pivot down.
-- D-pad left (hold): pivot to bottom and home.
-- D-pad right (hold): pivot up, then oscillate down/up sequence.
-- Left trigger (toggle): intake + reverse index/feed + shooter anti-jam behavior.
-- B (hold): reverse intake/indexer/feeder.
-- Right trigger (toggle): big shot sequence.
-- Right bumper (toggle): regular shot sequence.
-- Y (toggle): lob shot sequence.
-- A (toggle): line-drive shot sequence.
+- Left trigger (hold): intake / anti-jam sequence.
+- B (hold): reverse intake, indexer, and feeder.
+- Right trigger (toggle): big shot.
+- Right bumper (toggle): regular shot.
+- X (toggle): SmartDashboard-programmed shot using `Shots/X Back RPS` and `Shots/X Front RPS`.
+- Y (toggle): lob shot.
+- A (toggle): line-drive shot.
 
-## How Teleop Shot Alignment Works
+## Operator Notes
 
-1. Driver physically places robot at the front of the hub reference spot.
-2. Driver presses `Start` to reset pose estimate to `HUB_HOME_POSE_BLUE` (flipped automatically on Red).
-3. Driver presses `X`, `Y`, or `B` to pathfind to left/middle/right shot poses.
-4. Releasing `X`, `Y`, or `B` cancels the active pathfind command.
+- Left trigger is hold-to-run. Releasing it stops the intake sequence.
+- `B` is hold-to-run. Releasing it stops the reverse/un-jam sequence.
+- Right trigger, right bumper, `X`, `Y`, and `A` are toggled shots. Press once to start, press again to stop.
+- Pivot control is manual. Do not expect it to home itself or move to saved positions.
 
-This method is used because a full `resetPose(...)` is more reliable than only reseeding heading when the robot has been moved by hand.
+## Autonomous
 
-## PathPlanner and Setpoint Source of Truth
+- Dashboard chooser key: `Auto Chooser`.
+- On autonomous enable, the robot seeds pose from the selected auto's starting pose when one is available.
+- If no auto is selected, the robot runs a no-op command in autonomous.
+- Deploy now deletes old files from the roboRIO deploy directory, which helps prevent stale autos and paths from lingering between events.
 
-### Runtime files
+### Auto readiness indicators
 
-- Autos: `src/main/deploy/pathplanner/autos/`
-- Paths: `src/main/deploy/pathplanner/paths/`
-- Navgrid: `src/main/deploy/pathplanner/navgrid.json`
+- `Auto/SelectedValid`: `true` when a real auto is selected, `false` when the chooser is still on `Select Auto`.
+- `Auto/SelectedName`: the currently selected auto name.
+- `Auto/Status`: human-readable autonomous status and failure reason.
+- `Auto/StartPoseSeeded`: `true` once the selected auto's start pose has been seeded successfully.
 
-### Code source of truth for teleop shot/homing setpoints
+## Dashboard Items
 
-- `src/main/java/frc/BotchoCheese/Constants/PathPlannerSetpoints.java`
+- `Auto Chooser`: autonomous chooser.
+- `Auto/SelectedValid`: quick validity check for the selected auto.
+- `Auto/SelectedName`: selected auto name.
+- `Auto/Status`: autonomous readiness / failure status.
+- `Auto/StartPoseSeeded`: whether autonomous start pose seeding succeeded.
+- `Match/TimeSeconds`: current match time from DS/FMS.
+- `Match/Mode`: one of `DISABLED`, `AUTO`, `TELEOP`, `TEST`, `E-STOP`.
+- `Match/Alliance`: alliance color (`Red`, `Blue`, or `Unknown`).
+- `Match/Station`: station number (`1`-`3`, or `Unknown`).
+- `Match/Type`, `Match/Number`, `Match/Replay`, `Match/EventName`: match metadata from DS/FMS.
+- `Match/GameData`: raw game data character from FMS (`R` or `B` for REBUILT).
+- `Match/RebuiltShift`: active REBUILT phase (`SHIFT_1`..`SHIFT_4`, `TRANSITION`, `ENDGAME`, plus non-teleop mode labels).
+- `Match/RebuiltNextShift`: next REBUILT phase (`SHIFT_1`..`SHIFT_4`, `ENDGAME`, `MATCH_END`).
+- `Match/RebuiltActiveForUs`: `true` when your alliance is active in the current REBUILT shift logic.
+- `Match/RebuiltShiftTimeLeftSeconds`: countdown in seconds until the next REBUILT phase boundary.
+- `Match/CoachSummary`: compact drive-coach summary string (`<shift> -> <next> | ACTIVE/INACTIVE | <seconds> left`).
+- `Shots/X Back RPS`: custom back shooter speed for the `X` shot.
+- `Shots/X Front RPS`: custom front shooter speed for the `X` shot.
+- `Swerve/* Raw Abs (rot)`: raw absolute encoder values for each swerve module.
+- `SwerveCal/* OffsetToPaste (rot)`: copy these directly into `TunerConstants` encoder offsets (Option 1 calibration flow).
+- `SwerveCal/PasteLine *`: per-module ready-to-paste lines for `TunerConstants`.
+- `SwerveCal/PasteBlock`: four-line ready-to-paste block for all module offsets.
+- `SwerveCal/Instruction`: quick reminder of the calibration workflow.
 
-The robot does not parse path JSON at runtime for these teleop shot targets anymore.
-If you tune shot/homing poses in PathPlanner, copy updated values into `PathPlannerSetpoints.java`.
+## Elastic Layout From Robot
 
-Current headings for shot setpoints are intentionally tied to `goalEndState.rotation` from:
+- The robot hosts deploy files on port `5800` (`WebServer.start(5800, Filesystem.getDeployDirectory().getPath())`).
+- `elastic-layout.json` is deployed at `src/main/deploy/elastic-layout.json`, so drive team can load directly from robot.
+- In Elastic, use `File -> Load Layout From Robot`.
+- Direct URL fallback: `http://roborio-<team>-frc.local:5800/elastic-layout.json` (replace `<team>` with your team number).
 
-- `Left side.path`
-- `Middle.path`
-- `Right side.path`
+## Shooter Tuning Knobs
 
-## Autonomous Selection
+- Shared shoot conveyor duty cycles and shooter spin-up timeout now live in `RobotContainer`:
+- `SHOOT_INTAKE_DUTY`
+- `SHOOT_INDEXER_DUTY`
+- `SHOOT_FEEDER_DUTY`
+- `SHOOTER_SPINUP_TIMEOUT_SECONDS`
+- These values are used by both operator shoot buttons and the registered PathPlanner `Shoot` named command.
 
-- Auto chooser key on dashboard: `Auto Mode`.
-- All `.auto` files are listed; no Red-name filtering is applied.
-- In teleop init, robot seeds pose from selected auto start pose when available.
+## CAN Motor Map And Config
+
+| CAN ID | Device | Subsystem / Module | Bus | Motor Type / Arrangement | Stator Limit (A) | Supply Limit (A) | Neutral Mode | Key Config Notes |
+|---|---|---|---|---|---:|---:|---|---|
+| 0 | Front Left Drive | Swerve Front Left | CANivore (`1515Canivore`) | `TalonFX_Integrated` drive | Not explicitly set in code | Not explicitly set in code | Coast | Left side drive invert flag `false` |
+| 1 | Front Left Steer | Swerve Front Left | CANivore (`1515Canivore`) | `TalonFX_Integrated` steer | 45 | Not explicitly set in code | Coast | Steer invert `false`, feedback source `FusedCANcoder` |
+| 2 | Front Right Drive | Swerve Front Right | CANivore (`1515Canivore`) | `TalonFX_Integrated` drive | Not explicitly set in code | Not explicitly set in code | Coast | Right side drive invert flag `true` |
+| 3 | Front Right Steer | Swerve Front Right | CANivore (`1515Canivore`) | `TalonFX_Integrated` steer | 45 | Not explicitly set in code | Coast | Steer invert `false`, feedback source `FusedCANcoder` |
+| 4 | Back Left Drive | Swerve Back Left | CANivore (`1515Canivore`) | `TalonFX_Integrated` drive | Not explicitly set in code | Not explicitly set in code | Coast | Left side drive invert flag `false` |
+| 5 | Back Left Steer | Swerve Back Left | CANivore (`1515Canivore`) | `TalonFX_Integrated` steer | 45 | Not explicitly set in code | Coast | Steer invert `false`, feedback source `FusedCANcoder` |
+| 6 | Back Right Drive | Swerve Back Right | CANivore (`1515Canivore`) | `TalonFX_Integrated` drive | Not explicitly set in code | Not explicitly set in code | Coast | Right side drive invert flag `true` |
+| 7 | Back Right Steer | Swerve Back Right | CANivore (`1515Canivore`) | `TalonFX_Integrated` steer | 45 | Not explicitly set in code | Coast | Steer invert `false`, feedback source `FusedCANcoder` |
+| 18 | Indexer Motor | Indexer | roboRIO CAN | `TalonFXS` + `Minion_JST` | 40 | 30 | Brake | Duty-cycle output command |
+| 20 | Left Pivot Motor (Leader) | Pivot | roboRIO CAN | `TalonFX` | 60 | 40 | Brake by config; switched to Coast in `disabledInit()` | Manual voltage control; follower pair |
+| 21 | Right Pivot Motor (Follower) | Pivot | roboRIO CAN | `TalonFX` follower (Opposed) | 60 | 40 | Brake by config; switched to Coast in `disabledInit()` | Follows ID 20 with `MotorAlignmentValue.Opposed` |
+| 22 | Intake Motor | Intake | roboRIO CAN | `TalonFX` (X44) | 60 | 40 | Brake | Inverted `Clockwise_Positive`; duty-cycle output |
+| 23 | Feeder Motor | Feeder | roboRIO CAN | `TalonFX` | 60 | 40 | Brake | Duty-cycle output |
+| 24 | Back Left Shooter | Shooter | roboRIO CAN | `TalonFX` | 40 | 30 | Brake | Inverted `Clockwise_Positive`; velocity closed-loop |
+| 25 | Back Right Shooter (Follower) | Shooter | roboRIO CAN | `TalonFX` follower (Aligned) | 40 | 30 | Brake | Follows ID 24 with `MotorAlignmentValue.Aligned` |
+| 26 | Front Shooter | Shooter | roboRIO CAN | `TalonFX` | 40 | 30 | Brake | Inverted `Clockwise_Positive`; velocity closed-loop |
+
+### Swerve Azimuth Sensors (Not Motors)
+
+| CAN ID | Device | Module | Bus | Notes |
+|---|---|---|---|---|
+| 10 | CANcoder | Front Left | CANivore (`1515Canivore`) | Encoder invert flag `false`; code-side offset in `TunerConstants` |
+| 11 | CANcoder | Front Right | CANivore (`1515Canivore`) | Encoder invert flag `false`; code-side offset in `TunerConstants` |
+| 12 | CANcoder | Back Left | CANivore (`1515Canivore`) | Encoder invert flag `false`; code-side offset in `TunerConstants` |
+| 13 | CANcoder | Back Right | CANivore (`1515Canivore`) | Encoder invert flag `false`; code-side offset in `TunerConstants` |
 
 ## Vision Notes
 
-- `StrafeToTag` and `RotateToTag` are available from driver triggers.
-- `LimelightHomography.update(...)` is currently disabled in `Robot` (`kUseLimelight = false`).
+- `LimelightHomography.update(...)` is currently disabled in `Robot`.
+- The codebase still contains some vision alignment commands, but they are not currently bound to the driver controller.
 
 ## Important Files
 
-- `src/main/java/frc/BotchoCheese/RobotContainer.java` (all bindings and command wiring)
-- `src/main/java/frc/BotchoCheese/Robot.java` (mode lifecycle behavior)
-- `src/main/java/frc/BotchoCheese/Constants/PathPlannerSetpoints.java` (teleop shot/home setpoints)
-- `src/main/deploy/pathplanner/` (auto/path assets)
+- `src/main/java/frc/BotchoCheese/RobotContainer.java`: controller bindings and command wiring.
+- `src/main/java/frc/BotchoCheese/Robot.java`: robot mode lifecycle behavior.
+- `src/main/java/frc/BotchoCheese/Subsystems/Pivot.java`: manual pivot behavior.
+- `src/main/deploy/pathplanner/`: autonomous and path assets.
 
 ## Team Workflow Notes
 
-- Keep this README and `PathPlannerSetpoints.java` in sync with current driver behavior.
-- If controls change in `RobotContainer`, update this document in the same PR.
-- Old `controllerbounds.txt` may be stale; use `RobotContainer` and this README as the current reference.
+- Keep this README in sync with `RobotContainer.java`.
+- If bindings change, update this document in the same PR.
+- Treat `controllerbounds.txt` as potentially stale unless it is updated alongside the code.

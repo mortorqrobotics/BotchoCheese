@@ -6,7 +6,6 @@ import com.ctre.phoenix6.configs.CANdleConfiguration;
 import com.ctre.phoenix6.controls.EmptyAnimation;
 import com.ctre.phoenix6.controls.RainbowAnimation;
 import com.ctre.phoenix6.controls.SolidColor;
-import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.hardware.CANdle;
 import com.ctre.phoenix6.signals.LossOfSignalBehaviorValue;
 import com.ctre.phoenix6.signals.Enable5VRailValue;
@@ -19,14 +18,17 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.BotchoCheese.Constants.RobotMap;
 
 public class CANdleLight extends SubsystemBase {
+    // LED strip bounds passed into Phoenix animation/color requests.
     private static final int LED_START_INDEX = 0;
     private static final int LED_COUNT = 0;
     private static final int LED_END_INDEX = LED_START_INDEX + LED_COUNT - 1;
     private static final double CANDLE_BRIGHTNESS = 0.5;
 
-    private final CANdle candle = new CANdle(RobotMap.CANDLE_CAN_ID, new CANBus(RobotMap.CANIVORE_CAN_BUS));
+    // Use the roboRIO CAN bus (same bus pattern as shooter TalonFX constructors).
+    private final CANdle candle = new CANdle(RobotMap.CANDLE_CAN_ID);
 
     public CANdleLight() {
+        // Configure the CANdle once at startup, then leave color changes to the helper methods below.
         CANdleConfiguration config = new CANdleConfiguration();
         config.CANdleFeatures.StatusLedWhenActive = StatusLedWhenActiveValue.Disabled;
         config.CANdleFeatures.Enable5VRail = Enable5VRailValue.Enabled;
@@ -43,6 +45,7 @@ public class CANdleLight extends SubsystemBase {
     }
 
     public void setSolidColor(int r, int g, int b) {
+        // Clear any running animation before applying a fixed RGB color.
         candle.setControl(new EmptyAnimation(0));
         candle.setControl(
             new SolidColor(LED_START_INDEX, LED_END_INDEX).withColor(new RGBWColor(r, g, b))

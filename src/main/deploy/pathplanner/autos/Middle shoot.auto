@@ -17,13 +17,69 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "Shoot"
+                  "name": "ShootFirstWithPivotDown"
                 }
               },
               {
                 "type": "path",
                 "data": {
                   "pathName": "Middle alliance balls"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "PivotDownOnlyShort"
+                }
+              },
+              {
+                "type": "race",
+                "data": {
+                  "commands": [
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "Intake"
+                      }
+                    },
+                    {
+                      "type": "sequential",
+                      "data": {
+                        "commands": [
+                          {
+                            "type": "path",
+                            "data": {
+                              "pathName": "Middle back 1m"
+                            }
+                          },
+                          {
+                            "type": "wait",
+                            "data": {
+                              "waitTime": 3.0
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "Middle back to middle shoot"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Shoot"
+                }
+              },
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "Middle shoot to low y"
                 }
               }
             ]

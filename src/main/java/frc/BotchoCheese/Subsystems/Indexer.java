@@ -12,7 +12,9 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.BotchoCheese.Constants.RobotMap;
 
 public class Indexer extends SubsystemBase {
+    // Minion motor that moves notes between the intake path and feeder path.
     private final TalonFXS indexer;
+    // Phoenix request reused for percent-output commands.
     private final DutyCycleOut indexerDuty = new DutyCycleOut(0);
 
     public Indexer() {
@@ -34,6 +36,7 @@ public class Indexer extends SubsystemBase {
     }
 
     public Command runIndexer(double percent) {
+        // Runs until the command ends, then stops the indexer motor.
         return this.startEnd(
             () -> indexer.setControl(indexerDuty.withOutput(Math.max(-1.0, Math.min(1.0, percent)))),
             () -> indexer.setControl(indexerDuty.withOutput(0.0))
