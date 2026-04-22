@@ -4,24 +4,28 @@
 
 package frc.BotchoCheese;
 
-import edu.wpi.first.math.geometry.Pose2d;
+import com.ctre.phoenix6.SignalLogger;
+
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.networktables.StructPublisher;
-import edu.wpi.first.wpilibj.DataLogManager;
+import edu.wpi.first.networktables.DoublePublisher;
+import edu.wpi.first.networktables.IntegerPublisher;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.BotchoCheese.Commands.LimelightHomography;
+import frc.BotchoCheese.Utils.DebugLog;
 import frc.BotchoCheese.Utils.LimelightHelpers;
 
 
 public class Robot extends TimedRobot {
+  private static final long LIMELIGHT_IDLE_THROTTLE = 100;
 
   public static LimelightHelpers limelight;
   public static LimelightHelpers limelightTwo;
@@ -30,66 +34,113 @@ public class Robot extends TimedRobot {
 
   private final RobotContainer m_robotContainer;
 
-  private final boolean kUseLimelight = true;
-
-  private StructPublisher<Pose2d> publisher;
-
+  private final boolean kUseLimelight = false;
   private final Field2d m_field = new Field2d();
+  private double lastCanHealthLogSeconds = 0.0;
+  private DoublePublisher canUtilizationPublisher;
+  private IntegerPublisher canBusOffPublisher;
+  private IntegerPublisher canTxFullPublisher;
+  private IntegerPublisher canRxErrorPublisher;
+  private IntegerPublisher canTxErrorPublisher;
+  private DoublePublisher poseXPublisher;
+  private DoublePublisher poseYPublisher;
+  private DoublePublisher poseHeadingDegPublisher;
 
   public Robot() {
     m_robotContainer = new RobotContainer();
 
-    publisher = NetworkTableInstance.getDefault()
-    .getStructTopic("MyPose", Pose2d.struct)
-    .publish();
-
     SmartDashboard.putData("Field", m_field);
     m_field.setRobotPose(RobotContainer.drivetrain.getState().Pose);
-    DataLogManager.start(); 
+  }
+
+  @Override
+  public void robotInit() {
+    setLimelightThrottle(LIMELIGHT_IDLE_THROTTLE);
+
+    var poseTable = NetworkTableInstance.getDefault().getTable("Pose");
+    poseXPublisher = poseTable.getDoubleTopic("X").publish();
+    poseYPublisher = poseTable.getDoubleTopic("Y").publish();
+    poseHeadingDegPublisher = poseTable.getDoubleTopic("HeadingDeg").publish();
+
+    if (DebugLog.DEBUG) {
+      SignalLogger.setPath("logs");
+      SignalLogger.start();
+      DebugLog.info("CTRE SignalLogger enabled (debug mode).");
+
+      var debugTable = NetworkTableInstance.getDefault().getTable("Debug");
+      canUtilizationPublisher = debugTable.getDoubleTopic("CAN/UtilizationPct").publish();
+      canBusOffPublisher = debugTable.getIntegerTopic("CAN/BusOffCount").publish();
+      canTxFullPublisher = debugTable.getIntegerTopic("CAN/TxFullCount").publish();
+      canRxErrorPublisher = debugTable.getIntegerTopic("CAN/RxErrorCount").publish();
+      canTxErrorPublisher = debugTable.getIntegerTopic("CAN/TxErrorCount").publish();
+
+      CommandScheduler.getInstance().onCommandInitialize(
+          command -> DebugLog.debug("[CMD INIT] " + command.getName()));
+      CommandScheduler.getInstance().onCommandFinish(
+          command -> DebugLog.debug("[CMD END] " + command.getName()));
+      CommandScheduler.getInstance().onCommandInterrupt(
+          command -> DebugLog.debug("[CMD INTERRUPT] " + command.getName()));
+    }
+    DebugLog.info("Startup complete (vision processing disabled, minimal telemetry mode).");
   }
 
   @Override
   public void robotPeriodic() {
     CommandScheduler.getInstance().run();
 
-    //Module Offsets
-    SmartDashboard.putNumber("Mod0 Offset", Units.rotationsToDegrees(RobotContainer.drivetrain.getModule(0).getEncoder().getAbsolutePosition().getValueAsDouble()));
-    SmartDashboard.putNumber("Mod1 Offset", Units.rotationsToDegrees(RobotContainer.drivetrain.getModule(1).getEncoder().getAbsolutePosition().getValueAsDouble()));
-    SmartDashboard.putNumber("Mod2 Offset", Units.rotationsToDegrees(RobotContainer.drivetrain.getModule(2).getEncoder().getAbsolutePosition().getValueAsDouble()));
-    SmartDashboard.putNumber("Mod3 Offset", Units.rotationsToDegrees(RobotContainer.drivetrain.getModule(3).getEncoder().getAbsolutePosition().getValueAsDouble()));
-
-    SmartDashboard.putNumber("Mod0 Drive Speed", RobotContainer.drivetrain.getModule(0).getEncoder().getVelocity().getValueAsDouble());
-    SmartDashboard.putNumber("Mod1 Drive Speed", RobotContainer.drivetrain.getModule(1).getEncoder().getVelocity().getValueAsDouble());
-    SmartDashboard.putNumber("Mod2 Drive Speed", RobotContainer.drivetrain.getModule(2).getEncoder().getVelocity().getValueAsDouble());
-    SmartDashboard.putNumber("Mod3 Drive Speed", RobotContainer.drivetrain.getModule(3).getEncoder().getVelocity().getValueAsDouble());
-
-    // SmartDashboard.putNumber("Mod0 Offset", Units.rotationsToDegrees(RobotContainer.drivetrain.getModule(0).getEncoder().getAbsolutePosition().getValueAsDouble()));
-    // SmartDashboard.putNumber("Mod1 Offset", Units.rotationsToDegrees(RobotContainer.drivetrain.getModule(1).getEncoder().getAbsolutePosition().getValueAsDouble()));
-    // SmartDashboard.putNumber("Mod2 new Offset", Units.rotationsToDegrees(RobotContainer.drivetrain.getModule(2).getEncoder().getAbsolutePosition().getValueAsDouble()));
-    // SmartDashboard.putNumber("Mod3 new Offset", Units.rotationsToDegrees(RobotContainer.drivetrain.getModule(3).getEncoder().getAbsolutePosition().getValueAsDouble()));
-    
-    SmartDashboard.putNumber("PoseX", RobotContainer.drivetrain.getState().Pose.getX());
-    SmartDashboard.putNumber("PoseY", RobotContainer.drivetrain.getState().Pose.getY());
-    SmartDashboard.putNumber("Yaw", RobotContainer.drivetrain.getState().Pose.getRotation().getDegrees());
+    publishDashboardData();
 
     if (kUseLimelight) {
       LimelightHomography.update(RobotContainer.drivetrain);
     }
-  
-  //AdvantageScope simulation
-  Pose2d poseA = RobotContainer.drivetrain.getState().Pose;
-  //System.out.println("Current pose: " + poseA);
-  publisher.set(poseA);
-  
+
+    publishPoseData();
+
+    if (DebugLog.DEBUG) {
+      logCanHealthSnapshot();
+    }
+  }
+
+  private void publishDashboardData() {
+    SmartDashboard.putNumber(
+        "Swerve/FrontLeft Raw Abs (rot)",
+        RobotContainer.drivetrain.getModule(0).getEncoder().getAbsolutePosition().getValueAsDouble());
+    SmartDashboard.putNumber(
+        "Swerve/FrontRight Raw Abs (rot)",
+        RobotContainer.drivetrain.getModule(1).getEncoder().getAbsolutePosition().getValueAsDouble());
+    SmartDashboard.putNumber(
+        "Swerve/BackLeft Raw Abs (rot)",
+        RobotContainer.drivetrain.getModule(2).getEncoder().getAbsolutePosition().getValueAsDouble());
+    SmartDashboard.putNumber(
+        "Swerve/BackRight Raw Abs (rot)",
+        RobotContainer.drivetrain.getModule(3).getEncoder().getAbsolutePosition().getValueAsDouble());
+  }
+
+  private void publishPoseData() {
+    if (poseXPublisher == null || poseYPublisher == null || poseHeadingDegPublisher == null) {
+      return;
+    }
+
+    var pose = RobotContainer.drivetrain.getState().Pose;
+    poseXPublisher.set(pose.getX());
+    poseYPublisher.set(pose.getY());
+    poseHeadingDegPublisher.set(pose.getRotation().getDegrees());
+  }
+
+  private void setLimelightThrottle(long throttleValue) {
+    NetworkTableInstance.getDefault().getTable("limelight").getEntry("throttle_set").setNumber(throttleValue);
+  }
+
+
+@Override
+public void disabledInit() {
+  m_robotContainer.pivot.disableBrakeMode();
+  setLimelightThrottle(LIMELIGHT_IDLE_THROTTLE);
 }
 
-  @Override
-  public void disabledInit() {
-  }
 
   @Override
   public void disabledPeriodic() {
-     NetworkTableInstance.getDefault().getTable("limelight").getEntry("throttle_set").setNumber(100);
   }
 
   @Override
@@ -97,13 +148,9 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousInit() {
-    try {  
-      RobotContainer.gyro.setYaw(DriverStation.getAlliance().get() == Alliance.Blue ? Math.PI: 0); // this is esentually directly from the external IMU since we barely trust vision angle
-      RobotContainer.drivetrain.resetRotation(new Rotation2d(DriverStation.getAlliance().get() == Alliance.Blue ? Math.PI: 0));
-    } 
-    catch (Exception e) {
-      System.out.print(e);
-    }
+    m_robotContainer.pivot.enableBrakeMode();
+    applyAllianceHeadingReference();
+    DebugLog.info("Autonomous init");
 
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
@@ -121,10 +168,13 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
-    NetworkTableInstance.getDefault().getTable("limelight").getEntry("throttle_set").setNumber(0);
+    m_robotContainer.pivot.enableBrakeMode();
+    m_robotContainer.seedPoseFromSelectedAuto();
+    DebugLog.info("Teleop init");
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
+
     
   }
 
@@ -136,6 +186,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void testInit() {
+    m_robotContainer.pivot.enableBrakeMode();
     CommandScheduler.getInstance().cancelAll();
   }
 
@@ -147,4 +198,47 @@ public class Robot extends TimedRobot {
 
   @Override
   public void simulationPeriodic() {}
+
+  private void logCanHealthSnapshot() {
+    double now = Timer.getFPGATimestamp();
+    if (now - lastCanHealthLogSeconds < 1.0) {
+      return;
+    }
+    lastCanHealthLogSeconds = now;
+
+    var canStatus = RobotController.getCANStatus();
+    DebugLog.debug(
+        String.format(
+            "[CAN] util=%.1f%% busOff=%d txFull=%d rxErr=%d txErr=%d",
+            canStatus.percentBusUtilization * 100.0,
+            canStatus.busOffCount,
+            canStatus.txFullCount,
+            canStatus.receiveErrorCount,
+            canStatus.transmitErrorCount));
+
+    if (canUtilizationPublisher != null) {
+      canUtilizationPublisher.set(canStatus.percentBusUtilization * 100.0);
+    }
+    if (canBusOffPublisher != null) {
+      canBusOffPublisher.set(canStatus.busOffCount);
+    }
+    if (canTxFullPublisher != null) {
+      canTxFullPublisher.set(canStatus.txFullCount);
+    }
+    if (canRxErrorPublisher != null) {
+      canRxErrorPublisher.set(canStatus.receiveErrorCount);
+    }
+    if (canTxErrorPublisher != null) {
+      canTxErrorPublisher.set(canStatus.transmitErrorCount);
+    }
+  }
+
+  private void applyAllianceHeadingReference() {
+    Alliance alliance = DriverStation.getAlliance().orElse(Alliance.Blue);
+    double headingRad = alliance == Alliance.Red ? Math.PI : 0.0;
+    double headingDeg = Math.toDegrees(headingRad);
+
+    RobotContainer.gyro.setYaw(headingDeg);
+    RobotContainer.drivetrain.resetRotation(new Rotation2d(headingRad));
+  }
 }

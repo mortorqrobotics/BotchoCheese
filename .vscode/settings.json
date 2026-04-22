@@ -58,5 +58,6 @@
     "edu.wpi.first.math.**.struct.*",
   ],
   "java.dependency.enableDependencyCheckup": false,
-  "wpilib.autoStartRioLog": false
+  "wpilib.autoStartRioLog": false,
+  "chatgpt.commentCodeLensEnabled": false
 }

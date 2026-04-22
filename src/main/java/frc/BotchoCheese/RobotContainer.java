@@ -20,109 +20,131 @@ import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.commands.PathPlannerAuto;
+import com.pathplanner.lib.util.FlippingUtil;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.BotchoCheese.Commands.StrafeToTag;
-import frc.BotchoCheese.Commands.RotateToTag;
 import frc.BotchoCheese.Constants.RobotMap;
 import frc.BotchoCheese.Constants.TunerConstants;
 import frc.BotchoCheese.Subsystems.CommandSwerveDrivetrain;
 import frc.BotchoCheese.Subsystems.Feeder;
 import frc.BotchoCheese.Subsystems.Indexer;
-//import frc.BotchoCheese.Subsystems.Climber;
 import frc.BotchoCheese.Subsystems.Intake;
+import frc.BotchoCheese.Subsystems.Pivot;
 import frc.BotchoCheese.Subsystems.Shooter;
-
+import frc.BotchoCheese.Utils.DebugLog;
 
 public class RobotContainer {
-    private static final String DEFAULT_AUTO_NAME = "Auto 1 (Default)";
+    // Auto chooser/dashboard
+    private static final String NO_AUTO_SELECTED = "Select Auto";
     private static final String AUTO_CHOOSER_KEY = "Auto Mode";
     private static final String PATHPLANNER_AUTO_FOLDER = "pathplanner/autos";
+    private static final String X_SHOT_BACK_RPS_KEY = "Shots/X Back RPS";
+    private static final String X_SHOT_FRONT_RPS_KEY = "Shots/X Front RPS";
 
-    public static double MaxSpeed = 1.0 * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
-    
-    public static boolean pivotIsUp = true;
-    public static boolean hoodIsDown = true;
-    
-    public static double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
+    // Drive tuning
+    private static final double DRIVE_DEADBAND = 0.1;
+    public static double MaxSpeed = 1.0 * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond);
+    public static double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond);
 
-    /* Setting up bindings for necessary control of the swerve drive platform */
-    public static final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
-            .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
-            .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
-    private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
-    private final SwerveRequest.RobotCentric forwardStraight = new SwerveRequest.RobotCentric()
-            .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
-    private final Telemetry logger = new Telemetry(MaxSpeed);
+    // Controllers
+    private static final CommandXboxController JOYSTICK1_CONTROLLER = new CommandXboxController(0);
+    private static final CommandXboxController JOYSTICK2_CONTROLLER = new CommandXboxController(1);
 
-    private final static CommandXboxController JOYSTICK1_CONTROLLER = new CommandXboxController(0);
-    private final static CommandXboxController JOYSTICK2_CONTROLLER = new CommandXboxController(1);
-    public final static CommandSwerveDrivetrain drivetrain = createDrivetrain();
+    // Drivetrain + sensors
+    public static final CommandSwerveDrivetrain drivetrain = createDrivetrain();
     public static Pigeon2 gyro = new Pigeon2(RobotMap.PIGEON_ID);
 
-    // Initializing the Shooter subsystem here so it persists
+    // Subsystems
     public final Shooter shooter = new Shooter();
-
-    // Initializing the Feeder subsystem
     public final Feeder feeder = new Feeder();
-
-   // public final Climber climber = new Climber();
-
     public final Intake intake = new Intake();
-
     public final Indexer indexer = new Indexer();
+    public final Pivot pivot = new Pivot();
 
-    /* Path follower */
-    private final SendableChooser<Command> autoChooser;
+    // Drive requests
+    public static final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
+        .withDeadband(MaxSpeed * DRIVE_DEADBAND)
+        .withRotationalDeadband(MaxAngularRate * DRIVE_DEADBAND)
+        .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
+    private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
+    private final SwerveRequest.RobotCentric forwardStraight = new SwerveRequest.RobotCentric()
+        .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
+
+    // Auto selection
+    private final SendableChooser<String> autoChooser;
 
     public RobotContainer() {
-        
-        NamedCommands.registerCommand("Shoot", 
-            Commands.sequence(
-                Commands.parallel(feeder.reverseFeeder().withTimeout(0.5), indexer.reverseIndexer().withTimeout(0.25), shooter.shoot().withTimeout(0.5), intake.startIntake().withTimeout(0.5))).andThen(Commands.parallel(shooter.shoot().withTimeout(2), feeder.runFeeder().withTimeout(2), indexer.indexerOn().withTimeout(2), intake.startIntake().withTimeout(2))                
-            )
-        );
-        NamedCommands.registerCommand("PivotDown", intake.pivotDown().withTimeout(1.5).andThen(intake.startIntake().withTimeout(1.5)));
-        // NamedCommands.registerCommand("PivotUp", intake.pivotDown().withTimeout(3));
-        NamedCommands.registerCommand("IntakeOn", intake.startIntake());
-        NamedCommands.registerCommand("IntakeOff", new InstantCommand(()->intake.stopIntake()));
+        registerNamedCommands();
 
         autoChooser = new SendableChooser<>();
         configureAutoChooser();
-        SmartDashboard.putData(AUTO_CHOOSER_KEY, autoChooser);
+        configureDashboard();
 
         configureBindings();
+    }
+
+    private void registerNamedCommands() {
+        final double pivotDownSeconds = 1.0; // tune this "X seconds" value
+
+        NamedCommands.registerCommand(
+            "Shoot",
+            Commands.sequence(
+                shooter.shootRps(75.0).withTimeout(0.5),
+                Commands.parallel(
+                    shooter.shootRps(75.0),
+                    intake.runIntake(0.75),
+                    indexer.runIndexer(0.85),
+                    feeder.runFeeder(0.75)
+                )
+            ).withTimeout(10.0)
+        );
+
+        NamedCommands.registerCommand("PivotDown", pivot.pivotDown().withTimeout(pivotDownSeconds));
+        NamedCommands.registerCommand(
+            "Intake",
+            Commands.parallel(
+                intake.runIntake(0.75),
+                indexer.runIndexer(-0.5),
+                feeder.runFeeder(-0.75),
+                shooter.shootRps(0.0, -25.0)
+            )
+        );
+    }
+
+    private void configureDashboard() {
+        SmartDashboard.putData(AUTO_CHOOSER_KEY, autoChooser);
+        SmartDashboard.putNumber(X_SHOT_BACK_RPS_KEY, 75.0);
+        SmartDashboard.putNumber(X_SHOT_FRONT_RPS_KEY, 75.0);
     }
 
     private void configureAutoChooser() {
         List<String> autoNames = getAutoNamesFromDeploy();
 
+        autoChooser.setDefaultOption(NO_AUTO_SELECTED, NO_AUTO_SELECTED);
+
         if (autoNames.isEmpty()) {
-            autoChooser.setDefaultOption("Do Nothing", Commands.none());
-            DriverStation.reportWarning("No PathPlanner autos found in deploy/pathplanner/autos", false);
+            DebugLog.warnThrottled(
+                "autos.none_found",
+                "No PathPlanner autos found in deploy/pathplanner/autos",
+                10.0
+            );
             return;
         }
 
-        String defaultAuto = autoNames.contains(DEFAULT_AUTO_NAME) ? DEFAULT_AUTO_NAME : autoNames.get(0);
-        autoChooser.setDefaultOption(defaultAuto, AutoBuilder.buildAuto(defaultAuto));
-
         for (String autoName : autoNames) {
-            if (!autoName.equals(defaultAuto)) {
-                autoChooser.addOption(autoName, AutoBuilder.buildAuto(autoName));
-            }
+            autoChooser.addOption(autoName, autoName);
         }
-
     }
 
     private List<String> getAutoNamesFromDeploy() {
@@ -132,64 +154,37 @@ public class RobotContainer {
         }
 
         try (var files = Files.list(autoFolder)) {
-            return files
+            List<String> autoNames = files
                 .filter(path -> path.toString().endsWith(".auto"))
                 .map(path -> path.getFileName().toString().replaceFirst("\\.auto$", ""))
                 .sorted(Comparator.naturalOrder())
                 .collect(Collectors.toList());
+            return autoNames;
         } catch (IOException e) {
-            DriverStation.reportError("Failed to read PathPlanner autos: " + e.getMessage(), e.getStackTrace());
+            DebugLog.error("Failed to read PathPlanner autos: " + e.getMessage(), e.getStackTrace());
             return List.of();
         }
     }
 
+    private static double applyDriveDeadband(double value) {
+        return MathUtil.applyDeadband(value, DRIVE_DEADBAND);
+    }
+
     private void configureBindings() {
-        
-        // Note that X is defined as forward according to WPILib convention,
-        // and Y is defined as to the left according to WPILib convention.
+        configureDriverBindings();
+        configureOperatorBindings();
+    }
+
+    private void configureDriverBindings() {
         drivetrain.setDefaultCommand(
             drivetrain.applyRequest(() ->
                 drive.withVelocityX(-applyDriveDeadband(JOYSTICK1_CONTROLLER.getLeftY()) * MaxSpeed)
                     .withVelocityY(-applyDriveDeadband(JOYSTICK1_CONTROLLER.getLeftX()) * MaxSpeed)
-                    .withRotationalRate(-applyDriveDeadband(JOYSTICK1_CONTROLLER.getRightX()) * MaxAngularRate)
+                    .withRotationalRate(applyDriveDeadband(JOYSTICK1_CONTROLLER.getRightX()) * MaxAngularRate)
             )
-        ); 
-        /*drivetrain.setDefaultCommand(
-            // Drivetrain will execute this command periodically
-            drivetrain.applyRequest(() -> {
-                double velocityX = -applyDriveDeadband(JOYSTICK1_CONTROLLER.getLeftY()) * MaxSpeed;
-                double velocityY = -applyDriveDeadband(JOYSTICK1_CONTROLLER.getLeftX()) * MaxSpeed;
-                double rotationalRate = -applyDriveDeadband(JOYSTICK1_CONTROLLER.getRightX()) * MaxAngularRate;
+        );
 
-                SmartDashboard.putBoolean("Driver Controller Connected", JOYSTICK1_CONTROLLER.getHID().isConnected());
-                SmartDashboard.putNumber("Driver Left Y", JOYSTICK1_CONTROLLER.getLeftY());
-                SmartDashboard.putNumber("Driver Left X", JOYSTICK1_CONTROLLER.getLeftX());
-                SmartDashboard.putNumber("Driver Right X", JOYSTICK1_CONTROLLER.getRightX());
-                SmartDashboard.putBoolean(
-                    "Driver Controller Active",
-                    Math.abs(velocityX) > 0.0 || Math.abs(velocityY) > 0.0 || Math.abs(rotationalRate) > 0.0
-                );
-
-                return drive.withVelocityX(velocityX)
-                    .withVelocityY(velocityY)
-                    .withRotationalRate(rotationalRate);
-            })
-        );*/
-
-        // new Trigger(this::isDriverControllerActive)
-        //     .onTrue(Commands.runOnce(() -> DriverStation.reportWarning("Driver joystick movement detected", false)));
-        // JOYSTICK1_CONTROLLER.leftBumper().onTrue(Commands.runOnce(SignalLogger::start));
-        // JOYSTICK1_CONTROLLER.leftBumper().onTrue(Commands.runOnce(SignalLogger::stop));
-
-        // JOYSTICK1_CONTROLLER.y().whileTrue(drivetrain.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
-        // JOYSTICK1_CONTROLLER.a().whileTrue(drivetrain.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
-        // JOYSTICK1_CONTROLLER.b().whileTrue(drivetrain.sysIdDynamic(SysIdRoutine.Direction.kForward));
-        // JOYSTICK1_CONTROLLER.x().whileTrue(drivetrain.sysIdDynamic(SysIdRoutine.Direction.kReverse));
-        // Controller 1
-        JOYSTICK1_CONTROLLER.x().whileTrue(drivetrain.applyRequest(() -> brake));
-        // JOYSTICK1_CONTROLLER.b().whileTrue(drivetrain.applyRequest(() ->
-        //     point.withModuleDirection(new Rotation2d(-JOYSTICK1_CONTROLLER.getLeftY(), -JOYSTICK1_CONTROLLER.getLeftX()))
-        // ));
+        JOYSTICK1_CONTROLLER.leftBumper().whileTrue(drivetrain.applyRequest(() -> brake));
 
         JOYSTICK1_CONTROLLER.povUp().whileTrue(drivetrain.applyRequest(() ->
             forwardStraight.withVelocityX(0.5).withVelocityY(0))
@@ -203,123 +198,155 @@ public class RobotContainer {
         JOYSTICK1_CONTROLLER.povRight().whileTrue(drivetrain.applyRequest(() ->
             forwardStraight.withVelocityX(0).withVelocityY(0.5))
         );
-        
-       // JOYSTICK1_CONTROLLER.a().toggleOnTrue(createFullIntakeToShooterCommand());
 
-        //JOYSTICK1_CONTROLLER.leftBumper().whileTrue(climber.manualClimberUp());
-       // JOYSTICK1_CONTROLLER.rightBumper().whileTrue(climber.manualClimberDown());
-        // JOYSTICK1_CONTROLLER.leftBumper().whileTrue(climber.manualClimber(true)); // true = up, false = down
-        // JOYSTICK1_CONTROLLER.rightBumper().whileTrue(climber.manualClimber(false)); // true = up, false = down
-
-        // JOYSTICK1_CONTROLLER.leftTrigger().whileTrue(shooter.hoodUp());
-        // JOYSTICK1_CONTROLLER.rightTrigger().whileTrue(shooter.hoodDown());
-
-        // reset the field-centric heading on menu button press
         JOYSTICK1_CONTROLLER.start().onTrue(new InstantCommand(()->drivetrain.seedFieldCentric()));
+    }
 
-        JOYSTICK1_CONTROLLER.leftTrigger().whileTrue(new StrafeToTag(drivetrain));
-        JOYSTICK1_CONTROLLER.rightTrigger().whileTrue(new RotateToTag(drivetrain, 0));
+    private void configureOperatorBindings() {
 
-        // reset the field-centric heading on menu button press
-        //JOYSTICK1_CONTROLLER.start().onTrue(new InstantCommand(()->drivetrain.seedFieldCentric()));
+        // Pivot controls
+        JOYSTICK2_CONTROLLER.povUp().whileTrue(pivot.pivotUp());
+        JOYSTICK2_CONTROLLER.povDown().whileTrue(pivot.pivotDown());
 
-        //Controller 2
-        // Indexer + Feeder + Shooter
-        JOYSTICK2_CONTROLLER.rightTrigger().whileTrue(feeder.runFeeder());
-        JOYSTICK2_CONTROLLER.rightTrigger().whileTrue(indexer.indexerOn());
-        JOYSTICK2_CONTROLLER.rightTrigger().whileTrue(intake.startIntake());
-
-
-        // Feeder Reverse
-        JOYSTICK2_CONTROLLER.a().whileTrue(feeder.reverseFeeder());
-        JOYSTICK2_CONTROLLER.a().whileTrue(indexer.reverseIndexer());
-
-        // Hood Up-PPAD Up/Down-DPAD Down
-        // JOYSTICK2_CONTROLLER.povUp().whileTrue(shooter.hoodUp());
-        // JOYSTICK2_CONTROLLER.povDown().whileTrue(shooter.hoodDown());
-
-        // Intake + Indexer
-        JOYSTICK2_CONTROLLER.leftTrigger().whileTrue(intake.startIntake());
-        JOYSTICK2_CONTROLLER.leftTrigger().whileTrue(indexer.indexerOn());
-        JOYSTICK2_CONTROLLER.leftTrigger().whileTrue(feeder.reverseFeeder());
-
-        //Outtake
-        JOYSTICK2_CONTROLLER.povLeft().whileTrue(feeder.reverseFeeder());
-        JOYSTICK2_CONTROLLER.povLeft().whileTrue(indexer.reverseIndexer());
-        JOYSTICK2_CONTROLLER.povLeft().whileTrue(intake.intakeOut());
-
-        // Shooter
-        JOYSTICK2_CONTROLLER.leftBumper().whileTrue(shooter.shoot());
-
-        // Feeder
-        JOYSTICK2_CONTROLLER.b().whileTrue(shooter.reverseShoot());
-
-        // Intake
-        //JOYSTICK2_CONTROLLER.x().whileTrue(intake.startIntake());
-        JOYSTICK2_CONTROLLER.x().onTrue(new InstantCommand(()->shooter.cycleSpeed()));
-
-        // // Hood Auto
-        // JOYSTICK2_CONTROLLER.a().onTrue(
-        //     Commands.either(
-        //         shooter.hoodDown().andThen(Commands.runOnce(() -> hoodIsDown = true)),
-        //         shooter.hoodUp().andThen(Commands.runOnce(() -> hoodIsDown = false)),
-        //         () -> hoodIsDown
-        //     )
-        // );
-
-        // Indexer
-        // JOYSTICK2_CONTROLLER.y().whileTrue(indexer.indexerOn());
-        JOYSTICK2_CONTROLLER.y().whileTrue(Commands.parallel(shooter.shoot(), intake.startIntake()));
-        JOYSTICK2_CONTROLLER.y().whileTrue(
+        // Intake balls / anti-jam
+        JOYSTICK2_CONTROLLER.leftTrigger().toggleOnTrue(
             Commands.parallel(
-                feeder.reverseFeeder().withTimeout(0.75), 
-                indexer.reverseIndexer().withTimeout(0.75)
-            ).andThen(
-                Commands.parallel(
-                    feeder.runFeeder().withTimeout(0.25), 
-                    indexer.reverseIndexer().withTimeout(0.25)
-                )
+                intake.runIntake(0.75),
+                indexer.runIndexer(-0.5),
+                feeder.runFeeder(-0.75),
+                shooter.shootRps(0.0, -25.0)
             )
-            .andThen(
+        );
+
+        // Reverse all conveyors
+        JOYSTICK2_CONTROLLER.b().whileTrue(
+            Commands.parallel(
+                intake.runIntake(-0.75),
+                indexer.runIndexer(-0.75),
+                feeder.runFeeder(-0.5)
+            )
+        );
+
+        // Big shot
+        JOYSTICK2_CONTROLLER.rightTrigger().toggleOnTrue(
+            Commands.sequence(
+                shooter.shootRps(120.0).withTimeout(0.5),
                 Commands.parallel(
-                    feeder.runFeeder(), 
-                    indexer.indexerOn()
+                    shooter.shootRps(120.0),
+                    intake.runIntake(0.9),
+                    indexer.runIndexer(0.75),
+                    feeder.runFeeder(0.85)
                 )
             )
         );
 
-        // Intake Pivot Up-DPAD Left/Down-DPAD Right
-        JOYSTICK2_CONTROLLER.povUp().onTrue(intake.pivotUp().andThen(Commands.runOnce(() -> pivotIsUp = false)));
-        JOYSTICK2_CONTROLLER.povDown().onTrue(intake.pivotDown().andThen(Commands.runOnce(() -> pivotIsUp = true)));
+        // Regular shot
+        JOYSTICK2_CONTROLLER.rightBumper().toggleOnTrue(
+            Commands.sequence(
+                shooter.shootRps(90.0).withTimeout(0.5),
+                Commands.parallel(
+                    shooter.shootRps(90.0),
+                    intake.runIntake(0.9),
+                    indexer.runIndexer(0.85),
+                    feeder.runFeeder(0.85)
+                )
+            )
+        );
 
-        JOYSTICK2_CONTROLLER.rightBumper().whileTrue(intake.startIntake());
-        JOYSTICK2_CONTROLLER.rightBumper().whileTrue(indexer.reverseIndexer());
-        JOYSTICK2_CONTROLLER.rightBumper().whileTrue(feeder.reverseFeeder());
-    }
-    private static double applyDriveDeadband(double value) {
-        return MathUtil.applyDeadband(value, 0.1);
-    }
+        // SmartDashboard-programmed X shot
+        JOYSTICK2_CONTROLLER.x().toggleOnTrue(
+            Commands.sequence(
+                shooter.shootRps(getXShotBackRps(), getXShotFrontRps()).withTimeout(0.5),
+                Commands.parallel(
+                    shooter.shootRps(getXShotBackRps(), getXShotFrontRps()),
+                    intake.runIntake(0.9),
+                    indexer.runIndexer(0.85),
+                    feeder.runFeeder(0.85)
+                )
+            )
+        );
 
-   
+        // Lob shot (back, front)
+        JOYSTICK2_CONTROLLER.y().toggleOnTrue(
+            Commands.sequence(
+                shooter.shootRps(120.0, 20).withTimeout(0.5),
+                Commands.parallel(
+                    shooter.shootRps(120.0, 20),
+                    intake.runIntake(0.9),
+                    indexer.runIndexer(0.85),
+                    feeder.runFeeder(0.85)
+                )
+            )
+        );
 
-    private Command createFullIntakeToShooterCommand() {
-        return Commands.parallel(
-           // intake.routineIntakeOn(),
-            indexer.indexerOn(),
-            feeder.runFeeder(),
-            shooter.shoot()
+        // Line-drive shot (back, front)
+        JOYSTICK2_CONTROLLER.a().toggleOnTrue(
+            Commands.sequence(
+                shooter.shootRps(20, 120.0).withTimeout(0.5),
+                Commands.parallel(
+                    shooter.shootRps(20, 120.0),
+                    intake.runIntake(0.9),
+                    indexer.runIndexer(0.85),
+                    feeder.runFeeder(0.85)
+                )
+            )
         );
     }
 
     public Command getAutonomousCommand() {
-        /* Run the path selected from the auto chooser */
-        Command selected = autoChooser.getSelected();
-        if (selected == null) {
-            DriverStation.reportWarning("No autonomous selected; running no-op command.", false);
+        String selectedAutoName = autoChooser.getSelected();
+        if (selectedAutoName == null || selectedAutoName.equals(NO_AUTO_SELECTED)) {
+            DebugLog.warnThrottled(
+                "auto.none_selected",
+                "No autonomous selected; running no-op command.",
+                5.0
+            );
             return Commands.none();
         }
-        System.out.println(selected.getName());
-        return selected;
+        DebugLog.info("Auto selected: " + selectedAutoName);
+        return AutoBuilder.buildAuto(selectedAutoName);
+    }
+
+    public void seedPoseFromSelectedAuto() {
+        String selectedAutoName = autoChooser.getSelected();
+        if (selectedAutoName == null || selectedAutoName.equals(NO_AUTO_SELECTED)) {
+            DebugLog.warnThrottled(
+                "pose_seed.no_auto",
+                "No auto selected for pose seeding.",
+                5.0
+            );
+            return;
+        }
+
+        try {
+            PathPlannerAuto auto = new PathPlannerAuto(selectedAutoName);
+            Pose2d bluePose = auto.getStartingPose();
+            if (bluePose == null) {
+                DebugLog.warnThrottled(
+                    "pose_seed.no_start_pose",
+                    "Selected auto has no path-based starting pose: " + selectedAutoName,
+                    5.0
+                );
+                return;
+            }
+
+            Pose2d alliancePose = AutoBuilder.shouldFlip() ? FlippingUtil.flipFieldPose(bluePose) : bluePose;
+            drivetrain.resetPose(alliancePose);
+            DebugLog.info("Seeded pose from auto: " + selectedAutoName);
+        } catch (Exception ex) {
+            DebugLog.error(
+                "Failed to seed pose from selected auto: " + selectedAutoName,
+                ex.getStackTrace()
+            );
+        }
+    }
+
+    private double getXShotBackRps() {
+        return SmartDashboard.getNumber(X_SHOT_BACK_RPS_KEY, 75.0);
+    }
+
+    private double getXShotFrontRps() {
+        return SmartDashboard.getNumber(X_SHOT_FRONT_RPS_KEY, 75.0);
     }
 
     public static CommandSwerveDrivetrain createDrivetrain() {

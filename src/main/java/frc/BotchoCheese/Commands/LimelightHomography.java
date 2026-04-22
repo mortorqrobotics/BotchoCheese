@@ -1,3 +1,5 @@
+// currently not in use
+
 package frc.BotchoCheese.Commands;
 
 import com.ctre.phoenix6.Utils;
@@ -40,7 +42,6 @@ public final class LimelightHomography {
             return;
         }
         
-        // TODO: Check if needed to change to red
         // Feed current robot heading into both LLs to stabilize MegaTag2 orientation.
         LimelightHelpers.SetRobotOrientation(RobotMap.LIMELIGHT_NAME, headingDeg, 0, 0, 0, 0, 0);
         LimelightHelpers.SetRobotOrientation(RobotMap.LIMELIGHT_2_NAME, headingDeg, 0, 0, 0, 0, 0);

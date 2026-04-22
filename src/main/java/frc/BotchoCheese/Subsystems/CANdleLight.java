@@ -1,3 +1,5 @@
+// currently not in use
+
 package frc.BotchoCheese.Subsystems;
 
 import com.ctre.phoenix6.configs.CANdleConfiguration;
@@ -17,10 +19,12 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.BotchoCheese.Constants.RobotMap;
 
 public class CANdleLight extends SubsystemBase {
-    private static final int LED_START_INDEX = RobotMap.CANDLE_LED_START_INDEX;
-    private static final int LED_END_INDEX =
-        RobotMap.CANDLE_LED_START_INDEX + RobotMap.CANDLE_LED_COUNT - 1;
-    private final CANdle candle = new CANdle(RobotMap.CANDLE_CAN_ID, new CANBus(RobotMap.CANDLE_CAN_BUS));
+    private static final int LED_START_INDEX = 0;
+    private static final int LED_COUNT = 0;
+    private static final int LED_END_INDEX = LED_START_INDEX + LED_COUNT - 1;
+    private static final double CANDLE_BRIGHTNESS = 0.5;
+
+    private final CANdle candle = new CANdle(RobotMap.CANDLE_CAN_ID, new CANBus(RobotMap.CANIVORE_CAN_BUS));
 
     public CANdleLight() {
         CANdleConfiguration config = new CANdleConfiguration();
@@ -28,7 +32,7 @@ public class CANdleLight extends SubsystemBase {
         config.CANdleFeatures.Enable5VRail = Enable5VRailValue.Enabled;
         config.LED.LossOfSignalBehavior = LossOfSignalBehaviorValue.KeepRunning;
         config.LED.StripType = StripTypeValue.RGB;
-        config.LED.BrightnessScalar = RobotMap.CANDLE_BRIGHTNESS;
+        config.LED.BrightnessScalar = CANDLE_BRIGHTNESS;
         config.CANdleFeatures.VBatOutputMode = VBatOutputModeValue.Modulated;
         candle.getConfigurator().apply(config);
         setOff();

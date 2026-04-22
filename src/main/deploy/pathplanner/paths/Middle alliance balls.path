@@ -1,0 +1,54 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 2.416753182870371,
+        "y": 4.049631148726852
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 2.2816099672760886,
+        "y": 4.277882847969582
+      },
+      "isLocked": false,
+      "linkedName": "Middle shoot"
+    },
+    {
+      "anchor": {
+        "x": 1.290285951967593,
+        "y": 5.980155454282408
+      },
+      "prevControl": {
+        "x": 1.1623478167430874,
+        "y": 6.194938678849123
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "Alliance balls"
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 0.5,
+    "maxAcceleration": 1.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 179.41773160445572
+  },
+  "reversed": false,
+  "folder": null,
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 180.0
+  },
+  "useDefaultConstraints": true
+}

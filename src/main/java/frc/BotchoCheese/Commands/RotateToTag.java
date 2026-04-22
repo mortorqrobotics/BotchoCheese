@@ -27,7 +27,6 @@ public class RotateToTag extends Command {
         this.drivetrainSubsystem = drivetrainSubsystem;
         this.angleOffset = angleOffset;
         angleController = new PIDController(2, 0, 0);
-        // TODO tune PID and tolerance
         angleController.setTolerance(0.025);
         angleController.enableContinuousInput(-Math.PI, Math.PI);
 
@@ -54,8 +53,6 @@ public class RotateToTag extends Command {
 
         var tagPose = tagPoseOpt.get();
         angleSetpoint = tagPose.getRotation().toRotation2d().getRadians() + Math.PI + angleOffset;
-        System.out.println("Angle Setpoint (Degrees): " + tagPose.getRotation().toRotation2d());
-        System.out.println("Angle Setpoint " + angleSetpoint);
         angleController.reset();
         angleController.setSetpoint(angleSetpoint);
     }
@@ -72,7 +69,6 @@ public class RotateToTag extends Command {
 
         double currentAngle = drivetrainSubsystem.getState().Pose.getRotation().getRadians();
         double rotation = angleController.calculate(currentAngle, angleSetpoint);
-        System.out.println("Target Rotation (Before Max) " + rotation);
 
         rotation = Math.max(-3.0, Math.min(3.0, rotation));
 
