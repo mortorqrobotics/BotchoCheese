@@ -17,7 +17,7 @@ public class RobotMap {
     public static final double kVisionStdDevTheta = 180.0;
 
     // Single Limelight instance used for drivetrain pose updates.
-    public static final String LIMELIGHT_NAME = "limelight-1515-1";
+    public static final String LIMELIGHT_NAME = "limelight";
 
     // AprilTag field map used to bound/validate global pose estimates.
     public static final AprilTagFieldLayout APRILTAG_FIELD_LAYOUT =
