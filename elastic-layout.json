@@ -21,6 +21,18 @@
             }
           },
           {
+            "title": "Limelight Feed",
+            "x": 1024.0,
+            "y": 128.0,
+            "width": 512.0,
+            "height": 384.0,
+            "type": "Camera Stream",
+            "properties": {
+              "topic": "/CameraPublisher/Limelight",
+              "period": 0.06
+            }
+          },
+          {
             "title": "Field",
             "x": 0.0,
             "y": 128.0,

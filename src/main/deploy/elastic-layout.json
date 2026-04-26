@@ -5,8 +5,20 @@
     {
       "name": "Game Day",
       "grid_layout": {
-fesfe        "layouts": [],
+        "layouts": [],
         "containers": [
+          {
+            "title": "Limelight Feed",
+            "x": 0.0,
+            "y": 0.0,
+            "width": 768.0,
+            "height": 512.0,
+            "type": "Camera Stream",
+            "properties": {
+              "topic": "/CameraPublisher/Limelight",
+              "period": 0.06
+            }
+          },
           {
             "title": "Auto Chooser",
             "x": 768.0,

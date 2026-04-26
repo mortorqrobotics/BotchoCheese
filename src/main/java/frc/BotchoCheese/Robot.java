@@ -6,6 +6,9 @@ package frc.BotchoCheese;
 
 import java.util.Locale;
 
+import edu.wpi.first.cameraserver.CameraServer;
+import edu.wpi.first.cscore.HttpCamera;
+import edu.wpi.first.cscore.VideoSource.ConnectionStrategy;
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -22,6 +25,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.BotchoCheese.Constants.RobotMap;
+import frc.BotchoCheese.Utils.LimelightHelpers;
 
 
 public class Robot extends TimedRobot {
@@ -61,12 +65,20 @@ public class Robot extends TimedRobot {
   public void robotInit() {
     // Host dashboard layout files from /home/lvuser/deploy so Elastic can load them directly from the robot.
     WebServer.start(5800, Filesystem.getDeployDirectory().getPath());
+    publishLimelightCameraStream();
     setLimelightThrottle(LIMELIGHT_DISABLED_THROTTLE);
 
     var poseTable = NetworkTableInstance.getDefault().getTable("Pose");
     poseXPublisher = poseTable.getDoubleTopic("X").publish();
     poseYPublisher = poseTable.getDoubleTopic("Y").publish();
     poseHeadingDegPublisher = poseTable.getDoubleTopic("HeadingDeg").publish();
+  }
+
+  private void publishLimelightCameraStream() {
+    String streamUrl = String.format("http://%s.local:5800/stream.mjpg", RobotMap.LIMELIGHT_NAME);
+    HttpCamera limelightCamera = new HttpCamera("Limelight", streamUrl);
+    limelightCamera.setConnectionStrategy(ConnectionStrategy.kKeepOpen);
+    CameraServer.addCamera(limelightCamera);
   }
 
   @Override
@@ -126,12 +138,23 @@ public class Robot extends TimedRobot {
 
     var pose = RobotContainer.drivetrain.getPose();
     m_field.setRobotPose(pose);
+    publishLimelightRawFieldPose();
     poseXPublisher.set(pose.getX());
     poseYPublisher.set(pose.getY());
     poseHeadingDegPublisher.set(pose.getRotation().getDegrees());
     SmartDashboard.putNumber("Pose/OdomX", pose.getX());
     SmartDashboard.putNumber("Pose/OdomY", pose.getY());
     SmartDashboard.putNumber("Pose/OdomHeadingDeg", pose.getRotation().getDegrees());
+  }
+
+  private void publishLimelightRawFieldPose() {
+    var estimate = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(RobotMap.LIMELIGHT_NAME);
+    if (!LimelightHelpers.validPoseEstimate(estimate) || estimate.tagCount <= 0) {
+      m_field.getObject("LimelightRaw").setPoses();
+      return;
+    }
+
+    m_field.getObject("LimelightRaw").setPose(estimate.pose);
   }
 
   private void setLimelightThrottle(long throttleValue) {
