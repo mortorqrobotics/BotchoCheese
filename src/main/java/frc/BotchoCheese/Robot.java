@@ -75,10 +75,22 @@ public class Robot extends TimedRobot {
   }
 
   private void publishLimelightCameraStream() {
-    String streamUrl = String.format("http://%s.local:5800/stream.mjpg", RobotMap.LIMELIGHT_NAME);
-    HttpCamera limelightCamera = new HttpCamera("Limelight", streamUrl);
+    int team = DriverStation.getTeamNumber();
+    String teamIpUrl = String.format("http://10.%d.%d.11:5800/stream.mjpg", team / 100, team % 100);
+    String[] streamUrls = {
+        "http://limelight.local:5800/stream.mjpg",
+        String.format("http://%s.local:5800/stream.mjpg", RobotMap.LIMELIGHT_NAME),
+        teamIpUrl
+    };
+
+    HttpCamera limelightCamera = new HttpCamera("Limelight", streamUrls[0]);
+    limelightCamera.setUrls(streamUrls);
     limelightCamera.setConnectionStrategy(ConnectionStrategy.kKeepOpen);
-    CameraServer.addCamera(limelightCamera);
+    CameraServer.startAutomaticCapture(limelightCamera);
+
+    SmartDashboard.putString("Vision/LimelightStreamPrimary", streamUrls[0]);
+    SmartDashboard.putString("Vision/LimelightStreamFallback1", streamUrls[1]);
+    SmartDashboard.putString("Vision/LimelightStreamFallback2", streamUrls[2]);
   }
 
   @Override
