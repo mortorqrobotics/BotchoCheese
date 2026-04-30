@@ -75,11 +75,11 @@ public class Robot extends TimedRobot {
   }
 
   private void publishLimelightCameraStream() {
-    int team = DriverStation.getTeamNumber();
+    int team = 1515;
     String teamIpUrl = String.format("http://10.%d.%d.11:5800/stream.mjpg", team / 100, team % 100);
     String[] streamUrls = {
-        "http://limelight.local:5800/stream.mjpg",
-        String.format("http://%s.local:5800/stream.mjpg", RobotMap.LIMELIGHT_NAME),
+        "http://limelight.local:5801/stream.mjpg",
+        String.format("http://%s.local:5801/stream.mjpg", RobotMap.LIMELIGHT_NAME),
         teamIpUrl
     };
 
