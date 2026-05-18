@@ -26,7 +26,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.BotchoCheese.Constants.RobotMap;
 import frc.BotchoCheese.Utils.LimelightHelpers;
-
+import frc.BotchoCheese.Subsystems.CANdleLight;
 
 public class Robot extends TimedRobot {
   private static final long LIMELIGHT_DISABLED_THROTTLE = 100;
@@ -35,6 +35,7 @@ public class Robot extends TimedRobot {
   private static final CANBus CANIVORE_BUS = new CANBus(RobotMap.CANIVORE_CAN_BUS);
 
   private Command m_autonomousCommand;
+  CANdleLight candle = new CANdleLight();
 
   private final RobotContainer m_robotContainer;
   private final TalonFX[] swerveNeutralReportMotors = {
@@ -188,6 +189,7 @@ public void disabledInit() {
   setSwerveNeutralMode(NeutralModeValue.Coast);
   m_robotContainer.pivot.disableBrakeMode();
   setLimelightThrottle(LIMELIGHT_DISABLED_THROTTLE);
+  candle.setDisabledColor();
 }
 
 
@@ -210,7 +212,7 @@ public void disabledInit() {
     if (m_autonomousCommand != null) {
       CommandScheduler.getInstance().schedule(m_autonomousCommand);
     }
-
+    candle.setAutonomousColor();
   }
 
   @Override
@@ -227,8 +229,7 @@ public void disabledInit() {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
-
-    
+    candle.setTeleopColor();
   }
 
   @Override
@@ -243,6 +244,7 @@ public void disabledInit() {
     m_robotContainer.pivot.enableBrakeMode();
     setLimelightThrottle(LIMELIGHT_ENABLED_THROTTLE);
     CommandScheduler.getInstance().cancelAll();
+    candle.setTestColor();
   }
 
   @Override

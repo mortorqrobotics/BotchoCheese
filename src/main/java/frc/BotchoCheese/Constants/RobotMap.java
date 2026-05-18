@@ -56,5 +56,5 @@ public class RobotMap {
 
     // CANivore bus name for drivetrain hardware and CANdle device ID.
     public static final String CANIVORE_CAN_BUS = "1515Canivore";
-    public static final int CANDLE_CAN_ID = 40;
+    public static final int CANDLE_CAN_ID = 41;
 }
