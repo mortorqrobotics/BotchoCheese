@@ -267,7 +267,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         LimelightHelpers.SetRobotOrientation(RobotMap.LIMELIGHT_NAME, headingDeg, yawRate, 0, 0, 0, 0);
         SmartDashboard.putBoolean("Pose/VisionAccepted", false);
 
-        if (Math.abs(yawRateDegPerSec) > 360.0) {
+        if (Math.abs(yawRate) > 360.0) {
             return; // Reject during high-speed turns
         }
 
@@ -374,9 +374,4 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         });
         m_simNotifier.startPeriodic(kSimLoopPeriod);
     }
-
-    
-
-
-
 }
