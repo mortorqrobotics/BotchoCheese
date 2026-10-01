@@ -37,7 +37,7 @@ import frc.BotchoCheese.Utils.LimelightHelpers.PoseEstimate;
  * Subsystem so it can easily be used in command-based projects.
  */
 public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Subsystem {
-    private static final Set<Integer> kAllowedVisionTagIds = Set.of(25, 26);
+    public static Pigeon2 gyro = new Pigeon2(RobotMap.PIGEON_ID);
     private static final double kSimLoopPeriod = 0.005; // 5 ms
     private Notifier m_simNotifier = null;
     private double m_lastSimTime;
@@ -260,21 +260,19 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         visionUpdate(pose, timestampSeconds);
     }
 
-    /**
-     * Basic single-Limelight pose estimation update.
-     * Call this from robotPeriodic to fuse AprilTag global pose samples.
-     */
     public void visionUpdateFromLimelight() {
-        double headingDeg = getPose().getRotation().getDegrees();
-        LimelightHelpers.SetRobotOrientation(RobotMap.LIMELIGHT_NAME, headingDeg, 0, 0, 0, 0, 0);
+        double headingDeg = gyro.getYaw().getValueAsDouble();
+        double yawRate = gyro.getAngularVelocityZWorld().getValueAsDouble();
+        
+        LimelightHelpers.SetRobotOrientation(RobotMap.LIMELIGHT_NAME, headingDeg, yawRate, 0, 0, 0, 0);
         SmartDashboard.putBoolean("Pose/VisionAccepted", false);
 
-        PoseEstimate estimate =
-            LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(RobotMap.LIMELIGHT_NAME);
-        if (!LimelightHelpers.validPoseEstimate(estimate) || estimate.tagCount <= 0) {
-            return;
+        if (Math.abs(yawRateDegPerSec) > 360.0) {
+            return; // Reject during high-speed turns
         }
-        if (!containsAllowedVisionTag(estimate)) {
+
+        PoseEstimate estimate = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(RobotMap.LIMELIGHT_NAME);
+        if (!LimelightHelpers.validPoseEstimate(estimate) || estimate.tagCount <= 0) {
             return;
         }
 
@@ -283,12 +281,30 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             return;
         }
 
+        // Dynamic standard deviation scaling based on distance and tag count
+        double avgDistance = estimate.avgTagDist;
+        double xyStdDev;
+
+        if (estimate.tagCount >= 2) {
+            // Multiple tags: high trust
+            xyStdDev = 0.3 + (avgDistance * 0.1);
+        } else {
+            // Single tag: scale trust down heavily with distance
+            if (avgDistance > 4.0) {
+                return; // Reject single tag estimates beyond 4 meters
+            }
+            xyStdDev = 0.5 + (avgDistance * avgDistance * 0.1);
+        }
+
+        // Update estimator standard deviations dynamically for this sample
+        setVisionMeasurementStdDevs(VecBuilder.fill(xyStdDev, xyStdDev, Units.degreesToRadians(9999999.0)));
+
         visionUpdate(pose, Utils.fpgaToCurrentTime(estimate.timestampSeconds));
         SmartDashboard.putBoolean("Pose/VisionAccepted", true);
         SmartDashboard.putNumber("Pose/VisionX", pose.getX());
         SmartDashboard.putNumber("Pose/VisionY", pose.getY());
         SmartDashboard.putNumber("Pose/VisionHeadingDeg", pose.getRotation().getDegrees());
-    }
+}
 
     private boolean isPoseInFieldBounds(Pose2d pose) {
         final double marginMeters = 0.25;
@@ -298,18 +314,6 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             && pose.getX() <= maxX + marginMeters
             && pose.getY() >= -marginMeters
             && pose.getY() <= maxY + marginMeters;
-    }
-
-    private boolean containsAllowedVisionTag(PoseEstimate estimate) {
-        if (estimate.rawFiducials == null || estimate.rawFiducials.length == 0) {
-            return false;
-        }
-        for (LimelightHelpers.RawFiducial fiducial : estimate.rawFiducials) {
-            if (kAllowedVisionTagIds.contains(fiducial.id)) {
-                return true;
-            }
-        }
-        return false;
     }
 
     // /**
@@ -370,4 +374,9 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         });
         m_simNotifier.startPeriodic(kSimLoopPeriod);
     }
+
+    
+
+
+
 }
