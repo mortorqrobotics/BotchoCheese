@@ -64,7 +64,6 @@ public class RobotContainer {
 
     // Shared drivetrain instance plus a standalone pigeon handle using the mapped device ID.
     public static final CommandSwerveDrivetrain drivetrain = createDrivetrain();
-    public static Pigeon2 gyro = new Pigeon2(RobotMap.PIGEON_ID);
 
     // Mechanism subsystems used by button bindings and autos.
     public final Shooter shooter = new Shooter();

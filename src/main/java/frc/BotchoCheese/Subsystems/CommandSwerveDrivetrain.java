@@ -304,7 +304,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         SmartDashboard.putNumber("Pose/VisionX", pose.getX());
         SmartDashboard.putNumber("Pose/VisionY", pose.getY());
         SmartDashboard.putNumber("Pose/VisionHeadingDeg", pose.getRotation().getDegrees());
-}
+    }
 
     private boolean isPoseInFieldBounds(Pose2d pose) {
         final double marginMeters = 0.25;
@@ -340,6 +340,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
     @Override
     public void periodic() {
+        visionUpdateFromLimelight();
         /*
          * Periodically try to apply the operator perspective.
          * If we haven't applied the operator perspective before, then we should apply it regardless of DS state.

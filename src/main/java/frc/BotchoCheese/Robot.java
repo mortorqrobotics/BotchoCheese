@@ -99,7 +99,6 @@ public class Robot extends TimedRobot {
     CommandScheduler.getInstance().run();
 
     publishDashboardData();
-    RobotContainer.drivetrain.visionUpdateFromLimelight();
 
     publishPoseData();
   }
