@@ -4,6 +4,7 @@ import java.util.Set;
 import java.util.function.Supplier;
 
 import com.ctre.phoenix6.Utils;
+import com.ctre.phoenix6.hardware.Pigeon2;
 import com.ctre.phoenix6.swerve.SwerveDrivetrainConstants;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.swerve.SwerveRequest;
@@ -13,10 +14,12 @@ import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 
 import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.math.util.Units;
 // import static edu.wpi.first.units.Units.Second;
 // import static edu.wpi.first.units.Units.Volts;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -118,16 +121,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     // /* The SysId routine to test */
     // private SysIdRoutine m_sysIdRoutineToApply = m_sysIdRoutineTranslation;
 
-    /**
-     * Constructs a CTRE SwerveDrivetrain using the specified constants.
-     * <p>
-     * This constructs the underlying hardware devices, so users should not construct
-     * the devices themselves. If they need the devices, they can access them through
-     * getters in the classes.
-     *
-     * @param drivetrainConstants Drivetrain-wide constants for the swerve drive
-     * @param modules             Constants for each specific module
-     */
+    // Constructs a CTRE SwerveDrivetrain with just constants.
     public CommandSwerveDrivetrain(
         SwerveDrivetrainConstants drivetrainConstants,
         SwerveModuleConstants<?, ?, ?>... modules
@@ -139,19 +133,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         configureAutoBuilder();
     }
 
-    /**
-     * Constructs a CTRE SwerveDrivetrain using the specified constants.
-     * <p>
-     * This constructs the underlying hardware devices, so users should not construct
-     * the devices themselves. If they need the devices, they can access them through
-     * getters in the classes.
-     *
-     * @param drivetrainConstants        Drivetrain-wide constants for the swerve drive
-     * @param odometryUpdateFrequency    The frequency to run the odometry loop. If
-     *                                   unspecified or set to 0 Hz, this is 250 Hz on
-     *                                   CAN FD, and 100 Hz on CAN 2.0.
-     * @param modules                    Constants for each specific module
-     */
+    // Constructs a CTRE SwerveDrivetrain using the specified constants.
     public CommandSwerveDrivetrain(
         SwerveDrivetrainConstants drivetrainConstants,
         double odometryUpdateFrequency,
@@ -164,30 +146,12 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         configureAutoBuilder();
     }
 
-    /**
-     * Constructs a CTRE SwerveDrivetrain using the specified constants.
-     * <p>
-     * This constructs the underlying hardware devices, so users should not construct
-     * the devices themselves. If they need the devices, they can access them through
-     * getters in the classes.
-     *
-     * @param drivetrainConstants        Drivetrain-wide constants for the swerve drive
-     * @param odometryUpdateFrequency    The frequency to run the odometry loop. If
-     *                                   unspecified or set to 0 Hz, this is 250 Hz on
-     *                                   CAN FD, and 100 Hz on CAN 2.0.
-     * @param odometryStandardDeviation  The standard deviation for odometry calculation
-     *                                  in the form [x, y, theta]ᵀ, with units in meters
-     *                                  and radians
-     * @param visionStandardDeviation   The standard deviation for vision calculation
-     *                                  in the form [x, y, theta]ᵀ, with units in meters
-     *                                  and radians
-     * @param modules                    Constants for each specific module
-     */
+    // Constructs a CTRE SwerveDrivetrain using the specified constants.
     public CommandSwerveDrivetrain(
         SwerveDrivetrainConstants drivetrainConstants,
         double odometryUpdateFrequency,
-        Matrix<N3, N1> odometryStandardDeviation,
-        Matrix<N3, N1> visionStandardDeviation,
+        Matrix<N3, N1> odometryStandardDeviation, // Odometry standard deviations [x, y, theta] in meters/radians
+        Matrix<N3, N1> visionStandardDeviation, // Vision standard deviations [x, y, theta] in meters/radians
         SwerveModuleConstants<?, ?, ?>... modules
     ) {
         super(drivetrainConstants, odometryUpdateFrequency, odometryStandardDeviation, visionStandardDeviation, modules);
@@ -236,28 +200,9 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         return run(() -> this.setControl(requestSupplier.get()));
     }
 
-    /**
-     * Returns the drivetrain estimator's current robot pose.
-     */
+    // Returns the drivetrain estimator's current robot pose.
     public Pose2d getPose() {
         return getState().Pose;
-    }
-
-    /**
-     * Basic vision update hook kept in the swerve generated wrapper.
-     *
-     * @param pose vision-estimated robot pose in field coordinates
-     * @param timestampSeconds timestamp in seconds in the current robot-time domain
-     */
-    public void visionUpdate(Pose2d pose, double timestampSeconds) {
-        addVisionMeasurement(pose, timestampSeconds);
-    }
-
-    /**
-     * Alias kept for call sites that already use this name.
-     */
-    public void applyPoseUpdate(Pose2d pose, double timestampSeconds) {
-        visionUpdate(pose, timestampSeconds);
     }
 
     public void visionUpdateFromLimelight() {
@@ -296,10 +241,12 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             xyStdDev = 0.5 + (avgDistance * avgDistance * 0.1);
         }
 
-        // Update estimator standard deviations dynamically for this sample
-        setVisionMeasurementStdDevs(VecBuilder.fill(xyStdDev, xyStdDev, Units.degreesToRadians(9999999.0)));
-
-        visionUpdate(pose, Utils.fpgaToCurrentTime(estimate.timestampSeconds));
+        // Pass std devs per-measurement to avoid mutating drivetrain global estimator state
+        addVisionMeasurement(
+            pose, 
+            Utils.fpgaToCurrentTime(estimate.timestampSeconds),
+            VecBuilder.fill(xyStdDev, xyStdDev, Units.degreesToRadians(9999999.0))
+        );
         SmartDashboard.putBoolean("Pose/VisionAccepted", true);
         SmartDashboard.putNumber("Pose/VisionX", pose.getX());
         SmartDashboard.putNumber("Pose/VisionY", pose.getY());
@@ -316,38 +263,25 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             && pose.getY() <= maxY + marginMeters;
     }
 
-    // /**
-    //  * Runs the SysId Quasistatic test in the given direction for the routine
-    //  * specified by {@link #m_sysIdRoutineToApply}.
-    //  *
-    //  * @param direction Direction of the SysId Quasistatic test
-    //  * @return Command to run
-    //  */
+    // // Runs the SysId Quasistatic test in the given direction for the routine
     // public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
     //     return m_sysIdRoutineToApply.quasistatic(direction);
     // }
     //
-    // /**
-    //  * Runs the SysId Dynamic test in the given direction for the routine
-    //  * specified by {@link #m_sysIdRoutineToApply}.
-    //  *
-    //  * @param direction Direction of the SysId Dynamic test
-    //  * @return Command to run
-    //  */
+    // // Runs the SysId Dynamic test in the given direction for the routine
     // public Command sysIdDynamic(SysIdRoutine.Direction direction) {
     //     return m_sysIdRoutineToApply.dynamic(direction);
     // }
 
     @Override
     public void periodic() {
+        // Encapsulates drivetrain code from Robot Periodic to Drivetrain Periodic.
         visionUpdateFromLimelight();
+
         /*
-         * Periodically try to apply the operator perspective.
-         * If we haven't applied the operator perspective before, then we should apply it regardless of DS state.
-         * This allows us to correct the perspective in case the robot code restarts mid-match.
-         * Otherwise, only check and apply the operator perspective if the DS is disabled.
-         * This ensures driving behavior doesn't change until an explicit disable event occurs during testing.
-         */
+        * Apply operator perspective on code restart or when disabled to ensure
+        * field-centric forward direction updates safely without altering mid-match driving.
+        */
         if (!m_hasAppliedOperatorPerspective || DriverStation.isDisabled()) {
             DriverStation.getAlliance().ifPresent(allianceColor -> {
                 // Re-apply field-centric forward based on alliance whenever disabled or after a code restart.
@@ -364,13 +298,13 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     private void startSimThread() {
         m_lastSimTime = Utils.getCurrentTimeSeconds();
 
-        /* Run simulation at a faster rate so PID gains behave more reasonably */
+        // Run simulation at a faster rate so PID gains behave more reasonably
         m_simNotifier = new Notifier(() -> {
             final double currentTime = Utils.getCurrentTimeSeconds();
             double deltaTime = currentTime - m_lastSimTime;
             m_lastSimTime = currentTime;
 
-            /* use the measured time delta, get battery voltage from WPILib */
+            // use the measured time delta, get battery voltage from WPILib
             updateSimState(deltaTime, RobotController.getBatteryVoltage());
         });
         m_simNotifier.startPeriodic(kSimLoopPeriod);
