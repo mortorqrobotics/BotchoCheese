@@ -11,8 +11,10 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+import com.ctre.phoenix6.hardware.Pigeon2;
 
 import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.numbers.N1;
@@ -267,7 +269,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         LimelightHelpers.SetRobotOrientation(RobotMap.LIMELIGHT_NAME, headingDeg, yawRate, 0, 0, 0, 0);
         SmartDashboard.putBoolean("Pose/VisionAccepted", false);
 
-        if (Math.abs(yawRateDegPerSec) > 360.0) {
+        if (Math.abs(yawRate) > 360.0) {
             return; // Reject during high-speed turns
         }
 
@@ -297,7 +299,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         }
 
         // Update estimator standard deviations dynamically for this sample
-        setVisionMeasurementStdDevs(VecBuilder.fill(xyStdDev, xyStdDev, Units.degreesToRadians(9999999.0)));
+        setVisionMeasurementStdDevs(VecBuilder.fill(xyStdDev, xyStdDev, Math.toRadians(9999999.0)));
 
         visionUpdate(pose, Utils.fpgaToCurrentTime(estimate.timestampSeconds));
         SmartDashboard.putBoolean("Pose/VisionAccepted", true);
