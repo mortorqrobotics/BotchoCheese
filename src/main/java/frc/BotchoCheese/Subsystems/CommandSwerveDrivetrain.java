@@ -11,8 +11,10 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+import com.ctre.phoenix6.hardware.Pigeon2;
 
 import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.numbers.N1;
@@ -31,6 +33,17 @@ import frc.BotchoCheese.Constants.RobotMap;
 import frc.BotchoCheese.Constants.TunerConstants.TunerSwerveDrivetrain;
 import frc.BotchoCheese.Utils.LimelightHelpers;
 import frc.BotchoCheese.Utils.LimelightHelpers.PoseEstimate;
+
+import org.photonvision.simulation.VisionSystemSim;
+import org.photonvision.simulation.SimCameraProperties;
+import org.photonvision.simulation.PhotonCameraSim;
+import org.photonvision.simulation.VisionTargetSim;
+import org.photonvision.estimation.TargetModel;
+import org.photonvision.PhotonCamera;
+import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Pose3d;
 
 /**
  * Class that extends the Phoenix 6 SwerveDrivetrain class and implements
@@ -134,6 +147,25 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     ) {
         super(drivetrainConstants, modules);
         if (Utils.isSimulation()) {
+            // --- ADD THIS VISION SIMULATION SETUP ---
+            visionSim = new VisionSystemSim("main");
+            // Adds a virtual AprilTag (ID 1) at coordinates X=2.0, Y=2.0 on the field
+            visionSim.addVisionTargets(new VisionTargetSim(1, TargetModel.kAprilTag36h11, new Pose3d(2.0, 2.0, 1.5, new Rotation3d())));
+            //EXAMPLE: visionSim.addVisionTargets(new VisionTargetSim(ID, TargetModel.kAprilTag36h11, new Pose3d(xPos, yPos, zPos,  /*METERS*/  new Rotation3d(xRot, yRot, zRot /*RADIANS (use Math.PI to rotate back towards the origin)*/))));
+
+
+            // Camera settings
+            m_camera = new PhotonCamera("camera");
+            SimCameraProperties cameraProp = new SimCameraProperties();
+            cameraProp.setResolution(640, 480);
+            cameraProp.setFPS(30);
+            
+            // Camera transform, position, and rotation settings
+            Transform3d robotToCam = new Transform3d(new Translation3d(0.5, 0.0, 0.5), new Rotation3d(0, 0, 0));
+            cameraSim = new PhotonCameraSim(m_camera, cameraProp);
+            visionSim.addCamera(cameraSim, robotToCam);
+
+
             startSimThread();
         }
         configureAutoBuilder();
@@ -267,7 +299,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         LimelightHelpers.SetRobotOrientation(RobotMap.LIMELIGHT_NAME, headingDeg, yawRate, 0, 0, 0, 0);
         SmartDashboard.putBoolean("Pose/VisionAccepted", false);
 
-        if (Math.abs(yawRateDegPerSec) > 360.0) {
+        if (Math.abs(yawRate) > 360.0) {
             return; // Reject during high-speed turns
         }
 
@@ -297,7 +329,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         }
 
         // Update estimator standard deviations dynamically for this sample
-        setVisionMeasurementStdDevs(VecBuilder.fill(xyStdDev, xyStdDev, Units.degreesToRadians(9999999.0)));
+        setVisionMeasurementStdDevs(VecBuilder.fill(xyStdDev, xyStdDev, Math.toRadians(9999999.0)));
 
         visionUpdate(pose, Utils.fpgaToCurrentTime(estimate.timestampSeconds));
         SmartDashboard.putBoolean("Pose/VisionAccepted", true);

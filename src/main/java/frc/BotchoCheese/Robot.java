@@ -254,5 +254,18 @@ public void disabledInit() {
   public void testExit() {}
 
   @Override
-  public void simulationPeriodic() {}
+  public void simulationPeriodic() {
+    // 1. Pass motor voltages into your drivetrain physics simulation class
+    m_driveSim.setInputs(m_leftMotor.getVoltage(), m_rightMotor.getVoltage());
+    
+    // 2. Advance the simulation by 20 milliseconds (standard loop time)
+    m_driveSim.update(0.020);
+    
+    // 3. Feed the simulated encoder and gyro values back into your real code/odometry
+    m_leftEncoderSim.setDistance(m_driveSim.getLeftPositionMeters());
+    m_leftEncoderSim.setRate(m_driveSim.getLeftVelocityMetersPerSecond());
+    m_rightEncoderSim.setDistance(m_driveSim.getRightPositionMeters());
+    m_rightEncoderSim.setRate(m_driveSim.getRightVelocityMetersPerSecond());
+    m_gyroSim.setAngle(-m_driveSim.getHeading().getDegrees()); 
+  }
 }

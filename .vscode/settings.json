@@ -59,5 +59,6 @@
   ],
   "java.dependency.enableDependencyCheckup": false,
   "wpilib.autoStartRioLog": false,
-  "chatgpt.commentCodeLensEnabled": false
+  "chatgpt.commentCodeLensEnabled": false,
+  "wpilib.offline": true
 }
