@@ -55,6 +55,11 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     private Notifier m_simNotifier = null;
     private double m_lastSimTime;
 
+    //Simulation objects
+    private VisionSystemSim visionSim;
+    private PhotonCamera m_camera;
+    private PhotonCameraSim cameraSim;
+
     /* Blue alliance sees forward as 180 degrees for this robot's current field-oriented convention */
     private static final Rotation2d kBlueAlliancePerspectiveRotation = Rotation2d.k180deg;
     /* Red alliance sees forward as 0 degrees for this robot's current field-oriented convention */
@@ -392,6 +397,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         }
     }
 
+    //Continuously runs and updates the simulation
     private void startSimThread() {
         m_lastSimTime = Utils.getCurrentTimeSeconds();
 
@@ -403,6 +409,11 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
             /* use the measured time delta, get battery voltage from WPILib */
             updateSimState(deltaTime, RobotController.getBatteryVoltage());
+
+            //Updates PhotonVision with the new pose
+            if (visionSim != null) {
+                visionSim.update(getState().Pose);
+            }
         });
         m_simNotifier.startPeriodic(kSimLoopPeriod);
     }
