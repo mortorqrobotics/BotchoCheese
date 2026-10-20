@@ -153,16 +153,17 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         super(drivetrainConstants, modules);
         if (Utils.isSimulation()) {
             // --- ADD THIS VISION SIMULATION SETUP ---
-            visionSim = new VisionSystemSim("main");
-            // Adds a virtual AprilTag (ID 1) at coordinates X=2.0, Y=2.0 on the field
-            visionSim.addVisionTargets(new VisionTargetSim(1, TargetModel.kAprilTag36h11, new Pose3d(2.0, 2.0, 1.5, new Rotation3d())));
+            visionSim = new VisionSystemSim("main"); 
+            // Adds a virtual AprilTag (ID 1) at coordinates X=2.0, Y=2.0, Z=1.5 on the field 
+            //TODO: visionSim.addVisionTargets(new VisionTargetSim(1, TargetModel.kAprilTag36h11, new Pose3d(2.0, 2.0, 1.5, new Rotation3d())));
+
             //EXAMPLE: visionSim.addVisionTargets(new VisionTargetSim(ID, TargetModel.kAprilTag36h11, new Pose3d(xPos, yPos, zPos,  /*METERS*/  new Rotation3d(xRot, yRot, zRot /*RADIANS (use Math.PI to rotate back towards the origin)*/))));
 
 
             // Camera settings
             m_camera = new PhotonCamera("camera");
             SimCameraProperties cameraProp = new SimCameraProperties();
-            cameraProp.setResolution(640, 480);
+            cameraProp.setCalibration(640, 480,  Rotation2d.fromDegrees(100)); //Resolution and FOV settings
             cameraProp.setFPS(30);
             
             // Camera transform, position, and rotation settings
