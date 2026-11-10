@@ -207,6 +207,8 @@ public class RobotContainer {
 
         // Reset the field-centric heading reference to the robot's current orientation.
         JOYSTICK1_CONTROLLER.start().onTrue(new InstantCommand(()->drivetrain.seedFieldCentric()));
+
+        JOYSTICK1_CONTROLLER.a().whileTrue(drivetrain.autoTagAlign());
     }
 
     private void configureOperatorBindings() {

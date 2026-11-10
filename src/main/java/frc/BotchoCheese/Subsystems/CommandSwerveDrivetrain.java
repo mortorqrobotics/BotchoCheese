@@ -252,6 +252,35 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         SmartDashboard.putNumber("Pose/VisionY", pose.getY());
         SmartDashboard.putNumber("Pose/VisionHeadingDeg", pose.getRotation().getDegrees());
     }
+    public Command autoTagAlign() {
+        return Commands.defer(() -> {
+            int tagId = (int) LimelightHelpers.getFiducialID(RobotMap.LIMELIGHT_NAME);
+            if (tagId <= 0) {
+                return Commands.none();
+            }
+
+            return RobotMap.APRILTAG_FIELD_LAYOUT.getTagPose(tagId)
+                .map(tagPose3d -> {
+                    Pose2d targetPose = tagPose3d.toPose2d().transformBy(
+                        new Transform2d(
+                            new Translation2d(-0.5, 0.0), 
+                            Rotation2d.fromDegrees(180)
+                        )
+                    );
+                    return AutoBuilder.pathfindToPose(
+                        targetPose,
+                        new PathConstraints(
+                            2.5, 2.5, 
+                            Units.degreesToRadians(360), 
+                            Units.degreesToRadians(540)
+                        ),
+                        0.0, // Goal end velocity (m/s)
+                        0.0  // Rotation delay distance (m)
+                    );
+                })
+                .orElseGet(Commands::none);
+        }, Set.of(this));
+    }
 
     private boolean isPoseInFieldBounds(Pose2d pose) {
         final double marginMeters = 0.25;
