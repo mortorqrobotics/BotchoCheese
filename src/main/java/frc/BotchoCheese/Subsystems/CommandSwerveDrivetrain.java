@@ -1,6 +1,5 @@
 package frc.BotchoCheese.Subsystems;
 
-import java.util.Set;
 import java.util.function.Supplier;
 
 import com.ctre.phoenix6.Utils;
@@ -11,16 +10,20 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
-import com.ctre.phoenix6.hardware.Pigeon2;
 
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 // import static edu.wpi.first.units.Units.Second;
 // import static edu.wpi.first.units.Units.Volts;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Notifier;
@@ -29,35 +32,27 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 // import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+
 import frc.BotchoCheese.Constants.RobotMap;
 import frc.BotchoCheese.Constants.TunerConstants.TunerSwerveDrivetrain;
 import frc.BotchoCheese.Utils.LimelightHelpers;
 import frc.BotchoCheese.Utils.LimelightHelpers.PoseEstimate;
 
-import org.photonvision.simulation.VisionSystemSim;
-import org.photonvision.simulation.SimCameraProperties;
-import org.photonvision.simulation.PhotonCameraSim;
-import org.photonvision.simulation.VisionTargetSim;
-import org.photonvision.estimation.TargetModel;
 import org.photonvision.PhotonCamera;
-import edu.wpi.first.math.geometry.Transform3d;
-import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Pose3d;
-
-import frc.BotchoCheese.RobotContainer;
+import org.photonvision.simulation.PhotonCameraSim;
+import org.photonvision.simulation.SimCameraProperties;
+import org.photonvision.simulation.VisionSystemSim;
 
 /**
  * Class that extends the Phoenix 6 SwerveDrivetrain class and implements
  * Subsystem so it can easily be used in command-based projects.
  */
 public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Subsystem {
-    public static Pigeon2 gyro = new Pigeon2(RobotMap.PIGEON_ID);
     private static final double kSimLoopPeriod = 0.005; // 5 ms
     private Notifier m_simNotifier = null;
     private double m_lastSimTime;
 
-    //Simulation objects
+    // Simulation objects
     private VisionSystemSim visionSim;
     private PhotonCamera m_camera;
     private PhotonCameraSim cameraSim;
@@ -71,6 +66,10 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
     /** Swerve request to apply during robot-centric path following */
     private final SwerveRequest.ApplyRobotSpeeds m_pathApplyRobotSpeeds = new SwerveRequest.ApplyRobotSpeeds();
+
+    /** Minimalist AdvantageScope 2D/3D field pose publisher */
+    private final StructPublisher<Pose2d> drivePose = NetworkTableInstance.getDefault()
+        .getStructTopic("DriveState/Pose", Pose2d.struct).publish();
 
     /*
      * SysId characterization commands are intentionally disabled for production.
@@ -138,90 +137,25 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     // /* The SysId routine to test */
     // private SysIdRoutine m_sysIdRoutineToApply = m_sysIdRoutineTranslation;
 
-    /**
-     * Constructs a CTRE SwerveDrivetrain using the specified constants.
-     * <p>
-     * This constructs the underlying hardware devices, so users should not construct
-     * the devices themselves. If they need the devices, they can access them through
-     * getters in the classes.
-     *
-     * @param drivetrainConstants Drivetrain-wide constants for the swerve drive
-     * @param modules             Constants for each specific module
-     */
     public CommandSwerveDrivetrain(
         SwerveDrivetrainConstants drivetrainConstants,
         SwerveModuleConstants<?, ?, ?>... modules
     ) {
         super(drivetrainConstants, modules);
-        if (Utils.isSimulation()) {
-            visionSim = new VisionSystemSim("main"); 
-            // Adds a virtual AprilTag (ID 1) at coordinates X=2.0m, Y=2.0m, Z=1.5m on the field 
-            //visionSim.addVisionTargets(new VisionTargetSim(new Pose3d(2.0, 2.0, 1.5, new Rotation3d()/*RADIANS*/), TargetModel.kAprilTag36h11));
-            
-            // Automatically loads every AprilTag from your official field layout file
-            visionSim.addAprilTags(RobotMap.APRILTAG_FIELD_LAYOUT);
-
-            // Camera settings
-            m_camera = new PhotonCamera("camera");
-            SimCameraProperties cameraProp = new SimCameraProperties();
-            cameraProp.setCalibration(640, 480,  Rotation2d.fromDegrees(100)); //Resolution and FOV settings
-            cameraProp.setFPS(30);
-            
-            // Camera transform, position, and rotation settings
-            Transform3d robotToCam = new Transform3d(new Translation3d(0.5, 0.0, 0.5), new Rotation3d(0, 0, 0));
-            cameraSim = new PhotonCameraSim(m_camera, cameraProp);
-            visionSim.addCamera(cameraSim, robotToCam);
-
-
-            startSimThread();
-        }
+        initSimulation();
         configureAutoBuilder();
     }
 
-    /**
-     * Constructs a CTRE SwerveDrivetrain using the specified constants.
-     * <p>
-     * This constructs the underlying hardware devices, so users should not construct
-     * the devices themselves. If they need the devices, they can access them through
-     * getters in the classes.
-     *
-     * @param drivetrainConstants        Drivetrain-wide constants for the swerve drive
-     * @param odometryUpdateFrequency    The frequency to run the odometry loop. If
-     *                                   unspecified or set to 0 Hz, this is 250 Hz on
-     *                                   CAN FD, and 100 Hz on CAN 2.0.
-     * @param modules                    Constants for each specific module
-     */
     public CommandSwerveDrivetrain(
         SwerveDrivetrainConstants drivetrainConstants,
         double odometryUpdateFrequency,
         SwerveModuleConstants<?, ?, ?>... modules
     ) {
         super(drivetrainConstants, odometryUpdateFrequency, modules);
-        if (Utils.isSimulation()) {
-            startSimThread();
-        }
+        initSimulation();
         configureAutoBuilder();
     }
 
-    /**
-     * Constructs a CTRE SwerveDrivetrain using the specified constants.
-     * <p>
-     * This constructs the underlying hardware devices, so users should not construct
-     * the devices themselves. If they need the devices, they can access them through
-     * getters in the classes.
-     *
-     * @param drivetrainConstants        Drivetrain-wide constants for the swerve drive
-     * @param odometryUpdateFrequency    The frequency to run the odometry loop. If
-     *                                   unspecified or set to 0 Hz, this is 250 Hz on
-     *                                   CAN FD, and 100 Hz on CAN 2.0.
-     * @param odometryStandardDeviation  The standard deviation for odometry calculation
-     *                                  in the form [x, y, theta]ᵀ, with units in meters
-     *                                  and radians
-     * @param visionStandardDeviation   The standard deviation for vision calculation
-     *                                  in the form [x, y, theta]ᵀ, with units in meters
-     *                                  and radians
-     * @param modules                    Constants for each specific module
-     */
     public CommandSwerveDrivetrain(
         SwerveDrivetrainConstants drivetrainConstants,
         double odometryUpdateFrequency,
@@ -230,21 +164,35 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         SwerveModuleConstants<?, ?, ?>... modules
     ) {
         super(drivetrainConstants, odometryUpdateFrequency, odometryStandardDeviation, visionStandardDeviation, modules);
-        if (Utils.isSimulation()) {
-            startSimThread();
-        }
+        initSimulation();
         configureAutoBuilder();
+    }
+
+    private void initSimulation() {
+        if (!Utils.isSimulation()) return;
+
+        visionSim = new VisionSystemSim("main");
+        visionSim.addAprilTags(RobotMap.APRILTAG_FIELD_LAYOUT);
+
+        m_camera = new PhotonCamera("camera");
+        SimCameraProperties cameraProp = new SimCameraProperties();
+        cameraProp.setCalibration(640, 480, Rotation2d.fromDegrees(100));
+        cameraProp.setFPS(30);
+
+        Transform3d robotToCam = new Transform3d(new Translation3d(0.5, 0.0, 0.5), new Rotation3d(0, 0, 0));
+        cameraSim = new PhotonCameraSim(m_camera, cameraProp);
+        visionSim.addCamera(cameraSim, robotToCam);
+
+        startSimThread();
     }
 
     private void configureAutoBuilder() {
         try {
             var config = RobotConfig.fromGUISettings();
-            // This wires PathPlanner's generated chassis-speed commands into Phoenix swerve requests.
             AutoBuilder.configure(
-                this::getPose,           // Supplier of current robot pose
-                this::resetPose,         // Consumer for seeding pose against auto
-                () -> getState().Speeds, // Supplier of current robot speeds
-                // Consumer of ChassisSpeeds and feedforwards to drive the robot
+                this::getPose,
+                this::resetPose,
+                () -> getState().Speeds,
                 (speeds, feedforwards) -> setControl(
                     m_pathApplyRobotSpeeds.withSpeeds(speeds)
                         .withWheelForceFeedforwardsX(feedforwards.robotRelativeForcesXNewtons())
@@ -255,23 +203,18 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                     new PIDConstants(5, 0, 0)
                 ),
                 config,
-                // Assume the path needs to be flipped for Red vs Blue, this is normally the case
                 () -> DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red,
-                this // Subsystem for requirements
+                this
             );
         } catch (Exception ex) {
-            // Intentionally left blank.
+            DriverStation.reportError("Failed to load PathPlanner config and configure AutoBuilder", ex.getStackTrace());
         }
     }
 
     /**
      * Returns a command that applies the specified control request to this swerve drivetrain.
-     *
-     * @param request Function returning the request to apply
-     * @return Command to run
      */
     public Command applyRequest(Supplier<SwerveRequest> requestSupplier) {
-        // Wrap a Phoenix control request in a WPILib command so bindings can schedule it directly.
         return run(() -> this.setControl(requestSupplier.get()));
     }
 
@@ -283,26 +226,16 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     }
 
     /**
-     * Basic vision update hook kept in the swerve generated wrapper.
-     *
-     * @param pose vision-estimated robot pose in field coordinates
-     * @param timestampSeconds timestamp in seconds in the current robot-time domain
+     * Adds a vision measurement to the drivetrain pose estimator.
      */
     public void visionUpdate(Pose2d pose, double timestampSeconds) {
         addVisionMeasurement(pose, timestampSeconds);
     }
 
-    /**
-     * Alias kept for call sites that already use this name.
-     */
-    public void applyPoseUpdate(Pose2d pose, double timestampSeconds) {
-        visionUpdate(pose, timestampSeconds);
-    }
-
     public void visionUpdateFromLimelight() {
-        double headingDeg = gyro.getYaw().getValueAsDouble();
-        double yawRate = gyro.getAngularVelocityZWorld().getValueAsDouble();
-        
+        double headingDeg = getPigeon2().getYaw().getValueAsDouble();
+        double yawRate = getPigeon2().getAngularVelocityZWorld().getValueAsDouble();
+
         LimelightHelpers.SetRobotOrientation(RobotMap.LIMELIGHT_NAME, headingDeg, yawRate, 0, 0, 0, 0);
         SmartDashboard.putBoolean("Pose/VisionAccepted", false);
 
@@ -325,25 +258,22 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         double xyStdDev;
 
         if (estimate.tagCount >= 2) {
-            // Multiple tags: high trust
             xyStdDev = 0.3 + (avgDistance * 0.1);
         } else {
-            // Single tag: scale trust down heavily with distance
             if (avgDistance > 4.0) {
                 return; // Reject single tag estimates beyond 4 meters
             }
             xyStdDev = 0.5 + (avgDistance * avgDistance * 0.1);
         }
 
-        // Update estimator standard deviations dynamically for this sample
         setVisionMeasurementStdDevs(VecBuilder.fill(xyStdDev, xyStdDev, Math.toRadians(9999999.0)));
-
         visionUpdate(pose, Utils.fpgaToCurrentTime(estimate.timestampSeconds));
+
         SmartDashboard.putBoolean("Pose/VisionAccepted", true);
         SmartDashboard.putNumber("Pose/VisionX", pose.getX());
         SmartDashboard.putNumber("Pose/VisionY", pose.getY());
         SmartDashboard.putNumber("Pose/VisionHeadingDeg", pose.getRotation().getDegrees());
-}
+    }
 
     private boolean isPoseInFieldBounds(Pose2d pose) {
         final double marginMeters = 0.25;
@@ -379,16 +309,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
     @Override
     public void periodic() {
-        /*
-         * Periodically try to apply the operator perspective.
-         * If we haven't applied the operator perspective before, then we should apply it regardless of DS state.
-         * This allows us to correct the perspective in case the robot code restarts mid-match.
-         * Otherwise, only check and apply the operator perspective if the DS is disabled.
-         * This ensures driving behavior doesn't change until an explicit disable event occurs during testing.
-         */
         if (!m_hasAppliedOperatorPerspective || DriverStation.isDisabled()) {
             DriverStation.getAlliance().ifPresent(allianceColor -> {
-                // Re-apply field-centric forward based on alliance whenever disabled or after a code restart.
                 setOperatorPerspectiveForward(
                     allianceColor == Alliance.Red
                         ? kRedAlliancePerspectiveRotation
@@ -397,116 +319,25 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                 m_hasAppliedOperatorPerspective = true;
             });
         }
+
+        visionUpdateFromLimelight();
+        drivePose.set(getPose());
     }
 
-    //Continuously runs and updates the simulation
     private void startSimThread() {
         m_lastSimTime = Utils.getCurrentTimeSeconds();
 
-        /* Run simulation at a faster rate so PID gains behave more reasonably */
         m_simNotifier = new Notifier(() -> {
             final double currentTime = Utils.getCurrentTimeSeconds();
             double deltaTime = currentTime - m_lastSimTime;
             m_lastSimTime = currentTime;
 
-            /* use the measured time delta, get battery voltage from WPILib */
             updateSimState(deltaTime, RobotController.getBatteryVoltage());
 
-            //Updates PhotonVision with the new pose
             if (visionSim != null) {
                 visionSim.update(getState().Pose);
             }
         });
         m_simNotifier.startPeriodic(kSimLoopPeriod);
     }
-
-
-    /* Telemetry and AdvantageScope data below this line*/
-
-    /* What to publish over networktables for telemetry */
-    private final NetworkTableInstance inst = NetworkTableInstance.getDefault();
-
-    /* Robot swerve drive state */
-    private final NetworkTable driveStateTable = inst.getTable("DriveState");
-    private final StructPublisher<Pose2d> drivePose = driveStateTable.getStructTopic("Pose", Pose2d.struct).publish();
-    private final StructPublisher<ChassisSpeeds> driveSpeeds = driveStateTable.getStructTopic("Speeds", ChassisSpeeds.struct).publish();
-    private final StructArrayPublisher<SwerveModuleState> driveModuleStates = driveStateTable.getStructArrayTopic("ModuleStates", SwerveModuleState.struct).publish();
-    private final StructArrayPublisher<SwerveModuleState> driveModuleTargets = driveStateTable.getStructArrayTopic("ModuleTargets", SwerveModuleState.struct).publish();
-    private final StructArrayPublisher<SwerveModulePosition> driveModulePositions = driveStateTable.getStructArrayTopic("ModulePositions", SwerveModulePosition.struct).publish();
-    private final DoublePublisher driveTimestamp = driveStateTable.getDoubleTopic("Timestamp").publish();
-    private final DoublePublisher driveOdometryFrequency = driveStateTable.getDoubleTopic("OdometryFrequency").publish();
-
-    /* Robot pose for field positioning */
-    private final NetworkTable table = inst.getTable("Pose");
-    private final DoubleArrayPublisher fieldPub = table.getDoubleArrayTopic("robotPose").publish();
-    private final StringPublisher fieldTypePub = table.getStringTopic(".type").publish();
-
-    /* Mechanisms to represent the swerve module states */
-    private final Mechanism2d[] m_moduleMechanisms = new Mechanism2d[] {
-        new Mechanism2d(1, 1),
-        new Mechanism2d(1, 1),
-        new Mechanism2d(1, 1),
-        new Mechanism2d(1, 1),
-    };
-    /* A direction and length changing ligament for speed representation */
-    private final MechanismLigament2d[] m_moduleSpeeds = new MechanismLigament2d[] {
-        m_moduleMechanisms[0].getRoot("RootSpeed", 0.5, 0.5).append(new MechanismLigament2d("Speed", 0.5, 0)),
-        m_moduleMechanisms[1].getRoot("RootSpeed", 0.5, 0.5).append(new MechanismLigament2d("Speed", 0.5, 0)),
-        m_moduleMechanisms[2].getRoot("RootSpeed", 0.5, 0.5).append(new MechanismLigament2d("Speed", 0.5, 0)),
-        m_moduleMechanisms[3].getRoot("RootSpeed", 0.5, 0.5).append(new MechanismLigament2d("Speed", 0.5, 0)),
-    };
-    /* A direction changing and length constant ligament for module direction */
-    private final MechanismLigament2d[] m_moduleDirections = new MechanismLigament2d[] {
-        m_moduleMechanisms[0].getRoot("RootDirection", 0.5, 0.5)
-            .append(new MechanismLigament2d("Direction", 0.1, 0, 0, new Color8Bit(Color.kWhite))),
-        m_moduleMechanisms[1].getRoot("RootDirection", 0.5, 0.5)
-            .append(new MechanismLigament2d("Direction", 0.1, 0, 0, new Color8Bit(Color.kWhite))),
-        m_moduleMechanisms[2].getRoot("RootDirection", 0.5, 0.5)
-            .append(new MechanismLigament2d("Direction", 0.1, 0, 0, new Color8Bit(Color.kWhite))),
-        m_moduleMechanisms[3].getRoot("RootDirection", 0.5, 0.5)
-            .append(new MechanismLigament2d("Direction", 0.1, 0, 0, new Color8Bit(Color.kWhite))),
-    };
-
-    private final double[] m_poseArray = new double[3];
-    private final double[] m_moduleStatesArray = new double[8];
-    private final double[] m_moduleTargetsArray = new double[8];
-
-    /** Accept the swerve drive state and telemeterize it to SmartDashboard. */
-    public void telemeterize(SwerveDriveState state) {
-        /* Telemeterize the swerve drive state */
-        drivePose.set(state.Pose);
-        driveSpeeds.set(state.Speeds);
-        driveModuleStates.set(state.ModuleStates);
-        driveModuleTargets.set(state.ModuleTargets);
-        driveModulePositions.set(state.ModulePositions);
-        driveTimestamp.set(state.Timestamp);
-        driveOdometryFrequency.set(1.0 / state.OdometryPeriod);
-
-        m_poseArray[0] = state.Pose.getX();
-        m_poseArray[1] = state.Pose.getY();
-        m_poseArray[2] = state.Pose.getRotation().getDegrees();
-        for (int i = 0; i < 4; ++i) {
-            m_moduleStatesArray[i*2 + 0] = state.ModuleStates[i].angle.getRadians();
-            m_moduleStatesArray[i*2 + 1] = state.ModuleStates[i].speedMetersPerSecond;
-            m_moduleTargetsArray[i*2 + 0] = state.ModuleTargets[i].angle.getRadians();
-            m_moduleTargetsArray[i*2 + 1] = state.ModuleTargets[i].speedMetersPerSecond;
-        }
-
-        /* Telemeterize the pose to a Field2d */
-        fieldTypePub.set("Field2d");
-        fieldPub.set(m_poseArray);
-
-        /* Telemeterize the module states to Mechanism2d */
-        for (int i = 0; i < 4; ++i) {
-            m_moduleSpeeds[i].setAngle(state.ModuleStates[i].angle);
-            m_moduleDirections[i].setAngle(state.ModuleStates[i].angle);
-            double MaxSpeed = 1.0 * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond);
-            m_moduleSpeeds[i].setLength(state.ModuleStates[i].speedMetersPerSecond / (2 * MaxSpeed));
-        }
-    }
-
-    
-
-
-
 }

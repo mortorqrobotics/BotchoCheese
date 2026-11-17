@@ -32,9 +32,6 @@ public class RobotMap {
     1.8679160000000001, 1.8679160000000001, /*ID: 14 - 15*/
     1.30175, /*ID: 16*/
     0.308102, 0.308102, 0.308102, 0.308102, 0.308102, 0.308102 /*ID: 17 - 22*/};
-
-    // Device ID for the pigeon used by the drivetrain.
-    public static final int PIGEON_ID = 30;
     
     // Intake motor controller CAN ID.
     public static final int INTAKE_MOTOR_ID = 22;
