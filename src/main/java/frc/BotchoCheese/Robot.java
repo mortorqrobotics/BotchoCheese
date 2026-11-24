@@ -205,9 +205,9 @@ public void disabledInit() {
     setSwerveNeutralMode(NeutralModeValue.Brake);
     m_robotContainer.pivot.enableBrakeMode();
     setLimelightThrottle(LIMELIGHT_ENABLED_THROTTLE);
-    m_robotContainer.seedPoseFromSelectedAuto();
+    // m_robotContainer.seedPoseFromSelectedAuto();
 
-    m_autonomousCommand = m_robotContainer.getAutonomousCommand();
+    // m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
     if (m_autonomousCommand != null) {
       CommandScheduler.getInstance().schedule(m_autonomousCommand);

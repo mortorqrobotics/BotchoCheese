@@ -11,10 +11,6 @@ import static edu.wpi.first.units.Units.RotationsPerSecond;
 import com.ctre.phoenix6.hardware.Pigeon2;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
-import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.auto.NamedCommands;
-import com.pathplanner.lib.commands.PathPlannerAuto;
-import com.pathplanner.lib.util.FlippingUtil;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.VecBuilder;
@@ -88,82 +84,15 @@ public class RobotContainer {
         .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
 
     // Auto selection
-    private final SendableChooser<Command> autoChooser;
+    // private final SendableChooser<Command> autoChooser;
 
     public RobotContainer() {
-        registerNamedCommands();
+        // registerNamedCommands();
 
-        autoChooser = AutoBuilder.buildAutoChooser();
-        configureAutoChooser();
 
         configureBindings();
     }
 
-    private void registerNamedCommands() {
-        final double pivotDownSeconds = 0.6; // tune this "X seconds" value
-        final double firstShotPivotDownSeconds = 0.3;
-        final double travelPivotDownSeconds = 0.6;
-        final double autoIntakeSecondsAfterPivotDown = 5.0;
-
-        // These names must match the event markers referenced by PathPlanner autos.
-        NamedCommands.registerCommand(
-            "Shoot",
-            Commands.sequence(
-                shooter.shootRps(90.0).withTimeout(SHOOTER_SPINUP_TIMEOUT_SECONDS),
-                Commands.parallel(
-                    shooter.shootRps(90.0),
-                    intake.runIntake(SHOOT_INTAKE_DUTY),
-                    indexer.runIndexer(SHOOT_INDEXER_DUTY),
-                    feeder.runFeeder(SHOOT_FEEDER_DUTY)
-                )
-            ).withTimeout(3.0)
-        );
-        NamedCommands.registerCommand(
-            "ShootFirstWithPivotDown",
-            Commands.deadline(
-                Commands.sequence(
-                    shooter.shootRps(90.0).withTimeout(SHOOTER_SPINUP_TIMEOUT_SECONDS),
-                    Commands.parallel(
-                        shooter.shootRps(90.0),
-                        intake.runIntake(SHOOT_INTAKE_DUTY),
-                        indexer.runIndexer(SHOOT_INDEXER_DUTY),
-                        feeder.runFeeder(SHOOT_FEEDER_DUTY)
-                    )
-                ).withTimeout(3.0),
-                pivot.pivotDown().withTimeout(firstShotPivotDownSeconds)
-            )
-        );
-
-        Command pivotDownAndRun = Commands.sequence(
-            pivot.pivotDown().withTimeout(pivotDownSeconds),
-            Commands.parallel(
-                intake.runIntake(INTAKE_ASSIST_INTAKE_DUTY),
-                indexer.runIndexer(INTAKE_ASSIST_INDEXER_DUTY),
-                feeder.runFeeder(INTAKE_ASSIST_FEEDER_DUTY),
-                shooter.shootRps(0.0, -25.0)
-            ).withTimeout(autoIntakeSecondsAfterPivotDown)
-        );
-        NamedCommands.registerCommand("PivotDownAndRun", pivotDownAndRun);
-        NamedCommands.registerCommand("PivotDownOnly", pivot.pivotDown().withTimeout(pivotDownSeconds));
-        NamedCommands.registerCommand("PivotDownOnlyShort", pivot.pivotDown().withTimeout(travelPivotDownSeconds));
-        // Keep legacy name mapped to the new behavior so existing autos still work.
-        NamedCommands.registerCommand("PivotDown", pivotDownAndRun);
-        
-        NamedCommands.registerCommand(
-            "Intake",
-            Commands.parallel(
-                intake.runIntake(INTAKE_ASSIST_INTAKE_DUTY),
-                indexer.runIndexer(INTAKE_ASSIST_INDEXER_DUTY),
-                feeder.runFeeder(INTAKE_ASSIST_FEEDER_DUTY),
-                shooter.shootRps(0.0, -25.0)
-            )
-        );
-    }
-
-    private void configureAutoChooser() {
-        // Publish chooser so SmartDashboard/Elastic can select the autonomous routine.
-        SmartDashboard.putData(AUTO_CHOOSER_KEY, autoChooser);
-    }
 
     private static double applyDriveDeadband(double value) {
         return MathUtil.applyDeadband(value, DRIVE_DEADBAND);
@@ -287,48 +216,6 @@ public class RobotContainer {
         );
     }
 
-    public Command getAutonomousCommand() {
-        Command selectedAuto = autoChooser.getSelected();
-        if (!isAutoSelected(selectedAuto)) {
-            return Commands.none();
-        }
-        try {
-            return selectedAuto;
-        } catch (Exception ex) {
-            return Commands.none();
-        }
-    }
-
-    public void updateAutoSelectionDashboard() {
-        // Intentionally left blank.
-    }
-
-    public boolean seedPoseFromSelectedAuto() {
-        Command selectedAuto = autoChooser.getSelected();
-        if (!isAutoSelected(selectedAuto)) {
-            return false;
-        }
-
-        try {
-            // Use the auto's declared starting pose so odometry matches the selected routine.
-            PathPlannerAuto auto = (PathPlannerAuto) selectedAuto;
-            Pose2d bluePose = auto.getStartingPose();
-            if (bluePose == null) {
-                return false;
-            }
-
-            // PathPlanner start poses are stored from the blue-side perspective and flipped when needed.
-            Pose2d alliancePose = AutoBuilder.shouldFlip() ? FlippingUtil.flipFieldPose(bluePose) : bluePose;
-            drivetrain.resetPose(alliancePose);
-            return true;
-        } catch (Exception ex) {
-            return false;
-        }
-    }
-
-    private boolean isAutoSelected(Command selectedAuto) {
-        return selectedAuto instanceof PathPlannerAuto;
-    }
 
     public static CommandSwerveDrivetrain createDrivetrain() {
         // These standard deviations configure how much the drivetrain estimator trusts odometry vs vision.
